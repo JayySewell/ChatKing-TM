@@ -186,7 +186,7 @@ export class CKStorageExtended {
 
   async deleteApiKey(userId: string, service: string): Promise<boolean> {
     try {
-      return ckStorage.delete(`users/${userId}/api-keys`, service);
+      return await this.delete(`users/${userId}/api-keys`, service);
     } catch (error) {
       console.error('Failed to delete API key:', error);
       return false;
