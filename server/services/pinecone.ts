@@ -141,6 +141,43 @@ export class PineconeService {
     }
   }
 
+  async createDefaultIndexes(): Promise<PineconeIndex[]> {
+    const defaultIndexes = [
+      {
+        name: productionConfig.pinecone.indexName,
+        dimension: 768,
+        metric: "cosine" as const,
+        vectorCount: 0,
+      },
+      {
+        name: "chatking-conversations",
+        dimension: 384,
+        metric: "cosine" as const,
+        vectorCount: 0,
+      },
+      {
+        name: "chatking-documents",
+        dimension: 1536,
+        metric: "cosine" as const,
+        vectorCount: 0,
+      }
+    ];
+
+    const createdIndexes: PineconeIndex[] = [];
+
+    for (const index of defaultIndexes) {
+      console.log(`Creating index: ${index.name} (${index.dimension}D, ${index.metric})`);
+      const created = await this.createIndex(index.name, index.dimension, index.metric);
+      if (created) {
+        createdIndexes.push(index);
+        // Wait a bit between creations to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    return createdIndexes;
+  }
+
   async deleteIndex(name: string): Promise<boolean> {
     try {
       await this.makeRequest(`${this.baseUrl}/databases/${name}`, {
