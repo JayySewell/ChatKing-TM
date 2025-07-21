@@ -87,10 +87,10 @@ export class CKStorage {
 
   private encrypt(data: string): string {
     try {
-      const algorithm = 'aes-256-gcm';
+      const algorithm = 'aes-256-cbc';
       const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
       const iv = crypto.randomBytes(16);
-      const cipher = crypto.createCipher(algorithm, key);
+      const cipher = crypto.createCipheriv(algorithm, key, iv);
 
       let encrypted = cipher.update(data, 'utf8', 'hex');
       encrypted += cipher.final('hex');
@@ -111,11 +111,11 @@ export class CKStorage {
       }
 
       const [ivHex, encrypted] = encryptedData.split(':');
-      const algorithm = 'aes-256-gcm';
+      const algorithm = 'aes-256-cbc';
       const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
       const iv = Buffer.from(ivHex, 'hex');
 
-      const decipher = crypto.createDecipher(algorithm, key);
+      const decipher = crypto.createDecipheriv(algorithm, key, iv);
       let decrypted = decipher.update(encrypted, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
 
