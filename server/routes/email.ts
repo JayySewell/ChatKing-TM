@@ -29,7 +29,7 @@ interface TestEmailRequest {
 }
 
 interface UpdateEmailConfigRequest {
-  provider: 'smtp' | 'sendgrid' | 'mailgun' | 'resend' | 'gmail' | 'outlook';
+  provider: "smtp" | "sendgrid" | "mailgun" | "resend" | "gmail" | "outlook";
   host?: string;
   port?: number;
   secure?: boolean;
@@ -55,7 +55,11 @@ export const handleSendVerificationEmail: RequestHandler = async (req, res) => {
     const token = await emailService.generateVerificationToken(email);
 
     // Send verification email
-    const result = await emailService.sendVerificationEmail(email, token, userName);
+    const result = await emailService.sendVerificationEmail(
+      email,
+      token,
+      userName,
+    );
 
     if (result.success) {
       res.json({
@@ -223,7 +227,11 @@ export const handleSendSecurityAlert: RequestHandler = async (req, res) => {
       });
     }
 
-    const result = await emailService.sendSecurityAlert(email, alertType, details);
+    const result = await emailService.sendSecurityAlert(
+      email,
+      alertType,
+      details,
+    );
 
     if (result.success) {
       res.json({
@@ -360,19 +368,34 @@ export const handleTestEmailConfig: RequestHandler = async (req, res) => {
 };
 
 // Public routes (no authentication required)
-router.post('/send-verification', handleSendVerificationEmail);
-router.post('/verify', handleVerifyEmail);
-router.post('/send-password-reset', handleSendPasswordReset);
-router.post('/reset-password', handleResetPassword);
+router.post("/send-verification", handleSendVerificationEmail);
+router.post("/verify", handleVerifyEmail);
+router.post("/send-password-reset", handleSendPasswordReset);
+router.post("/reset-password", handleResetPassword);
 
 // Protected routes (authentication required)
-router.post('/send-welcome', authMiddleware, handleSendWelcomeEmail);
-router.post('/send-security-alert', authMiddleware, handleSendSecurityAlert);
-router.post('/test', authMiddleware, handleTestEmail);
+router.post("/send-welcome", authMiddleware, handleSendWelcomeEmail);
+router.post("/send-security-alert", authMiddleware, handleSendSecurityAlert);
+router.post("/test", authMiddleware, handleTestEmail);
 
 // Admin routes (owner only)
-router.get('/config', authMiddleware, ownerOnlyMiddleware, handleGetEmailConfig);
-router.put('/config', authMiddleware, ownerOnlyMiddleware, handleUpdateEmailConfig);
-router.post('/test-config', authMiddleware, ownerOnlyMiddleware, handleTestEmailConfig);
+router.get(
+  "/config",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleGetEmailConfig,
+);
+router.put(
+  "/config",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleUpdateEmailConfig,
+);
+router.post(
+  "/test-config",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleTestEmailConfig,
+);
 
 export default router;

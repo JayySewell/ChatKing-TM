@@ -21,7 +21,7 @@ interface EnhancedUserProfile {
 }
 
 interface UserPreferences {
-  theme: 'dark' | 'light' | 'auto';
+  theme: "dark" | "light" | "auto";
   language: string;
   aiModel: string;
   searchEngine: string;
@@ -67,7 +67,7 @@ export class EnhancedAuthService {
 
   async createOwnerAccount(): Promise<EnhancedUserProfile> {
     const ownerEmail = "Jayy.Sewell@chatkingai.com";
-    
+
     // Check if owner account already exists
     const existingOwner = await authService.getUserByEmail(ownerEmail);
     if (existingOwner) {
@@ -93,7 +93,7 @@ export class EnhancedAuthService {
       email: ownerEmail,
       username: "Jayy Sewell",
       firstName: "Jayy",
-      lastName: "Sewell", 
+      lastName: "Sewell",
       bio: "Founder & CEO of ChatKing AI - Building the future of AI-powered conversations and tools.",
       profileImage: "/images/jayy-sewell-profile.jpg",
       isOwner: true,
@@ -103,10 +103,10 @@ export class EnhancedAuthService {
       createdAt: new Date(),
       lastLogin: new Date(),
       preferences: {
-        theme: 'dark',
-        language: 'en',
-        aiModel: 'google/gemma-2-9b-it:free',
-        searchEngine: 'brave',
+        theme: "dark",
+        language: "en",
+        aiModel: "google/gemma-2-9b-it:free",
+        searchEngine: "brave",
         contentFilter: false, // Owner can see all content
         ageVerified: true,
         notifications: {
@@ -153,10 +153,10 @@ export class EnhancedAuthService {
       createdAt: basicUser.createdAt,
       lastLogin: basicUser.lastLogin || new Date(),
       preferences: {
-        theme: 'dark',
-        language: 'en',
-        aiModel: 'google/gemma-2-9b-it:free',
-        searchEngine: 'brave',
+        theme: "dark",
+        language: "en",
+        aiModel: "google/gemma-2-9b-it:free",
+        searchEngine: "brave",
         contentFilter: true,
         ageVerified: false,
         notifications: {
@@ -169,7 +169,8 @@ export class EnhancedAuthService {
         totalChats: 0,
         totalSearches: 0,
         totalCalculations: 0,
-        joinedAt: basicUser.createdAt?.toISOString() || new Date().toISOString(),
+        joinedAt:
+          basicUser.createdAt?.toISOString() || new Date().toISOString(),
         lastActive: new Date().toISOString(),
         strikes: 0,
         reputation: 100, // Default reputation
@@ -185,18 +186,24 @@ export class EnhancedAuthService {
     await ckStorage.writeFile(filePath, profile, { encrypt: true });
   }
 
-  async getEnhancedProfile(userId: string): Promise<EnhancedUserProfile | null> {
+  async getEnhancedProfile(
+    userId: string,
+  ): Promise<EnhancedUserProfile | null> {
     try {
       const filePath = `enhanced-profiles/${userId}.json`;
-      return await ckStorage.readFile<EnhancedUserProfile>(filePath, { encrypt: true });
+      return await ckStorage.readFile<EnhancedUserProfile>(filePath, {
+        encrypt: true,
+      });
     } catch (error) {
       return null;
     }
   }
 
-
-
-  async createSession(userId: string, ipAddress: string, userAgent: string): Promise<string> {
+  async createSession(
+    userId: string,
+    ipAddress: string,
+    userAgent: string,
+  ): Promise<string> {
     const sessionId = crypto.randomUUID();
     const sessionData: SessionData = {
       userId,
@@ -224,10 +231,14 @@ export class EnhancedAuthService {
     return sessionId;
   }
 
-  async validateSession(sessionId: string): Promise<{ valid: boolean; user?: EnhancedUserProfile }> {
+  async validateSession(
+    sessionId: string,
+  ): Promise<{ valid: boolean; user?: EnhancedUserProfile }> {
     try {
       const filePath = `sessions/${sessionId}.json`;
-      const session = await ckStorage.readFile<SessionData>(filePath, { encrypt: true });
+      const session = await ckStorage.readFile<SessionData>(filePath, {
+        encrypt: true,
+      });
 
       if (!session) {
         return { valid: false };
@@ -264,13 +275,19 @@ export class EnhancedAuthService {
     }
   }
 
-  async linkGoogleWorkspace(userId: string, googleWorkspaceId: string, accessToken: string): Promise<boolean> {
+  async linkGoogleWorkspace(
+    userId: string,
+    googleWorkspaceId: string,
+    accessToken: string,
+  ): Promise<boolean> {
     const profile = await this.getEnhancedProfile(userId);
     if (!profile) return false;
 
     // Verify the Google Workspace domain
     if (!profile.email.endsWith("@chatkingai.com")) {
-      throw new Error("Only @chatkingai.com domain emails can link Google Workspace");
+      throw new Error(
+        "Only @chatkingai.com domain emails can link Google Workspace",
+      );
     }
 
     profile.googleWorkspaceId = googleWorkspaceId;
@@ -283,7 +300,7 @@ export class EnhancedAuthService {
       accessToken: this.encryptToken(accessToken),
       linkedAt: new Date().toISOString(),
     };
-    
+
     const filePath = `google-tokens/${userId}.json`;
     await ckStorage.writeFile(filePath, tokenData, { encrypt: true });
 
@@ -295,7 +312,7 @@ export class EnhancedAuthService {
     if (!profile) return false;
 
     const age = this.calculateAge(birthDate);
-    
+
     if (age >= 18) {
       profile.preferences.ageVerified = true;
       await this.saveEnhancedProfile(profile);
@@ -310,7 +327,7 @@ export class EnhancedAuthService {
     if (!profile) return 0;
 
     profile.stats.strikes++;
-    
+
     // Log the strike
     await ckStorage.logAnalytics("user_strike", {
       userId,
@@ -333,18 +350,21 @@ export class EnhancedAuthService {
     return profile.stats.strikes;
   }
 
-  async updateStats(userId: string, action: 'chat' | 'search' | 'calculation'): Promise<void> {
+  async updateStats(
+    userId: string,
+    action: "chat" | "search" | "calculation",
+  ): Promise<void> {
     const profile = await this.getEnhancedProfile(userId);
     if (!profile) return;
 
     switch (action) {
-      case 'chat':
+      case "chat":
         profile.stats.totalChats++;
         break;
-      case 'search':
+      case "search":
         profile.stats.totalSearches++;
         break;
-      case 'calculation':
+      case "calculation":
         profile.stats.totalCalculations++;
         break;
     }
@@ -354,22 +374,22 @@ export class EnhancedAuthService {
   }
 
   private encryptToken(token: string): string {
-    const key = crypto.createHash('sha256').update(this.jwtSecret).digest();
+    const key = crypto.createHash("sha256").update(this.jwtSecret).digest();
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(token, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+    let encrypted = cipher.update(token, "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return iv.toString("hex") + ":" + encrypted;
   }
 
   private decryptToken(encryptedToken: string): string {
-    const key = crypto.createHash('sha256').update(this.jwtSecret).digest();
-    const textParts = encryptedToken.split(':');
-    const iv = Buffer.from(textParts.shift()!, 'hex');
-    const encrypted = textParts.join(':');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    const key = crypto.createHash("sha256").update(this.jwtSecret).digest();
+    const textParts = encryptedToken.split(":");
+    const iv = Buffer.from(textParts.shift()!, "hex");
+    const encrypted = textParts.join(":");
+    const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
     return decrypted;
   }
 
@@ -378,14 +398,20 @@ export class EnhancedAuthService {
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
 
     return age;
   }
 
-  async updateProfileImage(userId: string, imageUrl: string | null): Promise<boolean> {
+  async updateProfileImage(
+    userId: string,
+    imageUrl: string | null,
+  ): Promise<boolean> {
     try {
       const profile = await this.getEnhancedProfile(userId);
       if (!profile) {
@@ -400,18 +426,21 @@ export class EnhancedAuthService {
       await this.saveEnhancedProfile(updatedProfile);
       return true;
     } catch (error) {
-      console.error('Failed to update profile image:', error);
+      console.error("Failed to update profile image:", error);
       return false;
     }
   }
 
-  async updateProfile(userId: string, updates: {
-    firstName?: string;
-    lastName?: string;
-    username?: string;
-    bio?: string;
-    preferences?: Partial<UserPreferences>;
-  }): Promise<boolean> {
+  async updateProfile(
+    userId: string,
+    updates: {
+      firstName?: string;
+      lastName?: string;
+      username?: string;
+      bio?: string;
+      preferences?: Partial<UserPreferences>;
+    },
+  ): Promise<boolean> {
     try {
       const profile = await this.getEnhancedProfile(userId);
       if (!profile) {
@@ -420,20 +449,27 @@ export class EnhancedAuthService {
 
       const updatedProfile: EnhancedUserProfile = {
         ...profile,
-        firstName: updates.firstName !== undefined ? updates.firstName : profile.firstName,
-        lastName: updates.lastName !== undefined ? updates.lastName : profile.lastName,
-        username: updates.username !== undefined ? updates.username : profile.username,
+        firstName:
+          updates.firstName !== undefined
+            ? updates.firstName
+            : profile.firstName,
+        lastName:
+          updates.lastName !== undefined ? updates.lastName : profile.lastName,
+        username:
+          updates.username !== undefined ? updates.username : profile.username,
         bio: updates.bio !== undefined ? updates.bio : profile.bio,
-        preferences: updates.preferences ? {
-          ...profile.preferences,
-          ...updates.preferences,
-        } : profile.preferences,
+        preferences: updates.preferences
+          ? {
+              ...profile.preferences,
+              ...updates.preferences,
+            }
+          : profile.preferences,
       };
 
       await this.saveEnhancedProfile(updatedProfile);
       return true;
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error("Failed to update profile:", error);
       return false;
     }
   }
@@ -443,12 +479,15 @@ export class EnhancedAuthService {
       const profile = await this.getEnhancedProfile(userId);
       return profile?.preferences || null;
     } catch (error) {
-      console.error('Failed to get user settings:', error);
+      console.error("Failed to get user settings:", error);
       return null;
     }
   }
 
-  async updateUserSettings(userId: string, preferences: Partial<UserPreferences>): Promise<boolean> {
+  async updateUserSettings(
+    userId: string,
+    preferences: Partial<UserPreferences>,
+  ): Promise<boolean> {
     return this.updateProfile(userId, { preferences });
   }
 
@@ -457,7 +496,7 @@ export class EnhancedAuthService {
       const profile = await this.getEnhancedProfile(userId);
       return profile?.stats || null;
     } catch (error) {
-      console.error('Failed to get profile stats:', error);
+      console.error("Failed to get profile stats:", error);
       return null;
     }
   }

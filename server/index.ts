@@ -121,8 +121,8 @@ export function createServer() {
 
   // Standard middleware
   app.use(cors());
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(sessionMiddleware);
 
   // Initialize services
@@ -175,7 +175,10 @@ export function createServer() {
   app.post("/api/pinecone-enhanced/knowledge", handleAddKnowledge);
   app.post("/api/pinecone-enhanced/memory", handleConversationMemory);
   app.post("/api/pinecone-enhanced/conversations", handleSearchConversations);
-  app.get("/api/pinecone-enhanced/stats/:indexName", handleGetEnhancedIndexStats);
+  app.get(
+    "/api/pinecone-enhanced/stats/:indexName",
+    handleGetEnhancedIndexStats,
+  );
   app.post("/api/pinecone-enhanced/indexes", handleCreateEnhancedIndex);
 
   // Authentication API routes

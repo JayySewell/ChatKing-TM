@@ -7,7 +7,7 @@ const router = Router();
 export const handleGetSystemHealth: RequestHandler = async (req, res) => {
   try {
     const health = await systemHealthService.getSystemHealth();
-    
+
     res.json({
       ...health,
       timestamp: new Date().toISOString(),
@@ -35,7 +35,7 @@ export const handleGetSystemHealth: RequestHandler = async (req, res) => {
 export const handleGetDependencyStatus: RequestHandler = async (req, res) => {
   try {
     const dependencies = await systemHealthService.getDependencyStatus();
-    
+
     res.json({
       dependencies,
       timestamp: new Date().toISOString(),
@@ -51,7 +51,7 @@ export const handleGetDependencyStatus: RequestHandler = async (req, res) => {
 export const handleGetHealthReport: RequestHandler = async (req, res) => {
   try {
     const report = await systemHealthService.generateHealthReport();
-    
+
     res.json({
       ...report,
       generatedAt: new Date().toISOString(),
@@ -95,7 +95,7 @@ export const handleGetSystemInfo: RequestHandler = async (req, res) => {
         current: new Date().toISOString(),
       },
     };
-    
+
     res.json(info);
   } catch (error) {
     console.error("Get System Info Error:", error);
@@ -109,18 +109,18 @@ export const handleGetServiceStatus: RequestHandler = async (req, res) => {
   try {
     const { service } = req.params;
     const health = await systemHealthService.getSystemHealth();
-    
-    const serviceStatus = health.services.find(s => 
-      s.name.toLowerCase() === service.toLowerCase()
+
+    const serviceStatus = health.services.find(
+      (s) => s.name.toLowerCase() === service.toLowerCase(),
     );
-    
+
     if (!serviceStatus) {
       return res.status(404).json({
         error: "Service not found",
-        availableServices: health.services.map(s => s.name.toLowerCase()),
+        availableServices: health.services.map((s) => s.name.toLowerCase()),
       });
     }
-    
+
     res.json({
       service: serviceStatus,
       timestamp: new Date().toISOString(),
@@ -136,10 +136,10 @@ export const handleGetServiceStatus: RequestHandler = async (req, res) => {
 export const handleRestartService: RequestHandler = async (req, res) => {
   try {
     const { service } = req.params;
-    
+
     // In a real implementation, you'd have service restart logic here
     console.log(`Service restart requested: ${service}`);
-    
+
     res.json({
       success: true,
       message: `Service ${service} restart initiated`,
@@ -155,8 +155,8 @@ export const handleRestartService: RequestHandler = async (req, res) => {
 
 export const handleGetMetrics: RequestHandler = async (req, res) => {
   try {
-    const { timespan = '1h' } = req.query;
-    
+    const { timespan = "1h" } = req.query;
+
     // In a real implementation, you'd fetch historical metrics
     const metrics = {
       timespan,
@@ -187,7 +187,7 @@ export const handleGetMetrics: RequestHandler = async (req, res) => {
       },
       generatedAt: new Date().toISOString(),
     };
-    
+
     res.json(metrics);
   } catch (error) {
     console.error("Get Metrics Error:", error);
@@ -198,16 +198,36 @@ export const handleGetMetrics: RequestHandler = async (req, res) => {
 };
 
 // Public health check endpoint (no authentication required)
-router.get('/health', handleGetSystemHealth);
-router.get('/info', handleGetSystemInfo);
+router.get("/health", handleGetSystemHealth);
+router.get("/info", handleGetSystemInfo);
 
 // Protected endpoints (authentication required)
-router.get('/dependencies', authMiddleware, ownerOnlyMiddleware, handleGetDependencyStatus);
-router.get('/report', authMiddleware, ownerOnlyMiddleware, handleGetHealthReport);
-router.get('/service/:service', authMiddleware, ownerOnlyMiddleware, handleGetServiceStatus);
-router.get('/metrics', authMiddleware, ownerOnlyMiddleware, handleGetMetrics);
+router.get(
+  "/dependencies",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleGetDependencyStatus,
+);
+router.get(
+  "/report",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleGetHealthReport,
+);
+router.get(
+  "/service/:service",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleGetServiceStatus,
+);
+router.get("/metrics", authMiddleware, ownerOnlyMiddleware, handleGetMetrics);
 
 // Admin endpoints (owner only)
-router.post('/service/:service/restart', authMiddleware, ownerOnlyMiddleware, handleRestartService);
+router.post(
+  "/service/:service/restart",
+  authMiddleware,
+  ownerOnlyMiddleware,
+  handleRestartService,
+);
 
 export default router;

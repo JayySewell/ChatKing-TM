@@ -8,7 +8,7 @@ import { authService } from "./auth";
 
 interface ServiceStatus {
   name: string;
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
   responseTime?: number;
   error?: string;
   lastChecked: string;
@@ -16,7 +16,7 @@ interface ServiceStatus {
 }
 
 interface SystemHealth {
-  overall: 'healthy' | 'degraded' | 'unhealthy';
+  overall: "healthy" | "degraded" | "unhealthy";
   services: ServiceStatus[];
   uptime: number;
   version: string;
@@ -39,7 +39,7 @@ export class SystemHealthService {
     this.lastHealthCheck = new Date();
     this.healthCheckInterval = 5 * 60 * 1000; // 5 minutes
     this.services = new Map();
-    
+
     // Start periodic health checks
     this.startHealthChecks();
   }
@@ -75,14 +75,25 @@ export class SystemHealthService {
     const services: ServiceStatus[] = [];
 
     results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
+      if (result.status === "fulfilled") {
         services.push(result.value);
       } else {
-        const serviceNames = ['Pinecone', 'OpenRouter', 'BraveSearch', 'Email', 'Auth', 'Storage', 'Security'];
+        const serviceNames = [
+          "Pinecone",
+          "OpenRouter",
+          "BraveSearch",
+          "Email",
+          "Auth",
+          "Storage",
+          "Security",
+        ];
         services.push({
-          name: serviceNames[index] || 'Unknown',
-          status: 'unhealthy',
-          error: result.reason instanceof Error ? result.reason.message : 'Health check failed',
+          name: serviceNames[index] || "Unknown",
+          status: "unhealthy",
+          error:
+            result.reason instanceof Error
+              ? result.reason.message
+              : "Health check failed",
           lastChecked: new Date().toISOString(),
         });
       }
@@ -96,10 +107,10 @@ export class SystemHealthService {
     try {
       const result = await pineconeService.testConnection();
       const responseTime = Date.now() - startTime;
-      
+
       return {
-        name: 'Pinecone',
-        status: result.connected ? 'healthy' : 'unhealthy',
+        name: "Pinecone",
+        status: result.connected ? "healthy" : "unhealthy",
         responseTime,
         error: result.error,
         lastChecked: new Date().toISOString(),
@@ -110,10 +121,10 @@ export class SystemHealthService {
       };
     } catch (error) {
       return {
-        name: 'Pinecone',
-        status: 'unhealthy',
+        name: "Pinecone",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -125,10 +136,10 @@ export class SystemHealthService {
       const result = await openRouterService.testConnection();
       const responseTime = Date.now() - startTime;
       const stats = openRouterService.getUsageStats();
-      
+
       return {
-        name: 'OpenRouter',
-        status: result.connected ? 'healthy' : 'unhealthy',
+        name: "OpenRouter",
+        status: result.connected ? "healthy" : "unhealthy",
         responseTime,
         error: result.error,
         lastChecked: new Date().toISOString(),
@@ -141,10 +152,10 @@ export class SystemHealthService {
       };
     } catch (error) {
       return {
-        name: 'OpenRouter',
-        status: 'unhealthy',
+        name: "OpenRouter",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -156,10 +167,10 @@ export class SystemHealthService {
       const result = await braveSearchService.testConnection();
       const responseTime = Date.now() - startTime;
       const stats = await braveSearchService.getSearchStats();
-      
+
       return {
-        name: 'BraveSearch',
-        status: result.connected ? 'healthy' : 'unhealthy',
+        name: "BraveSearch",
+        status: result.connected ? "healthy" : "unhealthy",
         responseTime,
         error: result.error,
         lastChecked: new Date().toISOString(),
@@ -171,10 +182,10 @@ export class SystemHealthService {
       };
     } catch (error) {
       return {
-        name: 'BraveSearch',
-        status: 'unhealthy',
+        name: "BraveSearch",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -186,10 +197,10 @@ export class SystemHealthService {
       const result = await emailService.testEmailConfig();
       const responseTime = Date.now() - startTime;
       const config = emailService.getConfig();
-      
+
       return {
-        name: 'Email',
-        status: result.success ? 'healthy' : 'degraded',
+        name: "Email",
+        status: result.success ? "healthy" : "degraded",
         responseTime,
         error: result.error,
         lastChecked: new Date().toISOString(),
@@ -200,10 +211,10 @@ export class SystemHealthService {
       };
     } catch (error) {
       return {
-        name: 'Email',
-        status: 'unhealthy',
+        name: "Email",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -213,12 +224,14 @@ export class SystemHealthService {
     const startTime = Date.now();
     try {
       // Test auth service by checking if owner exists
-      const ownerExists = await authService.getUserByEmail('jayysewell18@gmail.com');
+      const ownerExists = await authService.getUserByEmail(
+        "jayysewell18@gmail.com",
+      );
       const responseTime = Date.now() - startTime;
-      
+
       return {
-        name: 'Authentication',
-        status: ownerExists ? 'healthy' : 'degraded',
+        name: "Authentication",
+        status: ownerExists ? "healthy" : "degraded",
         responseTime,
         lastChecked: new Date().toISOString(),
         details: {
@@ -227,10 +240,10 @@ export class SystemHealthService {
       };
     } catch (error) {
       return {
-        name: 'Authentication',
-        status: 'unhealthy',
+        name: "Authentication",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -240,31 +253,31 @@ export class SystemHealthService {
     const startTime = Date.now();
     try {
       // Test storage by performing a simple operation
-      const testId = 'health-check';
+      const testId = "health-check";
       const testData = { test: true, timestamp: new Date().toISOString() };
-      
+
       // This would use your CK-Storage system
       // await ckStorage.store('health-check', testId, testData);
       // await ckStorage.get('health-check', testId);
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
-        name: 'Storage',
-        status: 'healthy',
+        name: "Storage",
+        status: "healthy",
         responseTime,
         lastChecked: new Date().toISOString(),
         details: {
-          type: 'CK-Storage',
+          type: "CK-Storage",
           encrypted: true,
         },
       };
     } catch (error) {
       return {
-        name: 'Storage',
-        status: 'unhealthy',
+        name: "Storage",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
@@ -275,43 +288,51 @@ export class SystemHealthService {
     try {
       const stats = await securityService.getSecurityStats();
       const responseTime = Date.now() - startTime;
-      
+
       return {
-        name: 'Security',
-        status: 'healthy',
+        name: "Security",
+        status: "healthy",
         responseTime,
         lastChecked: new Date().toISOString(),
         details: {
           totalEvents: stats.totalEvents,
           blockedIps: stats.blockedIps,
-          activeThreats: stats.recentEvents.filter(e => 
-            new Date(e.timestamp).getTime() > Date.now() - 24 * 60 * 60 * 1000
+          activeThreats: stats.recentEvents.filter(
+            (e) =>
+              new Date(e.timestamp).getTime() >
+              Date.now() - 24 * 60 * 60 * 1000,
           ).length,
         },
       };
     } catch (error) {
       return {
-        name: 'Security',
-        status: 'unhealthy',
+        name: "Security",
+        status: "unhealthy",
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         lastChecked: new Date().toISOString(),
       };
     }
   }
 
-  private calculateOverallHealth(services: ServiceStatus[]): 'healthy' | 'degraded' | 'unhealthy' {
-    const healthyCount = services.filter(s => s.status === 'healthy').length;
-    const degradedCount = services.filter(s => s.status === 'degraded').length;
-    const unhealthyCount = services.filter(s => s.status === 'unhealthy').length;
+  private calculateOverallHealth(
+    services: ServiceStatus[],
+  ): "healthy" | "degraded" | "unhealthy" {
+    const healthyCount = services.filter((s) => s.status === "healthy").length;
+    const degradedCount = services.filter(
+      (s) => s.status === "degraded",
+    ).length;
+    const unhealthyCount = services.filter(
+      (s) => s.status === "unhealthy",
+    ).length;
 
     if (unhealthyCount > services.length / 2) {
-      return 'unhealthy';
+      return "unhealthy";
     }
     if (degradedCount > 0 || unhealthyCount > 0) {
-      return 'degraded';
+      return "degraded";
     }
-    return 'healthy';
+    return "healthy";
   }
 
   private async getSystemStats(): Promise<{
@@ -329,7 +350,7 @@ export class SystemHealthService {
         errorRate: 0,
       };
     } catch (error) {
-      console.error('Failed to get system stats:', error);
+      console.error("Failed to get system stats:", error);
       return {
         totalUsers: 0,
         totalSessions: 0,
@@ -345,17 +366,22 @@ export class SystemHealthService {
       try {
         const health = await this.getSystemHealth();
         this.lastHealthCheck = new Date();
-        
+
         // Log any unhealthy services
-        const unhealthyServices = health.services.filter(s => s.status === 'unhealthy');
+        const unhealthyServices = health.services.filter(
+          (s) => s.status === "unhealthy",
+        );
         if (unhealthyServices.length > 0) {
-          console.warn('Unhealthy services detected:', unhealthyServices.map(s => s.name));
+          console.warn(
+            "Unhealthy services detected:",
+            unhealthyServices.map((s) => s.name),
+          );
         }
-        
+
         // Store health data for historical tracking
         // await ckStorage.store('system-health', new Date().toISOString(), health);
       } catch (error) {
-        console.error('Health check failed:', error);
+        console.error("Health check failed:", error);
       }
     }, this.healthCheckInterval);
   }
@@ -374,10 +400,14 @@ export class SystemHealthService {
         architecture: process.arch,
       },
       apiKeys: {
-        pinecone: pineconeService.validateApiKey() ? 'configured' : 'missing',
-        openrouter: openRouterService.validateApiKey() ? 'configured' : 'missing',
-        braveSearch: braveSearchService.validateApiKey() ? 'configured' : 'missing',
-        email: emailService.getConfig().apiKey ? 'configured' : 'missing',
+        pinecone: pineconeService.validateApiKey() ? "configured" : "missing",
+        openrouter: openRouterService.validateApiKey()
+          ? "configured"
+          : "missing",
+        braveSearch: braveSearchService.validateApiKey()
+          ? "configured"
+          : "missing",
+        email: emailService.getConfig().apiKey ? "configured" : "missing",
       },
     };
   }
@@ -390,41 +420,53 @@ export class SystemHealthService {
   }> {
     const health = await this.getSystemHealth();
     const dependencies = await this.getDependencyStatus();
-    
+
     const criticalIssues: string[] = [];
     const recommendations: string[] = [];
-    
+
     // Analyze health data
-    health.services.forEach(service => {
-      if (service.status === 'unhealthy') {
-        criticalIssues.push(`${service.name} service is down: ${service.error}`);
+    health.services.forEach((service) => {
+      if (service.status === "unhealthy") {
+        criticalIssues.push(
+          `${service.name} service is down: ${service.error}`,
+        );
       }
-      if (service.status === 'degraded') {
-        recommendations.push(`${service.name} service needs attention: ${service.error}`);
+      if (service.status === "degraded") {
+        recommendations.push(
+          `${service.name} service needs attention: ${service.error}`,
+        );
       }
       if (service.responseTime && service.responseTime > 5000) {
-        recommendations.push(`${service.name} has slow response times (${service.responseTime}ms)`);
+        recommendations.push(
+          `${service.name} has slow response times (${service.responseTime}ms)`,
+        );
       }
     });
-    
+
     // Check API keys
     Object.entries(dependencies.apiKeys).forEach(([service, status]) => {
-      if (status === 'missing') {
-        recommendations.push(`Configure ${service} API key for full functionality`);
+      if (status === "missing") {
+        recommendations.push(
+          `Configure ${service} API key for full functionality`,
+        );
       }
     });
-    
+
     // Check memory usage
-    if (dependencies.node.memory.heapUsed / dependencies.node.memory.heapTotal > 0.9) {
-      criticalIssues.push('High memory usage detected');
+    if (
+      dependencies.node.memory.heapUsed / dependencies.node.memory.heapTotal >
+      0.9
+    ) {
+      criticalIssues.push("High memory usage detected");
     }
-    
-    const summary = health.overall === 'healthy' 
-      ? 'All systems operational' 
-      : health.overall === 'degraded'
-      ? 'Some services need attention'
-      : 'Critical issues detected';
-    
+
+    const summary =
+      health.overall === "healthy"
+        ? "All systems operational"
+        : health.overall === "degraded"
+          ? "Some services need attention"
+          : "Critical issues detected";
+
     return {
       summary,
       recommendations,
@@ -433,8 +475,10 @@ export class SystemHealthService {
         uptime: health.uptime,
         memoryUsage: dependencies.node.memory,
         responseTime: {
-          avg: health.services.reduce((sum, s) => sum + (s.responseTime || 0), 0) / health.services.length,
-          max: Math.max(...health.services.map(s => s.responseTime || 0)),
+          avg:
+            health.services.reduce((sum, s) => sum + (s.responseTime || 0), 0) /
+            health.services.length,
+          max: Math.max(...health.services.map((s) => s.responseTime || 0)),
         },
       },
     };

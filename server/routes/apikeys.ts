@@ -23,7 +23,7 @@ interface UpdateEnvironmentRequest {
 export const handleStoreApiKey: RequestHandler = async (req, res) => {
   try {
     const { service, name, key, environment }: StoreApiKeyRequest = req.body;
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id || "anonymous";
 
     if (!service || !name || !key) {
       return res.status(400).json({
@@ -78,7 +78,7 @@ export const handleStoreApiKey: RequestHandler = async (req, res) => {
 
 export const handleGetApiKeys: RequestHandler = async (req, res) => {
   try {
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id || "anonymous";
     const apiKeys = await apiKeyService.listApiKeys(userId);
 
     res.json({
@@ -96,7 +96,7 @@ export const handleGetApiKeys: RequestHandler = async (req, res) => {
 export const handleDeleteApiKey: RequestHandler = async (req, res) => {
   try {
     const { service } = req.params;
-    const userId = req.user?.id || 'anonymous';
+    const userId = req.user?.id || "anonymous";
 
     if (!service) {
       return res.status(400).json({
@@ -156,7 +156,7 @@ export const handleUpdateEnvironment: RequestHandler = async (req, res) => {
   try {
     const { variables }: UpdateEnvironmentRequest = req.body;
 
-    if (!variables || typeof variables !== 'object') {
+    if (!variables || typeof variables !== "object") {
       return res.status(400).json({
         error: "Variables object required",
       });
@@ -182,15 +182,19 @@ export const handleGetEnvironment: RequestHandler = async (req, res) => {
     const variables = apiKeyService.getEnvironmentVariables();
 
     // Mask sensitive values for security
-    const masked = Object.keys(variables).reduce((acc, key) => {
-      const value = variables[key];
-      if (value) {
-        acc[key] = value.substring(0, 8) + '***' + value.substring(value.length - 4);
-      } else {
-        acc[key] = null;
-      }
-      return acc;
-    }, {} as Record<string, string | null>);
+    const masked = Object.keys(variables).reduce(
+      (acc, key) => {
+        const value = variables[key];
+        if (value) {
+          acc[key] =
+            value.substring(0, 8) + "***" + value.substring(value.length - 4);
+        } else {
+          acc[key] = null;
+        }
+        return acc;
+      },
+      {} as Record<string, string | null>,
+    );
 
     res.json({
       variables: masked,
@@ -221,12 +225,12 @@ export const handleInitializeDefaults: RequestHandler = async (req, res) => {
 };
 
 // Routes
-router.post('/store', authMiddleware, handleStoreApiKey);
-router.get('/list', authMiddleware, handleGetApiKeys);
-router.delete('/:service', authMiddleware, handleDeleteApiKey);
-router.post('/test', authMiddleware, handleTestApiKey);
-router.put('/environment', authMiddleware, handleUpdateEnvironment);
-router.get('/environment', authMiddleware, handleGetEnvironment);
-router.post('/initialize', authMiddleware, handleInitializeDefaults);
+router.post("/store", authMiddleware, handleStoreApiKey);
+router.get("/list", authMiddleware, handleGetApiKeys);
+router.delete("/:service", authMiddleware, handleDeleteApiKey);
+router.post("/test", authMiddleware, handleTestApiKey);
+router.put("/environment", authMiddleware, handleUpdateEnvironment);
+router.get("/environment", authMiddleware, handleGetEnvironment);
+router.post("/initialize", authMiddleware, handleInitializeDefaults);
 
 export default router;

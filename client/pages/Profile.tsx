@@ -3,14 +3,61 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { Switch } from "../components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../components/ui/alert-dialog";
-import { Camera, Edit, Save, X, Shield, Bell, Palette, Globe, Zap, Calendar, MessageSquare, Search, Calculator, Award, User, Mail, Key, Eye, EyeOff } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
+import {
+  Camera,
+  Edit,
+  Save,
+  X,
+  Shield,
+  Bell,
+  Palette,
+  Globe,
+  Zap,
+  Calendar,
+  MessageSquare,
+  Search,
+  Calculator,
+  Award,
+  User,
+  Mail,
+  Key,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { toast } from "../hooks/use-toast";
 
 interface UserProfile {
@@ -28,7 +75,7 @@ interface UserProfile {
   createdAt: string;
   lastLogin: string;
   preferences: {
-    theme: 'dark' | 'light' | 'auto';
+    theme: "dark" | "light" | "auto";
     language: string;
     aiModel: string;
     searchEngine: string;
@@ -151,7 +198,7 @@ export default function Profile() {
       const updatedProfile = await response.json();
       setProfile(updatedProfile);
       setIsEditing(false);
-      
+
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -168,12 +215,14 @@ export default function Profile() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validate file type and size
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       toast({
         title: "Error",
         description: "Please select an image file",
@@ -182,7 +231,8 @@ export default function Profile() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
       toast({
         title: "Error",
         description: "Image size must be less than 5MB",
@@ -193,23 +243,23 @@ export default function Profile() {
 
     try {
       setImageUploading(true);
-      
+
       // Create FormData for file upload
       const formData = new FormData();
-      formData.append('profileImage', file);
-      formData.append('userId', localStorage.getItem("userId") || "");
+      formData.append("profileImage", file);
+      formData.append("userId", localStorage.getItem("userId") || "");
 
-      const response = await fetch('/api/auth/upload-avatar', {
-        method: 'POST',
+      const response = await fetch("/api/auth/upload-avatar", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload image');
+        throw new Error("Failed to upload image");
       }
 
       const result = await response.json();
-      
+
       // Update profile with new image URL
       if (profile) {
         setProfile({
@@ -223,7 +273,7 @@ export default function Profile() {
         description: "Profile image updated successfully",
       });
     } catch (error) {
-      console.error('Failed to upload image:', error);
+      console.error("Failed to upload image:", error);
       toast({
         title: "Error",
         description: "Failed to upload profile image",
@@ -255,10 +305,10 @@ export default function Profile() {
 
     try {
       setSaving(true);
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
+      const response = await fetch("/api/auth/change-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: localStorage.getItem("userId"),
@@ -269,7 +319,7 @@ export default function Profile() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to change password');
+        throw new Error(error.error || "Failed to change password");
       }
 
       setPasswordData({
@@ -287,10 +337,11 @@ export default function Profile() {
         description: "Password changed successfully",
       });
     } catch (error) {
-      console.error('Failed to change password:', error);
+      console.error("Failed to change password:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to change password",
+        description:
+          error instanceof Error ? error.message : "Failed to change password",
         variant: "destructive",
       });
     } finally {
@@ -298,7 +349,11 @@ export default function Profile() {
     }
   };
 
-  const getInitials = (firstName?: string, lastName?: string, username?: string) => {
+  const getInitials = (
+    firstName?: string,
+    lastName?: string,
+    username?: string,
+  ) => {
     if (firstName && lastName) {
       return `${firstName[0]}${lastName[0]}`.toUpperCase();
     }
@@ -309,10 +364,10 @@ export default function Profile() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -376,13 +431,19 @@ export default function Profile() {
           </h1>
           <div className="flex items-center gap-2">
             {profile.isOwner && (
-              <Badge variant="secondary" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+              <Badge
+                variant="secondary"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 text-white"
+              >
                 <Shield className="w-3 h-3 mr-1" />
                 Owner
               </Badge>
             )}
             {profile.isVerified && (
-              <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
+              <Badge
+                variant="secondary"
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+              >
                 <Award className="w-3 h-3 mr-1" />
                 Verified
               </Badge>
@@ -408,16 +469,21 @@ export default function Profile() {
                     <Camera className="w-5 h-5" />
                     Profile Photo
                   </CardTitle>
-                  <CardDescription>
-                    Update your profile picture
-                  </CardDescription>
+                  <CardDescription>Update your profile picture</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center space-y-4">
                   <div className="relative">
                     <Avatar className="w-32 h-32">
-                      <AvatarImage src={profile.profileImage} alt={profile.username} />
+                      <AvatarImage
+                        src={profile.profileImage}
+                        alt={profile.username}
+                      />
                       <AvatarFallback className="text-2xl">
-                        {getInitials(profile.firstName, profile.lastName, profile.username)}
+                        {getInitials(
+                          profile.firstName,
+                          profile.lastName,
+                          profile.username,
+                        )}
                       </AvatarFallback>
                     </Avatar>
                     <Button
@@ -444,10 +510,9 @@ export default function Profile() {
                   )}
                   <div className="text-center">
                     <h3 className="font-semibold text-lg">
-                      {profile.firstName && profile.lastName 
+                      {profile.firstName && profile.lastName
                         ? `${profile.firstName} ${profile.lastName}`
-                        : profile.username
-                      }
+                        : profile.username}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                       {profile.email}
@@ -498,7 +563,12 @@ export default function Profile() {
                       <Input
                         id="firstName"
                         value={formData.firstName}
-                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            firstName: e.target.value,
+                          })
+                        }
                         disabled={!isEditing}
                         placeholder="Enter your first name"
                       />
@@ -508,19 +578,23 @@ export default function Profile() {
                       <Input
                         id="lastName"
                         value={formData.lastName}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, lastName: e.target.value })
+                        }
                         disabled={!isEditing}
                         placeholder="Enter your last name"
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="username">Username</Label>
                     <Input
                       id="username"
                       value={formData.username}
-                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                      }
                       disabled={!isEditing}
                       placeholder="Enter your username"
                     />
@@ -531,7 +605,9 @@ export default function Profile() {
                     <Textarea
                       id="bio"
                       value={formData.bio}
-                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, bio: e.target.value })
+                      }
                       disabled={!isEditing}
                       placeholder="Tell us a bit about yourself..."
                       rows={4}
@@ -550,10 +626,7 @@ export default function Profile() {
                       >
                         Cancel
                       </Button>
-                      <Button
-                        onClick={handleSaveProfile}
-                        disabled={saving}
-                      >
+                      <Button onClick={handleSaveProfile} disabled={saving}>
                         {saving ? (
                           <>Saving...</>
                         ) : (
@@ -589,10 +662,13 @@ export default function Profile() {
                     <Label htmlFor="theme">Theme</Label>
                     <Select
                       value={formData.preferences.theme}
-                      onValueChange={(value: 'dark' | 'light' | 'auto') => 
+                      onValueChange={(value: "dark" | "light" | "auto") =>
                         setFormData({
                           ...formData,
-                          preferences: { ...formData.preferences, theme: value }
+                          preferences: {
+                            ...formData.preferences,
+                            theme: value,
+                          },
                         })
                       }
                     >
@@ -611,10 +687,13 @@ export default function Profile() {
                     <Label htmlFor="language">Language</Label>
                     <Select
                       value={formData.preferences.language}
-                      onValueChange={(value) => 
+                      onValueChange={(value) =>
                         setFormData({
                           ...formData,
-                          preferences: { ...formData.preferences, language: value }
+                          preferences: {
+                            ...formData.preferences,
+                            language: value,
+                          },
                         })
                       }
                     >
@@ -649,10 +728,13 @@ export default function Profile() {
                     <Label htmlFor="aiModel">Default AI Model</Label>
                     <Select
                       value={formData.preferences.aiModel}
-                      onValueChange={(value) => 
+                      onValueChange={(value) =>
                         setFormData({
                           ...formData,
-                          preferences: { ...formData.preferences, aiModel: value }
+                          preferences: {
+                            ...formData.preferences,
+                            aiModel: value,
+                          },
                         })
                       }
                     >
@@ -660,11 +742,21 @@ export default function Profile() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</SelectItem>
-                        <SelectItem value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</SelectItem>
-                        <SelectItem value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                        <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
-                        <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku</SelectItem>
+                        <SelectItem value="google/gemma-2-9b-it:free">
+                          Gemma 2 9B (Free)
+                        </SelectItem>
+                        <SelectItem value="meta-llama/llama-3.1-8b-instruct:free">
+                          Llama 3.1 8B (Free)
+                        </SelectItem>
+                        <SelectItem value="openai/gpt-3.5-turbo">
+                          GPT-3.5 Turbo
+                        </SelectItem>
+                        <SelectItem value="openai/gpt-4o-mini">
+                          GPT-4o Mini
+                        </SelectItem>
+                        <SelectItem value="anthropic/claude-3-haiku">
+                          Claude 3 Haiku
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -673,10 +765,13 @@ export default function Profile() {
                     <Label htmlFor="searchEngine">Search Engine</Label>
                     <Select
                       value={formData.preferences.searchEngine}
-                      onValueChange={(value) => 
+                      onValueChange={(value) =>
                         setFormData({
                           ...formData,
-                          preferences: { ...formData.preferences, searchEngine: value }
+                          preferences: {
+                            ...formData.preferences,
+                            searchEngine: value,
+                          },
                         })
                       }
                     >
@@ -705,7 +800,10 @@ export default function Profile() {
                       onCheckedChange={(checked) =>
                         setFormData({
                           ...formData,
-                          preferences: { ...formData.preferences, contentFilter: checked }
+                          preferences: {
+                            ...formData.preferences,
+                            contentFilter: checked,
+                          },
                         })
                       }
                     />
@@ -727,7 +825,9 @@ export default function Profile() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="emailNotifications">Email Notifications</Label>
+                      <Label htmlFor="emailNotifications">
+                        Email Notifications
+                      </Label>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
                         Receive updates via email
                       </p>
@@ -742,9 +842,9 @@ export default function Profile() {
                             ...formData.preferences,
                             notifications: {
                               ...formData.preferences.notifications,
-                              email: checked
-                            }
-                          }
+                              email: checked,
+                            },
+                          },
                         })
                       }
                     />
@@ -752,7 +852,9 @@ export default function Profile() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="pushNotifications">Push Notifications</Label>
+                      <Label htmlFor="pushNotifications">
+                        Push Notifications
+                      </Label>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
                         Receive browser notifications
                       </p>
@@ -767,9 +869,9 @@ export default function Profile() {
                             ...formData.preferences,
                             notifications: {
                               ...formData.preferences.notifications,
-                              push: checked
-                            }
-                          }
+                              push: checked,
+                            },
+                          },
                         })
                       }
                     />
@@ -777,7 +879,9 @@ export default function Profile() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="securityNotifications">Security Alerts</Label>
+                      <Label htmlFor="securityNotifications">
+                        Security Alerts
+                      </Label>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
                         Important security notifications
                       </p>
@@ -792,9 +896,9 @@ export default function Profile() {
                             ...formData.preferences,
                             notifications: {
                               ...formData.preferences.notifications,
-                              security: checked
-                            }
-                          }
+                              security: checked,
+                            },
+                          },
                         })
                       }
                     />
@@ -874,7 +978,10 @@ export default function Profile() {
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4 text-slate-400" />
                         <span className="text-sm">Connected</span>
-                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-green-100 text-green-800"
+                        >
                           Active
                         </Badge>
                       </div>
@@ -897,15 +1004,21 @@ export default function Profile() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <Label className="text-xs text-slate-500">Account Created</Label>
+                      <Label className="text-xs text-slate-500">
+                        Account Created
+                      </Label>
                       <p>{formatDate(profile.createdAt)}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-slate-500">Last Login</Label>
+                      <Label className="text-xs text-slate-500">
+                        Last Login
+                      </Label>
                       <p>{formatDate(profile.lastLogin)}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-slate-500">Account Status</Label>
+                      <Label className="text-xs text-slate-500">
+                        Account Status
+                      </Label>
                       <p className="flex items-center gap-1">
                         {profile.isActive ? (
                           <>
@@ -921,7 +1034,9 @@ export default function Profile() {
                       </p>
                     </div>
                     <div>
-                      <Label className="text-xs text-slate-500">Security Score</Label>
+                      <Label className="text-xs text-slate-500">
+                        Security Score
+                      </Label>
                       <p className="flex items-center gap-1">
                         {profile.stats.strikes === 0 ? (
                           <>
@@ -931,7 +1046,8 @@ export default function Profile() {
                         ) : (
                           <>
                             <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                            {profile.stats.strikes} warning{profile.stats.strikes !== 1 ? 's' : ''}
+                            {profile.stats.strikes} warning
+                            {profile.stats.strikes !== 1 ? "s" : ""}
                           </>
                         )}
                       </p>
@@ -942,7 +1058,10 @@ export default function Profile() {
             </div>
 
             {/* Password Change Dialog */}
-            <AlertDialog open={showPasswordChange} onOpenChange={setShowPasswordChange}>
+            <AlertDialog
+              open={showPasswordChange}
+              onOpenChange={setShowPasswordChange}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Change Password</AlertDialogTitle>
@@ -958,10 +1077,12 @@ export default function Profile() {
                         id="currentPassword"
                         type={passwordData.showCurrent ? "text" : "password"}
                         value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData({
-                          ...passwordData,
-                          currentPassword: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            currentPassword: e.target.value,
+                          })
+                        }
                         placeholder="Enter current password"
                       />
                       <Button
@@ -969,10 +1090,12 @@ export default function Profile() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setPasswordData({
-                          ...passwordData,
-                          showCurrent: !passwordData.showCurrent
-                        })}
+                        onClick={() =>
+                          setPasswordData({
+                            ...passwordData,
+                            showCurrent: !passwordData.showCurrent,
+                          })
+                        }
                       >
                         {passwordData.showCurrent ? (
                           <EyeOff className="h-4 w-4" />
@@ -990,10 +1113,12 @@ export default function Profile() {
                         id="newPassword"
                         type={passwordData.showNew ? "text" : "password"}
                         value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData({
-                          ...passwordData,
-                          newPassword: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
                         placeholder="Enter new password"
                       />
                       <Button
@@ -1001,10 +1126,12 @@ export default function Profile() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setPasswordData({
-                          ...passwordData,
-                          showNew: !passwordData.showNew
-                        })}
+                        onClick={() =>
+                          setPasswordData({
+                            ...passwordData,
+                            showNew: !passwordData.showNew,
+                          })
+                        }
                       >
                         {passwordData.showNew ? (
                           <EyeOff className="h-4 w-4" />
@@ -1016,16 +1143,20 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
                         type={passwordData.showConfirm ? "text" : "password"}
                         value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData({
-                          ...passwordData,
-                          confirmPassword: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         placeholder="Confirm new password"
                       />
                       <Button
@@ -1033,10 +1164,12 @@ export default function Profile() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setPasswordData({
-                          ...passwordData,
-                          showConfirm: !passwordData.showConfirm
-                        })}
+                        onClick={() =>
+                          setPasswordData({
+                            ...passwordData,
+                            showConfirm: !passwordData.showConfirm,
+                          })
+                        }
                       >
                         {passwordData.showConfirm ? (
                           <EyeOff className="h-4 w-4" />
@@ -1051,7 +1184,12 @@ export default function Profile() {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handlePasswordChange}
-                    disabled={saving || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                    disabled={
+                      saving ||
+                      !passwordData.currentPassword ||
+                      !passwordData.newPassword ||
+                      !passwordData.confirmPassword
+                    }
                   >
                     {saving ? "Changing..." : "Change Password"}
                   </AlertDialogAction>
@@ -1065,11 +1203,15 @@ export default function Profile() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Chats</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Chats
+                  </CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{profile.stats.totalChats.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {profile.stats.totalChats.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     AI conversations
                   </p>
@@ -1078,11 +1220,15 @@ export default function Profile() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Searches</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Searches
+                  </CardTitle>
                   <Search className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{profile.stats.totalSearches.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {profile.stats.totalSearches.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Web searches performed
                   </p>
@@ -1091,11 +1237,15 @@ export default function Profile() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Calculations</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Calculations
+                  </CardTitle>
                   <Calculator className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{profile.stats.totalCalculations.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {profile.stats.totalCalculations.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Math operations
                   </p>
@@ -1104,11 +1254,15 @@ export default function Profile() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Reputation</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Reputation
+                  </CardTitle>
                   <Award className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{profile.stats.reputation}</div>
+                  <div className="text-2xl font-bold">
+                    {profile.stats.reputation}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Community score
                   </p>
@@ -1119,9 +1273,7 @@ export default function Profile() {
             <Card>
               <CardHeader>
                 <CardTitle>Account Timeline</CardTitle>
-                <CardDescription>
-                  Your journey with ChatKing AI
-                </CardDescription>
+                <CardDescription>Your journey with ChatKing AI</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

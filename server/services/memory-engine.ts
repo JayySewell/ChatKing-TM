@@ -85,7 +85,12 @@ interface ContextualMemory {
 }
 
 interface ConversationFlow {
-  currentStage: "greeting" | "exploration" | "deep_dive" | "problem_solving" | "conclusion";
+  currentStage:
+    | "greeting"
+    | "exploration"
+    | "deep_dive"
+    | "problem_solving"
+    | "conclusion";
   topicProgression: string[];
   questionAsked: boolean;
   needsClarification: boolean;
@@ -151,9 +156,12 @@ export class MemoryEngine {
   private memoryCache: Map<string, MemoryContext> = new Map();
   private maxCacheSize = 100;
 
-  async getOrCreateMemoryContext(userId: string, sessionId: string): Promise<MemoryContext> {
+  async getOrCreateMemoryContext(
+    userId: string,
+    sessionId: string,
+  ): Promise<MemoryContext> {
     const cacheKey = `${userId}:${sessionId}`;
-    
+
     // Check cache first
     if (this.memoryCache.has(cacheKey)) {
       return this.memoryCache.get(cacheKey)!;
@@ -161,7 +169,7 @@ export class MemoryEngine {
 
     // Load from storage
     let context = await this.loadMemoryContext(userId, sessionId);
-    
+
     if (!context) {
       // Create new context
       context = await this.createNewMemoryContext(userId, sessionId);
@@ -169,20 +177,28 @@ export class MemoryEngine {
 
     // Cache the context
     this.cacheMemoryContext(cacheKey, context);
-    
+
     return context;
   }
 
-  private async loadMemoryContext(userId: string, sessionId: string): Promise<MemoryContext | null> {
+  private async loadMemoryContext(
+    userId: string,
+    sessionId: string,
+  ): Promise<MemoryContext | null> {
     try {
       const filePath = `memory/${userId}/${sessionId}.json`;
-      return await ckStorage.readFile<MemoryContext>(filePath, { encrypt: true });
+      return await ckStorage.readFile<MemoryContext>(filePath, {
+        encrypt: true,
+      });
     } catch (error) {
       return null;
     }
   }
 
-  private async createNewMemoryContext(userId: string, sessionId: string): Promise<MemoryContext> {
+  private async createNewMemoryContext(
+    userId: string,
+    sessionId: string,
+  ): Promise<MemoryContext> {
     // Load user profile and long-term memory
     const userProfile = await this.loadUserProfile(userId);
     const longTermMemory = await this.loadLongTermMemory(userId);
@@ -217,37 +233,46 @@ export class MemoryEngine {
     return context;
   }
 
-  async addMessage(userId: string, sessionId: string, message: ConversationMessage): Promise<void> {
+  async addMessage(
+    userId: string,
+    sessionId: string,
+    message: ConversationMessage,
+  ): Promise<void> {
     const context = await this.getOrCreateMemoryContext(userId, sessionId);
-    
+
     // Analyze message for learning
     await this.analyzeMessage(context, message);
-    
+
     // Add to conversation history
     context.conversationHistory.push(message);
-    
+
     // Maintain conversation history size
     if (context.conversationHistory.length > 50) {
       // Keep important messages and recent ones
-      context.conversationHistory = this.pruneConversationHistory(context.conversationHistory);
+      context.conversationHistory = this.pruneConversationHistory(
+        context.conversationHistory,
+      );
     }
-    
+
     // Update contextual memory
     await this.updateContextualMemory(context, message);
-    
+
     // Learn from user patterns
     await this.learnFromInteraction(context, message);
-    
+
     await this.saveMemoryContext(context);
   }
 
-  private async analyzeMessage(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async analyzeMessage(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     // Extract topics
     message.topics = await this.extractTopics(message.content);
-    
+
     // Analyze sentiment
     message.sentiment = await this.analyzeSentiment(message.content);
-    
+
     // Calculate importance
     message.importance = await this.calculateImportance(context, message);
   }
@@ -257,126 +282,186 @@ export class MemoryEngine {
     const keywords = content
       .toLowerCase()
       .split(/\s+/)
-      .filter(word => word.length > 3)
-      .filter(word => !this.isStopWord(word));
-    
+      .filter((word) => word.length > 3)
+      .filter((word) => !this.isStopWord(word));
+
     return [...new Set(keywords)].slice(0, 5);
   }
 
-  private async analyzeSentiment(content: string): Promise<"positive" | "neutral" | "negative"> {
+  private async analyzeSentiment(
+    content: string,
+  ): Promise<"positive" | "neutral" | "negative"> {
     // Simple sentiment analysis (in production, use proper sentiment analysis)
-    const positiveWords = ["good", "great", "excellent", "amazing", "love", "like", "perfect", "awesome"];
-    const negativeWords = ["bad", "terrible", "awful", "hate", "dislike", "wrong", "error", "problem"];
-    
+    const positiveWords = [
+      "good",
+      "great",
+      "excellent",
+      "amazing",
+      "love",
+      "like",
+      "perfect",
+      "awesome",
+    ];
+    const negativeWords = [
+      "bad",
+      "terrible",
+      "awful",
+      "hate",
+      "dislike",
+      "wrong",
+      "error",
+      "problem",
+    ];
+
     const words = content.toLowerCase().split(/\s+/);
-    const positiveCount = words.filter(word => positiveWords.includes(word)).length;
-    const negativeCount = words.filter(word => negativeWords.includes(word)).length;
-    
+    const positiveCount = words.filter((word) =>
+      positiveWords.includes(word),
+    ).length;
+    const negativeCount = words.filter((word) =>
+      negativeWords.includes(word),
+    ).length;
+
     if (positiveCount > negativeCount) return "positive";
     if (negativeCount > positiveCount) return "negative";
     return "neutral";
   }
 
-  private async calculateImportance(context: MemoryContext, message: ConversationMessage): Promise<number> {
+  private async calculateImportance(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<number> {
     let importance = 5; // Base importance
-    
+
     // User messages are generally more important
     if (message.role === "user") importance += 2;
-    
+
     // Personal information is important
     if (this.containsPersonalInfo(message.content)) importance += 3;
-    
+
     // Questions are important
     if (message.content.includes("?")) importance += 1;
-    
+
     // Topics the user is interested in
     const userInterests = context.userProfile.interests;
-    if (message.topics.some(topic => userInterests.includes(topic))) importance += 2;
-    
+    if (message.topics.some((topic) => userInterests.includes(topic)))
+      importance += 2;
+
     // Feedback is very important
     if (message.metadata.userFeedback) importance += 3;
-    
+
     return Math.min(importance, 10);
   }
 
   private containsPersonalInfo(content: string): boolean {
     const personalIndicators = [
-      "my name", "i am", "i work", "i live", "i like", "i prefer", 
-      "my job", "my hobby", "my goal", "i want", "i need", "i'm learning"
+      "my name",
+      "i am",
+      "i work",
+      "i live",
+      "i like",
+      "i prefer",
+      "my job",
+      "my hobby",
+      "my goal",
+      "i want",
+      "i need",
+      "i'm learning",
     ];
-    
+
     const lowerContent = content.toLowerCase();
-    return personalIndicators.some(indicator => lowerContent.includes(indicator));
+    return personalIndicators.some((indicator) =>
+      lowerContent.includes(indicator),
+    );
   }
 
-  private async updateContextualMemory(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async updateContextualMemory(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     // Update current topic
     if (message.topics.length > 0) {
       context.contextualMemory.currentTopic = message.topics[0];
-      context.contextualMemory.relatedTopics = [...new Set([
-        ...context.contextualMemory.relatedTopics,
-        ...message.topics.slice(1)
-      ])].slice(0, 10);
+      context.contextualMemory.relatedTopics = [
+        ...new Set([
+          ...context.contextualMemory.relatedTopics,
+          ...message.topics.slice(1),
+        ]),
+      ].slice(0, 10);
     }
-    
+
     // Update conversation flow
     if (message.role === "user") {
       if (message.content.includes("?")) {
         context.contextualMemory.conversationFlow.questionAsked = true;
       }
-      
+
       // Assess engagement based on message length and sentiment
       const engagement = this.assessEngagement(message);
       context.contextualMemory.conversationFlow.userEngagement = engagement;
     }
-    
+
     // Track topic progression
-    if (message.topics.length > 0 && message.topics[0] !== context.contextualMemory.currentTopic) {
-      context.contextualMemory.conversationFlow.topicProgression.push(message.topics[0]);
-      if (context.contextualMemory.conversationFlow.topicProgression.length > 10) {
+    if (
+      message.topics.length > 0 &&
+      message.topics[0] !== context.contextualMemory.currentTopic
+    ) {
+      context.contextualMemory.conversationFlow.topicProgression.push(
+        message.topics[0],
+      );
+      if (
+        context.contextualMemory.conversationFlow.topicProgression.length > 10
+      ) {
         context.contextualMemory.conversationFlow.topicProgression.shift();
       }
     }
   }
 
-  private assessEngagement(message: ConversationMessage): "high" | "medium" | "low" {
+  private assessEngagement(
+    message: ConversationMessage,
+  ): "high" | "medium" | "low" {
     const length = message.content.length;
     const sentiment = message.sentiment;
-    
+
     if (length > 100 && sentiment === "positive") return "high";
     if (length > 50 && sentiment !== "negative") return "medium";
     return "low";
   }
 
-  private async learnFromInteraction(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async learnFromInteraction(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     // Learn communication preferences
     if (message.role === "user") {
       await this.learnCommunicationStyle(context, message);
     }
-    
+
     // Learn from feedback
     if (message.metadata.userSatisfaction) {
       await this.learnFromFeedback(context, message);
     }
-    
+
     // Track topic interests
     await this.updateTopicInterests(context, message);
   }
 
-  private async learnCommunicationStyle(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async learnCommunicationStyle(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     const style = context.userProfile.communicationStyle;
-    
+
     // Analyze formality
     const formalWords = ["please", "thank you", "appreciate", "grateful"];
     const casualWords = ["hey", "yeah", "cool", "awesome", "lol"];
-    
+
     const content = message.content.toLowerCase();
-    if (formalWords.some(word => content.includes(word))) {
+    if (formalWords.some((word) => content.includes(word))) {
       this.adjustFormality(style, "formal");
-    } else if (casualWords.some(word => content.includes(word))) {
+    } else if (casualWords.some((word) => content.includes(word))) {
       this.adjustFormality(style, "casual");
     }
-    
+
     // Analyze verbosity preference based on user message length
     const length = message.content.length;
     if (length > 200) {
@@ -386,23 +471,33 @@ export class MemoryEngine {
     }
   }
 
-  private adjustFormality(style: CommunicationStyle, tendency: "formal" | "casual"): void {
+  private adjustFormality(
+    style: CommunicationStyle,
+    tendency: "formal" | "casual",
+  ): void {
     if (style.formality === "mixed" || style.formality !== tendency) {
       // Gradually adjust based on observations
       style.formality = tendency;
     }
   }
 
-  private adjustVerbosity(style: CommunicationStyle, tendency: "detailed" | "concise"): void {
+  private adjustVerbosity(
+    style: CommunicationStyle,
+    tendency: "detailed" | "concise",
+  ): void {
     if (style.verbosity === "adaptive" || style.verbosity !== tendency) {
       style.verbosity = tendency;
     }
   }
 
-  private async learnFromFeedback(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async learnFromFeedback(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     const satisfaction = message.metadata.userSatisfaction!;
-    const previousMessage = context.conversationHistory[context.conversationHistory.length - 2];
-    
+    const previousMessage =
+      context.conversationHistory[context.conversationHistory.length - 2];
+
     if (previousMessage && previousMessage.role === "assistant") {
       // Create or update learned behavior
       const behavior: LearnedBehavior = {
@@ -414,19 +509,24 @@ export class MemoryEngine {
         lastUsed: new Date(),
         effectiveness: satisfaction / 5,
       };
-      
+
       context.learnedBehaviors.push(behavior);
     }
   }
 
-  private async updateTopicInterests(context: MemoryContext, message: ConversationMessage): Promise<void> {
+  private async updateTopicInterests(
+    context: MemoryContext,
+    message: ConversationMessage,
+  ): Promise<void> {
     for (const topic of message.topics) {
-      const existing = context.longTermMemory.frequentTopics.find(t => t.topic === topic);
-      
+      const existing = context.longTermMemory.frequentTopics.find(
+        (t) => t.topic === topic,
+      );
+
       if (existing) {
         existing.count++;
         existing.lastDiscussed = new Date();
-        
+
         // Increase expertise if user provides detailed information
         if (message.role === "user" && message.content.length > 100) {
           existing.userExpertise = Math.min(existing.userExpertise + 0.1, 1);
@@ -441,34 +541,43 @@ export class MemoryEngine {
         });
       }
     }
-    
+
     // Keep only top 50 topics
-    context.longTermMemory.frequentTopics = context.longTermMemory.frequentTopics
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 50);
+    context.longTermMemory.frequentTopics =
+      context.longTermMemory.frequentTopics
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 50);
   }
 
-  private pruneConversationHistory(history: ConversationMessage[]): ConversationMessage[] {
+  private pruneConversationHistory(
+    history: ConversationMessage[],
+  ): ConversationMessage[] {
     // Keep the most recent 20 messages and 10 most important messages
     const recent = history.slice(-20);
     const important = history
-      .filter(msg => !recent.includes(msg))
+      .filter((msg) => !recent.includes(msg))
       .sort((a, b) => b.importance - a.importance)
       .slice(0, 10);
-    
-    return [...important, ...recent].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    return [...important, ...recent].sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
+    );
   }
 
-  async generateContextualPrompt(userId: string, sessionId: string, userMessage: string): Promise<string> {
+  async generateContextualPrompt(
+    userId: string,
+    sessionId: string,
+    userMessage: string,
+  ): Promise<string> {
     const context = await this.getOrCreateMemoryContext(userId, sessionId);
-    
+
     let prompt = "You are ChatKing AI, an advanced AI assistant. ";
-    
+
     // Add user profile context
     if (context.userProfile.name) {
       prompt += `You are talking to ${context.userProfile.name}. `;
     }
-    
+
     // Add communication style preferences
     const style = context.userProfile.communicationStyle;
     if (style.formality === "formal") {
@@ -476,18 +585,18 @@ export class MemoryEngine {
     } else if (style.formality === "casual") {
       prompt += "Use a friendly and casual tone. ";
     }
-    
+
     if (style.verbosity === "concise") {
       prompt += "Keep responses brief and to the point. ";
     } else if (style.verbosity === "detailed") {
       prompt += "Provide comprehensive and detailed explanations. ";
     }
-    
+
     // Add topic context
     if (context.contextualMemory.currentTopic) {
       prompt += `Current topic: ${context.contextualMemory.currentTopic}. `;
     }
-    
+
     // Add recent conversation context
     const recentMessages = context.conversationHistory.slice(-5);
     if (recentMessages.length > 0) {
@@ -496,30 +605,35 @@ export class MemoryEngine {
         prompt += `${msg.role}: ${msg.content}\n`;
       }
     }
-    
+
     // Add user interests
     if (context.userProfile.interests.length > 0) {
       prompt += `User interests: ${context.userProfile.interests.join(", ")}. `;
     }
-    
+
     // Add learning behaviors
     const effectiveBehaviors = context.learnedBehaviors
-      .filter(b => b.effectiveness > 0.7)
+      .filter((b) => b.effectiveness > 0.7)
       .slice(0, 3);
-    
+
     if (effectiveBehaviors.length > 0) {
-      prompt += "Effective approaches: " + effectiveBehaviors.map(b => b.description).join(", ") + ". ";
+      prompt +=
+        "Effective approaches: " +
+        effectiveBehaviors.map((b) => b.description).join(", ") +
+        ". ";
     }
-    
+
     prompt += `\nUser message: ${userMessage}`;
-    
+
     return prompt;
   }
 
   private async loadUserProfile(userId: string): Promise<UserProfile> {
     try {
       const filePath = `memory/${userId}/profile.json`;
-      const profile = await ckStorage.readFile<UserProfile>(filePath, { encrypt: true });
+      const profile = await ckStorage.readFile<UserProfile>(filePath, {
+        encrypt: true,
+      });
       return profile || this.createDefaultProfile(userId);
     } catch (error) {
       return this.createDefaultProfile(userId);
@@ -549,7 +663,9 @@ export class MemoryEngine {
   private async loadLongTermMemory(userId: string): Promise<LongTermMemory> {
     try {
       const filePath = `memory/${userId}/longterm.json`;
-      const memory = await ckStorage.readFile<LongTermMemory>(filePath, { encrypt: true });
+      const memory = await ckStorage.readFile<LongTermMemory>(filePath, {
+        encrypt: true,
+      });
       return memory || this.createDefaultLongTermMemory();
     } catch (error) {
       return this.createDefaultLongTermMemory();
@@ -566,10 +682,14 @@ export class MemoryEngine {
     };
   }
 
-  private async loadUserPreferences(userId: string): Promise<UserMemoryPreferences> {
+  private async loadUserPreferences(
+    userId: string,
+  ): Promise<UserMemoryPreferences> {
     try {
       const filePath = `memory/${userId}/preferences.json`;
-      const prefs = await ckStorage.readFile<UserMemoryPreferences>(filePath, { encrypt: true });
+      const prefs = await ckStorage.readFile<UserMemoryPreferences>(filePath, {
+        encrypt: true,
+      });
       return prefs || this.createDefaultPreferences();
     } catch (error) {
       return this.createDefaultPreferences();
@@ -590,18 +710,24 @@ export class MemoryEngine {
   private async saveMemoryContext(context: MemoryContext): Promise<void> {
     const filePath = `memory/${context.userId}/${context.sessionId}.json`;
     await ckStorage.writeFile(filePath, context, { encrypt: true });
-    
+
     // Also save long-term memory and profile updates
     await this.saveLongTermMemory(context.userId, context.longTermMemory);
     await this.saveUserProfile(context.userId, context.userProfile);
   }
 
-  private async saveLongTermMemory(userId: string, memory: LongTermMemory): Promise<void> {
+  private async saveLongTermMemory(
+    userId: string,
+    memory: LongTermMemory,
+  ): Promise<void> {
     const filePath = `memory/${userId}/longterm.json`;
     await ckStorage.writeFile(filePath, memory, { encrypt: true });
   }
 
-  private async saveUserProfile(userId: string, profile: UserProfile): Promise<void> {
+  private async saveUserProfile(
+    userId: string,
+    profile: UserProfile,
+  ): Promise<void> {
     const filePath = `memory/${userId}/profile.json`;
     await ckStorage.writeFile(filePath, profile, { encrypt: true });
   }
@@ -612,32 +738,54 @@ export class MemoryEngine {
       const firstKey = this.memoryCache.keys().next().value;
       this.memoryCache.delete(firstKey);
     }
-    
+
     this.memoryCache.set(key, context);
   }
 
   private isStopWord(word: string): boolean {
-    const stopWords = ["the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by"];
+    const stopWords = [
+      "the",
+      "and",
+      "or",
+      "but",
+      "in",
+      "on",
+      "at",
+      "to",
+      "for",
+      "of",
+      "with",
+      "by",
+    ];
     return stopWords.includes(word);
   }
 
-  async getConversationSummary(userId: string, sessionId: string): Promise<string> {
+  async getConversationSummary(
+    userId: string,
+    sessionId: string,
+  ): Promise<string> {
     const context = await this.getOrCreateMemoryContext(userId, sessionId);
-    
+
     if (context.conversationHistory.length === 0) {
       return "No conversation history available.";
     }
-    
-    const topics = [...new Set(context.conversationHistory.flatMap(msg => msg.topics))];
-    const userMessages = context.conversationHistory.filter(msg => msg.role === "user").length;
-    const assistantMessages = context.conversationHistory.filter(msg => msg.role === "assistant").length;
-    
+
+    const topics = [
+      ...new Set(context.conversationHistory.flatMap((msg) => msg.topics)),
+    ];
+    const userMessages = context.conversationHistory.filter(
+      (msg) => msg.role === "user",
+    ).length;
+    const assistantMessages = context.conversationHistory.filter(
+      (msg) => msg.role === "assistant",
+    ).length;
+
     let summary = `Conversation with ${context.userProfile.name || "user"}: `;
     summary += `${userMessages} user messages, ${assistantMessages} assistant responses. `;
     summary += `Topics discussed: ${topics.join(", ")}. `;
     summary += `Current topic: ${context.contextualMemory.currentTopic}. `;
     summary += `User engagement: ${context.contextualMemory.conversationFlow.userEngagement}.`;
-    
+
     return summary;
   }
 }

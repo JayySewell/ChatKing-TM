@@ -14,22 +14,22 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     // Check if the file is an image
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed'), false);
+      cb(new Error("Only image files are allowed"), false);
     }
   },
 });
 
 // Ensure upload directory exists
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'avatars');
+const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "avatars");
 
 async function ensureUploadDir() {
   try {
     await fs.mkdir(UPLOAD_DIR, { recursive: true });
   } catch (error) {
-    console.error('Failed to create upload directory:', error);
+    console.error("Failed to create upload directory:", error);
   }
 }
 
@@ -65,16 +65,17 @@ export async function handleUploadAvatar(req: Request, res: Response) {
     }
 
     // Generate unique filename
-    const fileExtension = path.extname(req.file.originalname).toLowerCase() || '.jpg';
-    const fileName = `${userId}_${crypto.randomBytes(8).toString('hex')}${fileExtension}`;
+    const fileExtension =
+      path.extname(req.file.originalname).toLowerCase() || ".jpg";
+    const fileName = `${userId}_${crypto.randomBytes(8).toString("hex")}${fileExtension}`;
     const filePath = path.join(UPLOAD_DIR, fileName);
 
     try {
       // Process image with sharp
       const processedImageBuffer = await sharp(req.file.buffer)
         .resize(400, 400, {
-          fit: 'cover',
-          position: 'center',
+          fit: "cover",
+          position: "center",
         })
         .jpeg({
           quality: 85,
@@ -89,16 +90,19 @@ export async function handleUploadAvatar(req: Request, res: Response) {
       const imageUrl = `/uploads/avatars/${fileName}`;
 
       // Update user profile with new image URL
-      const success = await enhancedAuthService.updateProfileImage(userId, imageUrl);
+      const success = await enhancedAuthService.updateProfileImage(
+        userId,
+        imageUrl,
+      );
 
       if (!success) {
         // Clean up uploaded file if database update fails
         try {
           await fs.unlink(filePath);
         } catch (cleanupError) {
-          console.error('Failed to cleanup uploaded file:', cleanupError);
+          console.error("Failed to cleanup uploaded file:", cleanupError);
         }
-        
+
         return res.status(500).json({
           success: false,
           error: "Failed to update profile",
@@ -106,15 +110,21 @@ export async function handleUploadAvatar(req: Request, res: Response) {
       }
 
       // Clean up old image if it exists and is not the default
-      if (userProfile.profileImage && 
-          userProfile.profileImage.startsWith('/uploads/avatars/') &&
-          userProfile.profileImage !== imageUrl) {
+      if (
+        userProfile.profileImage &&
+        userProfile.profileImage.startsWith("/uploads/avatars/") &&
+        userProfile.profileImage !== imageUrl
+      ) {
         try {
-          const oldImagePath = path.join(process.cwd(), 'public', userProfile.profileImage);
+          const oldImagePath = path.join(
+            process.cwd(),
+            "public",
+            userProfile.profileImage,
+          );
           await fs.unlink(oldImagePath);
         } catch (error) {
           // Don't fail if old image cleanup fails
-          console.warn('Failed to cleanup old profile image:', error);
+          console.warn("Failed to cleanup old profile image:", error);
         }
       }
 
@@ -123,17 +133,15 @@ export async function handleUploadAvatar(req: Request, res: Response) {
         imageUrl,
         message: "Profile image updated successfully",
       });
-
     } catch (imageError) {
-      console.error('Image processing failed:', imageError);
+      console.error("Image processing failed:", imageError);
       res.status(500).json({
         success: false,
         error: "Failed to process image",
       });
     }
-
   } catch (error) {
-    console.error('Avatar upload failed:', error);
+    console.error("Avatar upload failed:", error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
@@ -163,24 +171,33 @@ export async function handleDeleteAvatar(req: Request, res: Response) {
     // Remove profile image from database
     const success = await enhancedAuthService.updateProfileImage(userId, null);
 
-    if (success && userProfile.profileImage && userProfile.profileImage.startsWith('/uploads/avatars/')) {
+    if (
+      success &&
+      userProfile.profileImage &&
+      userProfile.profileImage.startsWith("/uploads/avatars/")
+    ) {
       // Delete physical file
       try {
-        const imagePath = path.join(process.cwd(), 'public', userProfile.profileImage);
+        const imagePath = path.join(
+          process.cwd(),
+          "public",
+          userProfile.profileImage,
+        );
         await fs.unlink(imagePath);
       } catch (error) {
-        console.warn('Failed to delete image file:', error);
+        console.warn("Failed to delete image file:", error);
         // Don't fail the request if file deletion fails
       }
     }
 
     res.json({
       success,
-      message: success ? "Profile image removed successfully" : "Failed to remove profile image",
+      message: success
+        ? "Profile image removed successfully"
+        : "Failed to remove profile image",
     });
-
   } catch (error) {
-    console.error('Avatar deletion failed:', error);
+    console.error("Avatar deletion failed:", error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Deletion failed",
@@ -193,40 +210,40 @@ export async function handleGetAvatarTemplates(req: Request, res: Response) {
   try {
     const templates = [
       {
-        id: 'default-1',
-        name: 'Default Blue',
-        url: '/images/avatars/default-blue.svg',
-        category: 'default',
+        id: "default-1",
+        name: "Default Blue",
+        url: "/images/avatars/default-blue.svg",
+        category: "default",
       },
       {
-        id: 'default-2',
-        name: 'Default Green',
-        url: '/images/avatars/default-green.svg',
-        category: 'default',
+        id: "default-2",
+        name: "Default Green",
+        url: "/images/avatars/default-green.svg",
+        category: "default",
       },
       {
-        id: 'default-3',
-        name: 'Default Purple',
-        url: '/images/avatars/default-purple.svg',
-        category: 'default',
+        id: "default-3",
+        name: "Default Purple",
+        url: "/images/avatars/default-purple.svg",
+        category: "default",
       },
       {
-        id: 'default-4',
-        name: 'Default Orange',
-        url: '/images/avatars/default-orange.svg',
-        category: 'default',
+        id: "default-4",
+        name: "Default Orange",
+        url: "/images/avatars/default-orange.svg",
+        category: "default",
       },
       {
-        id: 'ai-1',
-        name: 'AI Assistant',
-        url: '/images/avatars/ai-robot.svg',
-        category: 'ai',
+        id: "ai-1",
+        name: "AI Assistant",
+        url: "/images/avatars/ai-robot.svg",
+        category: "ai",
       },
       {
-        id: 'ai-2',
-        name: 'Circuit Brain',
-        url: '/images/avatars/ai-brain.svg',
-        category: 'ai',
+        id: "ai-2",
+        name: "Circuit Brain",
+        url: "/images/avatars/ai-brain.svg",
+        category: "ai",
       },
     ];
 
@@ -234,9 +251,8 @@ export async function handleGetAvatarTemplates(req: Request, res: Response) {
       success: true,
       templates,
     });
-
   } catch (error) {
-    console.error('Failed to get avatar templates:', error);
+    console.error("Failed to get avatar templates:", error);
     res.status(500).json({
       success: false,
       error: "Failed to load avatar templates",
@@ -268,19 +284,23 @@ export async function handleSetAvatarTemplate(req: Request, res: Response) {
     const templates = await handleGetAvatarTemplates(req, res);
     // Note: This is a simplified implementation
     // In a real app, you'd want to validate the template ID properly
-    
+
     const templateUrl = `/images/avatars/${templateId}.svg`;
-    
-    const success = await enhancedAuthService.updateProfileImage(userId, templateUrl);
+
+    const success = await enhancedAuthService.updateProfileImage(
+      userId,
+      templateUrl,
+    );
 
     res.json({
       success,
       imageUrl: success ? templateUrl : null,
-      message: success ? "Avatar template set successfully" : "Failed to set avatar template",
+      message: success
+        ? "Avatar template set successfully"
+        : "Failed to set avatar template",
     });
-
   } catch (error) {
-    console.error('Failed to set avatar template:', error);
+    console.error("Failed to set avatar template:", error);
     res.status(500).json({
       success: false,
       error: "Failed to set avatar template",
@@ -289,4 +309,4 @@ export async function handleSetAvatarTemplate(req: Request, res: Response) {
 }
 
 // Middleware wrapper for multer
-export const uploadMiddleware = upload.single('profileImage');
+export const uploadMiddleware = upload.single("profileImage");

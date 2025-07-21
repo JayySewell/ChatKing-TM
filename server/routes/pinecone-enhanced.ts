@@ -7,13 +7,13 @@ export async function handlePineconeConnection(req: Request, res: Response) {
   try {
     const connection = await pineconeService.testConnection();
     const indexes = await pineconeService.listIndexes();
-    
+
     res.json({
       success: true,
       connected: connection.connected,
       error: connection.error,
       indexCount: connection.indexCount,
-      indexes: indexes.map(idx => ({
+      indexes: indexes.map((idx) => ({
         name: idx.name,
         dimension: idx.dimension,
         metric: idx.metric,
@@ -42,7 +42,10 @@ export async function handleSemanticSearch(req: Request, res: Response) {
     }
 
     // Content filtering
-    const contentAnalysis = await contentFilterService.analyzeContent(query, userId);
+    const contentAnalysis = await contentFilterService.analyzeContent(
+      query,
+      userId,
+    );
     if (!contentAnalysis.isAllowed) {
       return res.status(403).json({
         success: false,
@@ -62,7 +65,7 @@ export async function handleSemanticSearch(req: Request, res: Response) {
     // Filter results through content filter
     const filteredResults = await contentFilterService.filterSearchResults(
       searchResults.results,
-      userId
+      userId,
     );
 
     res.json({
@@ -103,7 +106,10 @@ export async function handleAddKnowledge(req: Request, res: Response) {
     }
 
     // Content filtering
-    const contentAnalysis = await contentFilterService.analyzeContent(content, userId);
+    const contentAnalysis = await contentFilterService.analyzeContent(
+      content,
+      userId,
+    );
     if (!contentAnalysis.isAllowed) {
       return res.status(403).json({
         success: false,
@@ -113,15 +119,21 @@ export async function handleAddKnowledge(req: Request, res: Response) {
     }
 
     // Add knowledge to vector database
-    const success = await pineconeService.addKnowledge(content, {
-      ...metadata,
-      addedBy: userId,
-      contentRating: contentAnalysis.ageRating,
-    }, indexName);
+    const success = await pineconeService.addKnowledge(
+      content,
+      {
+        ...metadata,
+        addedBy: userId,
+        contentRating: contentAnalysis.ageRating,
+      },
+      indexName,
+    );
 
     res.json({
       success,
-      message: success ? "Knowledge added successfully" : "Failed to add knowledge",
+      message: success
+        ? "Knowledge added successfully"
+        : "Failed to add knowledge",
       contentRating: contentAnalysis.ageRating,
     });
   } catch (error) {
@@ -157,18 +169,23 @@ export async function handleConversationMemory(req: Request, res: Response) {
       userId,
       conversationId,
       messages,
-      metadata
+      metadata,
     );
 
     res.json({
       success,
-      message: success ? "Conversation memory stored" : "Failed to store conversation memory",
+      message: success
+        ? "Conversation memory stored"
+        : "Failed to store conversation memory",
     });
   } catch (error) {
     console.error("Store conversation memory failed:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Failed to store conversation memory",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to store conversation memory",
     });
   }
 }
@@ -196,7 +213,7 @@ export async function handleSearchConversations(req: Request, res: Response) {
     const conversations = await pineconeService.searchUserConversations(
       userId,
       query,
-      limit || 5
+      limit || 5,
     );
 
     res.json({
@@ -209,7 +226,10 @@ export async function handleSearchConversations(req: Request, res: Response) {
     console.error("Search conversations failed:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Failed to search conversations",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to search conversations",
     });
   }
 }
@@ -217,7 +237,7 @@ export async function handleSearchConversations(req: Request, res: Response) {
 export async function handleGetIndexStats(req: Request, res: Response) {
   try {
     const { indexName } = req.params;
-    
+
     if (!indexName) {
       return res.status(400).json({
         success: false,
@@ -236,7 +256,8 @@ export async function handleGetIndexStats(req: Request, res: Response) {
     console.error("Get index stats failed:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Failed to get index stats",
+      error:
+        error instanceof Error ? error.message : "Failed to get index stats",
     });
   }
 }
@@ -255,7 +276,7 @@ export async function handleCreateIndex(req: Request, res: Response) {
 
     // Check if user is admin
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    if (!userProfile || userProfile.role !== 'admin') {
+    if (!userProfile || userProfile.role !== "admin") {
       return res.status(403).json({
         success: false,
         error: "Admin privileges required",
@@ -269,11 +290,17 @@ export async function handleCreateIndex(req: Request, res: Response) {
       });
     }
 
-    const success = await pineconeService.createIndex(name, dimension, metric || 'cosine');
+    const success = await pineconeService.createIndex(
+      name,
+      dimension,
+      metric || "cosine",
+    );
 
     res.json({
       success,
-      message: success ? "Index created successfully" : "Failed to create index",
+      message: success
+        ? "Index created successfully"
+        : "Failed to create index",
       indexName: name,
     });
   } catch (error) {

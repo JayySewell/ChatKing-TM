@@ -28,32 +28,37 @@ export class ApiKeyService {
   private encryptionKey: string;
 
   constructor() {
-    this.encryptionKey = process.env.ENCRYPTION_KEY || "chatking-secure-key-2024";
+    this.encryptionKey =
+      process.env.ENCRYPTION_KEY || "chatking-secure-key-2024";
   }
 
   private encrypt(text: string): string {
     const iv = crypto.randomBytes(16);
     // Ensure key is exactly 32 bytes for AES-256
-    const key = crypto.createHash('sha256').update(this.encryptionKey).digest();
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
+    const key = crypto.createHash("sha256").update(this.encryptionKey).digest();
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+    let encrypted = cipher.update(text, "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return iv.toString("hex") + ":" + encrypted;
   }
 
   private decrypt(encryptedText: string): string {
-    const textParts = encryptedText.split(':');
-    const iv = Buffer.from(textParts.shift()!, 'hex');
-    const encrypted = textParts.join(':');
+    const textParts = encryptedText.split(":");
+    const iv = Buffer.from(textParts.shift()!, "hex");
+    const encrypted = textParts.join(":");
     // Ensure key is exactly 32 bytes for AES-256
-    const key = crypto.createHash('sha256').update(this.encryptionKey).digest();
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    const key = crypto.createHash("sha256").update(this.encryptionKey).digest();
+    const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
     return decrypted;
   }
 
-  async storeApiKey(userId: string, service: string, config: Omit<ApiKeyConfig, 'createdAt' | 'usageCount'>): Promise<boolean> {
+  async storeApiKey(
+    userId: string,
+    service: string,
+    config: Omit<ApiKeyConfig, "createdAt" | "usageCount">,
+  ): Promise<boolean> {
     try {
       const encryptedKey = this.encrypt(config.key);
       const apiKeyData: ApiKeyConfig = {
@@ -91,27 +96,29 @@ export class ApiKeyService {
 
   async validateApiKey(service: string, key: string): Promise<boolean> {
     switch (service.toLowerCase()) {
-      case 'pinecone':
-        return key.startsWith('pcsk_') && key.length > 20;
-      case 'openai':
-        return key.startsWith('sk-') && key.length > 20;
-      case 'openrouter':
-        return key.startsWith('sk-or-') && key.length > 20;
-      case 'brave':
+      case "pinecone":
+        return key.startsWith("pcsk_") && key.length > 20;
+      case "openai":
+        return key.startsWith("sk-") && key.length > 20;
+      case "openrouter":
+        return key.startsWith("sk-or-") && key.length > 20;
+      case "brave":
         return key.length === 32 && /^[a-zA-Z0-9]+$/.test(key);
-      case 'google':
-        return key.length > 10 && key.includes('.googleusercontent.com');
-      case 'apple':
+      case "google":
+        return key.length > 10 && key.includes(".googleusercontent.com");
+      case "apple":
         return key.length > 10;
       default:
         return key.length > 5;
     }
   }
 
-  async listApiKeys(userId: string): Promise<Record<string, Omit<ApiKeyConfig, 'key'>>> {
+  async listApiKeys(
+    userId: string,
+  ): Promise<Record<string, Omit<ApiKeyConfig, "key">>> {
     try {
       const keys = await ckStorageExtended.getAllApiKeys(userId);
-      const sanitized: Record<string, Omit<ApiKeyConfig, 'key'>> = {};
+      const sanitized: Record<string, Omit<ApiKeyConfig, "key">> = {};
 
       for (const [service, config] of Object.entries(keys)) {
         sanitized[service] = {
@@ -140,7 +147,9 @@ export class ApiKeyService {
     }
   }
 
-  async updateEnvironmentVariables(variables: EnvironmentVariables): Promise<void> {
+  async updateEnvironmentVariables(
+    variables: EnvironmentVariables,
+  ): Promise<void> {
     // Update process.env with new variables
     for (const [key, value] of Object.entries(variables)) {
       if (value) {
@@ -167,44 +176,59 @@ export class ApiKeyService {
     };
   }
 
-  async testApiKey(service: string, key: string): Promise<{ valid: boolean; error?: string }> {
+  async testApiKey(
+    service: string,
+    key: string,
+  ): Promise<{ valid: boolean; error?: string }> {
     try {
       switch (service.toLowerCase()) {
-        case 'pinecone':
+        case "pinecone":
           // Test Pinecone connection
-          const response = await fetch(`https://controller.us-east1-aws.pinecone.io/databases`, {
-            headers: { 'Api-Key': key }
-          });
+          const response = await fetch(
+            `https://controller.us-east1-aws.pinecone.io/databases`,
+            {
+              headers: { "Api-Key": key },
+            },
+          );
           return { valid: response.ok };
 
-        case 'openai':
+        case "openai":
           // Test OpenAI connection
-          const openaiResponse = await fetch('https://api.openai.com/v1/models', {
-            headers: { 'Authorization': `Bearer ${key}` }
-          });
+          const openaiResponse = await fetch(
+            "https://api.openai.com/v1/models",
+            {
+              headers: { Authorization: `Bearer ${key}` },
+            },
+          );
           return { valid: openaiResponse.ok };
 
-        case 'openrouter':
+        case "openrouter":
           // Test OpenRouter connection
-          const orResponse = await fetch('https://openrouter.ai/api/v1/models', {
-            headers: { 'Authorization': `Bearer ${key}` }
-          });
+          const orResponse = await fetch(
+            "https://openrouter.ai/api/v1/models",
+            {
+              headers: { Authorization: `Bearer ${key}` },
+            },
+          );
           return { valid: orResponse.ok };
 
-        case 'brave':
+        case "brave":
           // Test Brave Search connection
-          const braveResponse = await fetch('https://api.search.brave.com/res/v1/web/search?q=test', {
-            headers: { 'X-Subscription-Token': key }
-          });
+          const braveResponse = await fetch(
+            "https://api.search.brave.com/res/v1/web/search?q=test",
+            {
+              headers: { "X-Subscription-Token": key },
+            },
+          );
           return { valid: braveResponse.ok };
 
         default:
           return { valid: this.validateApiKey(service, key) };
       }
     } catch (error) {
-      return { 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Connection failed' 
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : "Connection failed",
       };
     }
   }
@@ -214,7 +238,9 @@ export class ApiKeyService {
     const defaultKeys = {
       pinecone: {
         name: "Default Pinecone",
-        key: process.env.PINECONE_API_KEY || "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA",
+        key:
+          process.env.PINECONE_API_KEY ||
+          "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA",
         environment: process.env.PINECONE_ENVIRONMENT || "us-east1-aws",
         isActive: true,
       },

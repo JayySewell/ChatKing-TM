@@ -37,10 +37,7 @@ export class PineconeService {
   private indexHost: string;
   private environment: string;
 
-  constructor(
-    apiKey?: string,
-    environment?: string,
-  ) {
+  constructor(apiKey?: string, environment?: string) {
     // Use production config by default
     this.apiKey = apiKey || productionConfig.pinecone.apiKey;
     this.environment = environment || productionConfig.pinecone.environment;
@@ -49,7 +46,9 @@ export class PineconeService {
 
     // Validate API key format
     if (!this.validateApiKey()) {
-      console.warn("Warning: Invalid Pinecone API key format. Some features may not work.");
+      console.warn(
+        "Warning: Invalid Pinecone API key format. Some features may not work.",
+      );
     }
   }
 
@@ -81,25 +80,36 @@ export class PineconeService {
       const data = await this.makeRequest(`${this.baseUrl}/databases`);
 
       // Transform Pinecone API response to our format
-      const indexes = data.databases?.map((db: any) => ({
-        name: db.name,
-        dimension: db.dimension,
-        metric: db.metric,
-        vectorCount: db.status?.vectorCount || 0,
-      })) || [];
+      const indexes =
+        data.databases?.map((db: any) => ({
+          name: db.name,
+          dimension: db.dimension,
+          metric: db.metric,
+          vectorCount: db.status?.vectorCount || 0,
+        })) || [];
 
       // If no real indexes exist and we have a valid API key, create default ones
       if (indexes.length === 0 && this.validateApiKey()) {
-        console.log("No Pinecone indexes found, creating production indexes...");
+        console.log(
+          "No Pinecone indexes found, creating production indexes...",
+        );
         const defaultIndexes = await this.createDefaultIndexes();
         return defaultIndexes;
       }
 
       // If we have indexes, make sure our production index exists
-      const productionIndex = indexes.find(idx => idx.name === productionConfig.pinecone.indexName);
+      const productionIndex = indexes.find(
+        (idx) => idx.name === productionConfig.pinecone.indexName,
+      );
       if (!productionIndex && this.validateApiKey()) {
-        console.log(`Creating production index: ${productionConfig.pinecone.indexName}`);
-        await this.createIndex(productionConfig.pinecone.indexName, 768, "cosine");
+        console.log(
+          `Creating production index: ${productionConfig.pinecone.indexName}`,
+        );
+        await this.createIndex(
+          productionConfig.pinecone.indexName,
+          768,
+          "cosine",
+        );
         indexes.push({
           name: productionConfig.pinecone.indexName,
           dimension: 768,
@@ -112,7 +122,7 @@ export class PineconeService {
     } catch (error) {
       console.error("Failed to list Pinecone indexes:", error);
       // Only fallback to mock data in development
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return this.getMockIndexes();
       }
       // In production, return empty array if API fails
@@ -160,18 +170,24 @@ export class PineconeService {
         dimension: 1536,
         metric: "cosine" as const,
         vectorCount: 0,
-      }
+      },
     ];
 
     const createdIndexes: PineconeIndex[] = [];
 
     for (const index of defaultIndexes) {
-      console.log(`Creating index: ${index.name} (${index.dimension}D, ${index.metric})`);
-      const created = await this.createIndex(index.name, index.dimension, index.metric);
+      console.log(
+        `Creating index: ${index.name} (${index.dimension}D, ${index.metric})`,
+      );
+      const created = await this.createIndex(
+        index.name,
+        index.dimension,
+        index.metric,
+      );
       if (created) {
         createdIndexes.push(index);
         // Wait a bit between creations to avoid rate limits
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
@@ -246,11 +262,11 @@ export class PineconeService {
       console.error("Failed to query vectors:", error);
 
       // In production, try to return meaningful error info
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV === "production") {
         return {
           matches: [],
           namespace,
-          error: error instanceof Error ? error.message : 'Query failed',
+          error: error instanceof Error ? error.message : "Query failed",
         };
       }
 
@@ -306,7 +322,9 @@ export class PineconeService {
 
     try {
       // Get the actual index details from Pinecone API
-      const indexDetails = await this.makeRequest(`${this.baseUrl}/databases/${indexName}`);
+      const indexDetails = await this.makeRequest(
+        `${this.baseUrl}/databases/${indexName}`,
+      );
 
       if (indexDetails && indexDetails.status && indexDetails.status.host) {
         return `https://${indexDetails.status.host}`;
@@ -315,20 +333,27 @@ export class PineconeService {
       // Fallback to constructed URL
       return `https://${indexName}.svc.${this.environment}.pinecone.io`;
     } catch (error) {
-      console.warn(`Failed to get index URL for ${indexName}, using constructed URL:`, error);
+      console.warn(
+        `Failed to get index URL for ${indexName}, using constructed URL:`,
+        error,
+      );
       // Construct URL based on naming convention
       return `https://${indexName}.svc.${this.environment}.pinecone.io`;
     }
   }
 
   // Text embedding utilities
-  async embedText(text: string, embeddingService?: 'openai' | 'openrouter', apiKey?: string): Promise<number[]> {
+  async embedText(
+    text: string,
+    embeddingService?: "openai" | "openrouter",
+    apiKey?: string,
+  ): Promise<number[]> {
     // Try real embedding services first if API keys are available
-    if (embeddingService === 'openai' && apiKey) {
+    if (embeddingService === "openai" && apiKey) {
       return this.embedTextWithOpenAI(text, apiKey);
     }
 
-    if (embeddingService === 'openrouter' && apiKey) {
+    if (embeddingService === "openrouter" && apiKey) {
       return this.embedTextWithOpenRouter(text, apiKey);
     }
 
@@ -434,10 +459,12 @@ export class PineconeService {
   }
 
   validateApiKey(): boolean {
-    return this.apiKey &&
-           (this.apiKey.startsWith("pcsk_") || this.apiKey.startsWith("pc-")) &&
-           this.apiKey.length > 20 &&
-           !this.apiKey.includes("REQUIRED");
+    return (
+      this.apiKey &&
+      (this.apiKey.startsWith("pcsk_") || this.apiKey.startsWith("pc-")) &&
+      this.apiKey.length > 20 &&
+      !this.apiKey.includes("REQUIRED")
+    );
   }
 
   updateApiKey(newKey: string, environment?: string): void {
@@ -448,21 +475,25 @@ export class PineconeService {
     }
   }
 
-  async testConnection(): Promise<{ connected: boolean; error?: string; indexCount?: number }> {
+  async testConnection(): Promise<{
+    connected: boolean;
+    error?: string;
+    indexCount?: number;
+  }> {
     try {
       if (!this.validateApiKey()) {
-        return { connected: false, error: 'Invalid API key format' };
+        return { connected: false, error: "Invalid API key format" };
       }
 
       const indexes = await this.listIndexes();
       return {
         connected: true,
-        indexCount: indexes.length
+        indexCount: indexes.length,
       };
     } catch (error) {
       return {
         connected: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -474,7 +505,7 @@ export class PineconeService {
       topK?: number;
       filter?: Record<string, any>;
       includeMetadata?: boolean;
-    } = {}
+    } = {},
   ): Promise<{
     results: Array<{
       id: string;
@@ -491,7 +522,11 @@ export class PineconeService {
 
     try {
       // Generate embedding for the query
-      const queryEmbedding = await this.embedText(query, 'openrouter', productionConfig.openRouter.apiKey);
+      const queryEmbedding = await this.embedText(
+        query,
+        "openrouter",
+        productionConfig.openRouter.apiKey,
+      );
 
       // Perform vector search
       const searchResults = await this.queryVectors(indexName, {
@@ -501,7 +536,7 @@ export class PineconeService {
         filter: options.filter,
       });
 
-      const results = searchResults.matches.map(match => ({
+      const results = searchResults.matches.map((match) => ({
         id: match.id,
         score: match.score,
         content: match.metadata?.content || match.metadata?.text,
@@ -514,18 +549,18 @@ export class PineconeService {
         processingTime: Date.now() - startTime,
       };
     } catch (error) {
-      console.error('Semantic search failed:', error);
+      console.error("Semantic search failed:", error);
 
       // Return mock results in case of error
       return {
         results: [
           {
-            id: 'mock_result_1',
+            id: "mock_result_1",
             score: 0.85,
             content: `Here's some information related to "${query}". This is a fallback result while the vector database is being set up.`,
             metadata: {
-              title: 'Sample Knowledge Entry',
-              category: 'general',
+              title: "Sample Knowledge Entry",
+              category: "general",
               timestamp: new Date().toISOString(),
             },
           },
@@ -539,13 +574,17 @@ export class PineconeService {
   async addKnowledge(
     content: string,
     metadata: Record<string, any> = {},
-    indexName?: string
+    indexName?: string,
   ): Promise<boolean> {
     try {
       const targetIndex = indexName || productionConfig.pinecone.indexName;
 
       // Generate embedding for content
-      const embedding = await this.embedText(content, 'openrouter', productionConfig.openRouter.apiKey);
+      const embedding = await this.embedText(
+        content,
+        "openrouter",
+        productionConfig.openRouter.apiKey,
+      );
 
       // Create vector with metadata
       const vector: PineconeVector = {
@@ -554,7 +593,7 @@ export class PineconeService {
         metadata: {
           content,
           timestamp: new Date().toISOString(),
-          type: 'knowledge',
+          type: "knowledge",
           ...metadata,
         },
       };
@@ -568,7 +607,7 @@ export class PineconeService {
 
       return success;
     } catch (error) {
-      console.error('Failed to add knowledge:', error);
+      console.error("Failed to add knowledge:", error);
       return false;
     }
   }
@@ -577,14 +616,20 @@ export class PineconeService {
     userId: string,
     conversationId: string,
     messages: Array<{ role: string; content: string }>,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, any> = {},
   ): Promise<boolean> {
     try {
       // Combine messages into searchable content
-      const conversationText = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+      const conversationText = messages
+        .map((msg) => `${msg.role}: ${msg.content}`)
+        .join("\n");
 
       // Generate embedding
-      const embedding = await this.embedText(conversationText, 'openrouter', productionConfig.openRouter.apiKey);
+      const embedding = await this.embedText(
+        conversationText,
+        "openrouter",
+        productionConfig.openRouter.apiKey,
+      );
 
       // Create vector
       const vector: PineconeVector = {
@@ -595,14 +640,16 @@ export class PineconeService {
           conversationId,
           messages,
           timestamp: new Date().toISOString(),
-          type: 'conversation',
+          type: "conversation",
           messageCount: messages.length,
           ...metadata,
         },
       };
 
       // Store in conversations index
-      const success = await this.upsertVectors('chatking-conversations', [vector]);
+      const success = await this.upsertVectors("chatking-conversations", [
+        vector,
+      ]);
 
       if (success) {
         console.log(`Conversation memory stored:`, vector.id);
@@ -610,7 +657,7 @@ export class PineconeService {
 
       return success;
     } catch (error) {
-      console.error('Failed to store conversation memory:', error);
+      console.error("Failed to store conversation memory:", error);
       return false;
     }
   }
@@ -618,31 +665,37 @@ export class PineconeService {
   async searchUserConversations(
     userId: string,
     query: string,
-    limit: number = 5
-  ): Promise<Array<{
-    conversationId: string;
-    score: number;
-    messages: Array<{ role: string; content: string }>;
-    timestamp: string;
-  }>> {
+    limit: number = 5,
+  ): Promise<
+    Array<{
+      conversationId: string;
+      score: number;
+      messages: Array<{ role: string; content: string }>;
+      timestamp: string;
+    }>
+  > {
     try {
-      const queryEmbedding = await this.embedText(query, 'openrouter', productionConfig.openRouter.apiKey);
+      const queryEmbedding = await this.embedText(
+        query,
+        "openrouter",
+        productionConfig.openRouter.apiKey,
+      );
 
-      const results = await this.queryVectors('chatking-conversations', {
+      const results = await this.queryVectors("chatking-conversations", {
         vector: queryEmbedding,
         topK: limit,
         includeMetadata: true,
         filter: { userId },
       });
 
-      return results.matches.map(match => ({
+      return results.matches.map((match) => ({
         conversationId: match.metadata?.conversationId,
         score: match.score,
         messages: match.metadata?.messages || [],
         timestamp: match.metadata?.timestamp,
       }));
     } catch (error) {
-      console.error('Failed to search user conversations:', error);
+      console.error("Failed to search user conversations:", error);
       return [];
     }
   }
@@ -650,15 +703,15 @@ export class PineconeService {
   async embedTextWithOpenAI(text: string, apiKey?: string): Promise<number[]> {
     if (apiKey) {
       try {
-        const response = await fetch('https://api.openai.com/v1/embeddings', {
-          method: 'POST',
+        const response = await fetch("https://api.openai.com/v1/embeddings", {
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             input: text,
-            model: 'text-embedding-ada-002',
+            model: "text-embedding-ada-002",
           }),
         });
 
@@ -667,7 +720,7 @@ export class PineconeService {
           return data.data[0].embedding;
         }
       } catch (error) {
-        console.error('OpenAI embedding failed, falling back to mock:', error);
+        console.error("OpenAI embedding failed, falling back to mock:", error);
       }
     }
 
@@ -675,29 +728,38 @@ export class PineconeService {
     return this.generateMockEmbedding(text);
   }
 
-  async embedTextWithOpenRouter(text: string, apiKey?: string): Promise<number[]> {
+  async embedTextWithOpenRouter(
+    text: string,
+    apiKey?: string,
+  ): Promise<number[]> {
     if (apiKey) {
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/embeddings', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://chatkingai.com',
-            'X-Title': 'ChatKing AI',
+        const response = await fetch(
+          "https://openrouter.ai/api/v1/embeddings",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://chatkingai.com",
+              "X-Title": "ChatKing AI",
+            },
+            body: JSON.stringify({
+              input: text,
+              model: "openai/text-embedding-ada-002",
+            }),
           },
-          body: JSON.stringify({
-            input: text,
-            model: 'openai/text-embedding-ada-002',
-          }),
-        });
+        );
 
         if (response.ok) {
           const data = await response.json();
           return data.data[0].embedding;
         }
       } catch (error) {
-        console.error('OpenRouter embedding failed, falling back to mock:', error);
+        console.error(
+          "OpenRouter embedding failed, falling back to mock:",
+          error,
+        );
       }
     }
 

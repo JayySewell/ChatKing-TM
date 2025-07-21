@@ -29,7 +29,7 @@ interface ApiKeyConfig {
 
 interface ServiceStatus {
   name: string;
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
   responseTime?: number;
   error?: string;
   details?: any;
@@ -49,13 +49,20 @@ interface EnvironmentVariables {
 }
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<"api-keys" | "environment" | "services" | "security">("api-keys");
+  const [activeTab, setActiveTab] = useState<
+    "api-keys" | "environment" | "services" | "security"
+  >("api-keys");
   const [apiKeys, setApiKeys] = useState<Record<string, ApiKeyConfig>>({});
   const [environment, setEnvironment] = useState<EnvironmentVariables>({});
   const [services, setServices] = useState<ServiceStatus[]>([]);
   const [loading, setLoading] = useState(false);
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
-  const [newApiKey, setNewApiKey] = useState({ service: "", name: "", key: "", environment: "" });
+  const [newApiKey, setNewApiKey] = useState({
+    service: "",
+    name: "",
+    key: "",
+    environment: "",
+  });
   const [testResults, setTestResults] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -120,7 +127,7 @@ export default function Settings() {
       });
 
       const result = await response.json();
-      setTestResults(prev => ({ ...prev, [service]: result }));
+      setTestResults((prev) => ({ ...prev, [service]: result }));
     } catch (error) {
       console.error("Failed to test API key:", error);
     }
@@ -157,16 +164,16 @@ export default function Settings() {
   };
 
   const toggleShowSecret = (key: string) => {
-    setShowSecrets(prev => ({ ...prev, [key]: !prev[key] }));
+    setShowSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'healthy':
+      case "healthy":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'degraded':
+      case "degraded":
         return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'unhealthy':
+      case "unhealthy":
         return <XCircle className="w-5 h-5 text-red-500" />;
       default:
         return <Monitor className="w-5 h-5 text-gray-500" />;
@@ -175,15 +182,15 @@ export default function Settings() {
 
   const getServiceIcon = (serviceName: string) => {
     switch (serviceName.toLowerCase()) {
-      case 'pinecone':
+      case "pinecone":
         return <Database className="w-5 h-5" />;
-      case 'openrouter':
+      case "openrouter":
         return <Brain className="w-5 h-5" />;
-      case 'bravesearch':
+      case "bravesearch":
         return <Search className="w-5 h-5" />;
-      case 'email':
+      case "email":
         return <Mail className="w-5 h-5" />;
-      case 'security':
+      case "security":
         return <Shield className="w-5 h-5" />;
       default:
         return <Monitor className="w-5 h-5" />;
@@ -203,7 +210,8 @@ export default function Settings() {
               System Settings
             </h1>
             <p className="text-text-muted text-lg">
-              Configure API keys, environment variables, and monitor system health
+              Configure API keys, environment variables, and monitor system
+              health
             </p>
           </div>
 
@@ -243,7 +251,12 @@ export default function Settings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <select
                     value={newApiKey.service}
-                    onChange={(e) => setNewApiKey(prev => ({ ...prev, service: e.target.value }))}
+                    onChange={(e) =>
+                      setNewApiKey((prev) => ({
+                        ...prev,
+                        service: e.target.value,
+                      }))
+                    }
                     className="w-full cyber-input"
                   >
                     <option value="">Select Service</option>
@@ -258,7 +271,12 @@ export default function Settings() {
                   <input
                     type="text"
                     value={newApiKey.name}
-                    onChange={(e) => setNewApiKey(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setNewApiKey((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                     placeholder="Key name/description"
                     className="w-full cyber-input"
                   />
@@ -266,7 +284,9 @@ export default function Settings() {
                   <input
                     type="password"
                     value={newApiKey.key}
-                    onChange={(e) => setNewApiKey(prev => ({ ...prev, key: e.target.value }))}
+                    onChange={(e) =>
+                      setNewApiKey((prev) => ({ ...prev, key: e.target.value }))
+                    }
                     placeholder="API Key"
                     className="w-full cyber-input"
                   />
@@ -274,7 +294,12 @@ export default function Settings() {
                   <input
                     type="text"
                     value={newApiKey.environment}
-                    onChange={(e) => setNewApiKey(prev => ({ ...prev, environment: e.target.value }))}
+                    onChange={(e) =>
+                      setNewApiKey((prev) => ({
+                        ...prev,
+                        environment: e.target.value,
+                      }))
+                    }
                     placeholder="Environment (optional)"
                     className="w-full cyber-input"
                   />
@@ -282,7 +307,9 @@ export default function Settings() {
 
                 <button
                   onClick={saveApiKey}
-                  disabled={!newApiKey.service || !newApiKey.name || !newApiKey.key}
+                  disabled={
+                    !newApiKey.service || !newApiKey.name || !newApiKey.key
+                  }
                   className="btn-cyber"
                 >
                   <Save className="w-4 h-4 mr-2" />
@@ -299,25 +326,32 @@ export default function Settings() {
 
                 <div className="space-y-4">
                   {Object.entries(apiKeys).map(([service, config]) => (
-                    <div key={service} className="p-4 border border-border-glow rounded-lg">
+                    <div
+                      key={service}
+                      className="p-4 border border-border-glow rounded-lg"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           {getServiceIcon(service)}
                           <div>
-                            <h4 className="font-medium text-text-primary capitalize">{service}</h4>
-                            <p className="text-sm text-text-muted">{config.name}</p>
+                            <h4 className="font-medium text-text-primary capitalize">
+                              {service}
+                            </h4>
+                            <p className="text-sm text-text-muted">
+                              {config.name}
+                            </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => testApiKey(service, 'test')}
+                            onClick={() => testApiKey(service, "test")}
                             className="p-2 rounded hover:bg-neon-green/20 transition-colors"
                             title="Test API Key"
                           >
                             <TestTube className="w-4 h-4 text-neon-green" />
                           </button>
-                          
+
                           <button
                             onClick={() => deleteApiKey(service)}
                             className="p-2 rounded hover:bg-red-500/20 transition-colors"
@@ -331,13 +365,17 @@ export default function Settings() {
                       <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-text-muted">Status:</span>
-                          <span className={`ml-1 ${config.isActive ? 'text-green-500' : 'text-red-500'}`}>
-                            {config.isActive ? 'Active' : 'Inactive'}
+                          <span
+                            className={`ml-1 ${config.isActive ? "text-green-500" : "text-red-500"}`}
+                          >
+                            {config.isActive ? "Active" : "Inactive"}
                           </span>
                         </div>
                         <div>
                           <span className="text-text-muted">Usage:</span>
-                          <span className="ml-1 text-text-primary">{config.usageCount}</span>
+                          <span className="ml-1 text-text-primary">
+                            {config.usageCount}
+                          </span>
                         </div>
                         <div>
                           <span className="text-text-muted">Created:</span>
@@ -348,7 +386,9 @@ export default function Settings() {
                         <div>
                           <span className="text-text-muted">Last Used:</span>
                           <span className="ml-1 text-text-primary">
-                            {config.lastUsed ? new Date(config.lastUsed).toLocaleDateString() : 'Never'}
+                            {config.lastUsed
+                              ? new Date(config.lastUsed).toLocaleDateString()
+                              : "Never"}
                           </span>
                         </div>
                       </div>
@@ -362,11 +402,15 @@ export default function Settings() {
                               <XCircle className="w-4 h-4 text-red-500" />
                             )}
                             <span className="text-sm">
-                              {testResults[service].valid ? 'API key is valid' : 'API key failed validation'}
+                              {testResults[service].valid
+                                ? "API key is valid"
+                                : "API key failed validation"}
                             </span>
                           </div>
                           {testResults[service].error && (
-                            <p className="text-sm text-red-400 mt-1">{testResults[service].error}</p>
+                            <p className="text-sm text-red-400 mt-1">
+                              {testResults[service].error}
+                            </p>
                           )}
                         </div>
                       )}
@@ -376,7 +420,9 @@ export default function Settings() {
                   {Object.keys(apiKeys).length === 0 && (
                     <div className="text-center py-8">
                       <Key className="w-12 h-12 text-text-muted mx-auto mb-3" />
-                      <p className="text-text-muted">No API keys configured yet</p>
+                      <p className="text-text-muted">
+                        No API keys configured yet
+                      </p>
                     </div>
                   )}
                 </div>
@@ -403,7 +449,12 @@ export default function Settings() {
                         <input
                           type={showSecrets[key] ? "text" : "password"}
                           value={value || ""}
-                          onChange={(e) => setEnvironment(prev => ({ ...prev, [key]: e.target.value }))}
+                          onChange={(e) =>
+                            setEnvironment((prev) => ({
+                              ...prev,
+                              [key]: e.target.value,
+                            }))
+                          }
                           placeholder={`Enter ${key}`}
                           className="w-full cyber-input pr-10"
                         />
@@ -453,11 +504,16 @@ export default function Settings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {services.map((service) => (
-                    <div key={service.name} className="p-4 border border-border-glow rounded-lg">
+                    <div
+                      key={service.name}
+                      className="p-4 border border-border-glow rounded-lg"
+                    >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           {getServiceIcon(service.name)}
-                          <h4 className="font-medium text-text-primary">{service.name}</h4>
+                          <h4 className="font-medium text-text-primary">
+                            {service.name}
+                          </h4>
                         </div>
                         {getStatusIcon(service.status)}
                       </div>
@@ -465,37 +521,57 @@ export default function Settings() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-text-muted">Status:</span>
-                          <span className={`capitalize ${
-                            service.status === 'healthy' ? 'text-green-500' :
-                            service.status === 'degraded' ? 'text-yellow-500' :
-                            service.status === 'unhealthy' ? 'text-red-500' :
-                            'text-gray-500'
-                          }`}>
+                          <span
+                            className={`capitalize ${
+                              service.status === "healthy"
+                                ? "text-green-500"
+                                : service.status === "degraded"
+                                  ? "text-yellow-500"
+                                  : service.status === "unhealthy"
+                                    ? "text-red-500"
+                                    : "text-gray-500"
+                            }`}
+                          >
                             {service.status}
                           </span>
                         </div>
-                        
+
                         {service.responseTime && (
                           <div className="flex justify-between">
-                            <span className="text-text-muted">Response Time:</span>
-                            <span className="text-text-primary">{service.responseTime}ms</span>
+                            <span className="text-text-muted">
+                              Response Time:
+                            </span>
+                            <span className="text-text-primary">
+                              {service.responseTime}ms
+                            </span>
                           </div>
                         )}
 
                         {service.error && (
                           <div className="mt-2 p-2 bg-red-500/10 rounded border border-red-500/20">
-                            <p className="text-red-400 text-xs">{service.error}</p>
+                            <p className="text-red-400 text-xs">
+                              {service.error}
+                            </p>
                           </div>
                         )}
 
                         {service.details && (
                           <div className="mt-2 p-2 bg-secondary-bg rounded">
-                            {Object.entries(service.details).map(([key, value]) => (
-                              <div key={key} className="flex justify-between text-xs">
-                                <span className="text-text-muted capitalize">{key}:</span>
-                                <span className="text-text-primary">{String(value)}</span>
-                              </div>
-                            ))}
+                            {Object.entries(service.details).map(
+                              ([key, value]) => (
+                                <div
+                                  key={key}
+                                  className="flex justify-between text-xs"
+                                >
+                                  <span className="text-text-muted capitalize">
+                                    {key}:
+                                  </span>
+                                  <span className="text-text-primary">
+                                    {String(value)}
+                                  </span>
+                                </div>
+                              ),
+                            )}
                           </div>
                         )}
                       </div>
@@ -514,14 +590,15 @@ export default function Settings() {
                   <Shield className="w-6 h-6 mr-2 text-red-500" />
                   Security Configuration
                 </h3>
-                
+
                 <div className="text-center py-8">
                   <Shield className="w-16 h-16 text-text-muted mx-auto mb-4" />
                   <h4 className="text-xl font-medium text-text-primary mb-2">
                     Security Settings
                   </h4>
                   <p className="text-text-muted mb-4">
-                    Advanced security configuration options will be available here
+                    Advanced security configuration options will be available
+                    here
                   </p>
                   <div className="space-y-2 text-sm text-text-muted">
                     <p>🔒 Real-time threat detection active</p>

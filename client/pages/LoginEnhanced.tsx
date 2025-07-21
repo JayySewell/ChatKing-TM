@@ -1,5 +1,16 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, User, Mail, Lock, Shield, Chrome, Apple, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  Shield,
+  Chrome,
+  Apple,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 interface LoginFormData {
   email: string;
@@ -25,7 +36,7 @@ export default function LoginEnhanced() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
+
   const [loginData, setLoginData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -93,7 +104,7 @@ export default function LoginEnhanced() {
         // Store session token
         localStorage.setItem("chatking_session", data.sessionId);
         localStorage.setItem("chatking_user", JSON.stringify(data.user));
-        
+
         // Redirect to main app
         window.location.href = "/";
       } else {
@@ -156,7 +167,9 @@ export default function LoginEnhanced() {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess("Account created successfully! Please check your email for verification.");
+        setSuccess(
+          "Account created successfully! Please check your email for verification.",
+        );
         setTimeout(() => setIsLogin(true), 3000);
       } else {
         setError(data.error || "Registration failed");
@@ -200,7 +213,9 @@ export default function LoginEnhanced() {
             ChatKing AI
           </h1>
           <p className="text-text-muted">
-            {isLogin ? "Welcome back to the future of AI" : "Join the AI revolution"}
+            {isLogin
+              ? "Welcome back to the future of AI"
+              : "Join the AI revolution"}
           </p>
         </div>
 
@@ -252,7 +267,9 @@ export default function LoginEnhanced() {
               className="w-full flex items-center justify-center px-4 py-3 border border-border-glow rounded-lg hover:bg-secondary-bg/50 transition-colors disabled:opacity-50"
             >
               <Chrome className="w-5 h-5 mr-3 text-blue-400" />
-              <span className="text-text-primary">Continue with Google Workspace</span>
+              <span className="text-text-primary">
+                Continue with Google Workspace
+              </span>
             </button>
 
             <button
@@ -270,7 +287,9 @@ export default function LoginEnhanced() {
               <div className="w-full border-t border-border-glow"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-main-bg text-text-muted">Or continue with email</span>
+              <span className="px-2 bg-main-bg text-text-muted">
+                Or continue with email
+              </span>
             </div>
           </div>
 
@@ -287,7 +306,12 @@ export default function LoginEnhanced() {
                     type="email"
                     required
                     value={loginData.email}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setLoginData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     className="w-full pl-10 cyber-input"
                     placeholder="Enter your email"
                   />
@@ -304,7 +328,12 @@ export default function LoginEnhanced() {
                     type={showPassword ? "text" : "password"}
                     required
                     value={loginData.password}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) =>
+                      setLoginData((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
                     className="w-full pl-10 pr-10 cyber-input"
                     placeholder="Enter your password"
                   />
@@ -313,7 +342,11 @@ export default function LoginEnhanced() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -323,12 +356,22 @@ export default function LoginEnhanced() {
                   <input
                     type="checkbox"
                     checked={loginData.rememberMe}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                    onChange={(e) =>
+                      setLoginData((prev) => ({
+                        ...prev,
+                        rememberMe: e.target.checked,
+                      }))
+                    }
                     className="w-4 h-4 text-neon-purple bg-secondary-bg border-border-glow rounded focus:ring-neon-purple focus:ring-2"
                   />
-                  <span className="ml-2 text-sm text-text-muted">Remember me</span>
+                  <span className="ml-2 text-sm text-text-muted">
+                    Remember me
+                  </span>
                 </label>
-                <a href="/forgot-password" className="text-sm text-neon-purple hover:text-purple-300">
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-neon-purple hover:text-purple-300"
+                >
                   Forgot password?
                 </a>
               </div>
@@ -353,7 +396,12 @@ export default function LoginEnhanced() {
                     type="text"
                     required
                     value={registerData.firstName}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, firstName: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        firstName: e.target.value,
+                      }))
+                    }
                     className="w-full cyber-input"
                     placeholder="First name"
                   />
@@ -366,7 +414,12 @@ export default function LoginEnhanced() {
                     type="text"
                     required
                     value={registerData.lastName}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, lastName: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        lastName: e.target.value,
+                      }))
+                    }
                     className="w-full cyber-input"
                     placeholder="Last name"
                   />
@@ -383,7 +436,12 @@ export default function LoginEnhanced() {
                     type="email"
                     required
                     value={registerData.email}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     className="w-full pl-10 cyber-input"
                     placeholder="Enter your email"
                   />
@@ -398,7 +456,12 @@ export default function LoginEnhanced() {
                   type="date"
                   required
                   value={registerData.birthDate}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, birthDate: e.target.value }))}
+                  onChange={(e) =>
+                    setRegisterData((prev) => ({
+                      ...prev,
+                      birthDate: e.target.value,
+                    }))
+                  }
                   className="w-full cyber-input"
                 />
               </div>
@@ -413,7 +476,12 @@ export default function LoginEnhanced() {
                     type={showPassword ? "text" : "password"}
                     required
                     value={registerData.password}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
                     className="w-full pl-10 pr-10 cyber-input"
                     placeholder="Create a password"
                   />
@@ -422,18 +490,29 @@ export default function LoginEnhanced() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
-                
+
                 {registerData.password && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-text-muted">Password strength:</span>
-                      <span className={`font-medium ${
-                        passwordStrength < 50 ? 'text-red-400' : 
-                        passwordStrength < 75 ? 'text-yellow-400' : 'text-green-400'
-                      }`}>
+                      <span className="text-text-muted">
+                        Password strength:
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          passwordStrength < 50
+                            ? "text-red-400"
+                            : passwordStrength < 75
+                              ? "text-yellow-400"
+                              : "text-green-400"
+                        }`}
+                      >
                         {getPasswordStrengthText(passwordStrength)}
                       </span>
                     </div>
@@ -457,7 +536,12 @@ export default function LoginEnhanced() {
                     type={showConfirmPassword ? "text" : "password"}
                     required
                     value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        confirmPassword: e.target.value,
+                      }))
+                    }
                     className="w-full pl-10 pr-10 cyber-input"
                     placeholder="Confirm your password"
                   />
@@ -466,7 +550,11 @@ export default function LoginEnhanced() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -476,12 +564,21 @@ export default function LoginEnhanced() {
                   <input
                     type="checkbox"
                     checked={registerData.agreeToTerms}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, agreeToTerms: e.target.checked }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        agreeToTerms: e.target.checked,
+                      }))
+                    }
                     className="w-4 h-4 mt-0.5 text-neon-purple bg-secondary-bg border-border-glow rounded focus:ring-neon-purple focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-text-muted">
                     I agree to the{" "}
-                    <a href="/terms" className="text-neon-purple hover:text-purple-300" target="_blank">
+                    <a
+                      href="/terms"
+                      className="text-neon-purple hover:text-purple-300"
+                      target="_blank"
+                    >
                       Terms of Service
                     </a>
                   </span>
@@ -491,12 +588,21 @@ export default function LoginEnhanced() {
                   <input
                     type="checkbox"
                     checked={registerData.agreeToPrivacy}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, agreeToPrivacy: e.target.checked }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({
+                        ...prev,
+                        agreeToPrivacy: e.target.checked,
+                      }))
+                    }
                     className="w-4 h-4 mt-0.5 text-neon-purple bg-secondary-bg border-border-glow rounded focus:ring-neon-purple focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-text-muted">
                     I agree to the{" "}
-                    <a href="/privacy" className="text-neon-purple hover:text-purple-300" target="_blank">
+                    <a
+                      href="/privacy"
+                      className="text-neon-purple hover:text-purple-300"
+                      target="_blank"
+                    >
                       Privacy Policy
                     </a>
                   </span>

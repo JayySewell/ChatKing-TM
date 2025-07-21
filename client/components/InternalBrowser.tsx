@@ -72,7 +72,7 @@ export default function InternalBrowser({
       searchType,
     },
   ]);
-  
+
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -102,7 +102,7 @@ export default function InternalBrowser({
 
   const performSearch = async (query: string, type: string) => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch("/api/web/search", {
         method: "POST",
@@ -117,10 +117,13 @@ export default function InternalBrowser({
       });
 
       const data = await response.json();
-      
+
       if (data.results) {
         setSearchResults(data.results);
-        updateActiveTab({ title: `${query} - ChatKing Search`, url: `search://${query}` });
+        updateActiveTab({
+          title: `${query} - ChatKing Search`,
+          url: `search://${query}`,
+        });
       }
     } catch (error) {
       console.error("Search failed:", error);
@@ -132,21 +135,21 @@ export default function InternalBrowser({
 
   const navigateToUrl = async (url: string) => {
     setIsLoading(true);
-    
+
     // Add to history
     const newHistory = [...history.slice(0, historyIndex + 1), url];
     setHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
     setCanGoBack(newHistory.length > 1);
     setCanGoForward(false);
-    
+
     setCurrentUrl(url);
     setAddressBar(url);
-    
+
     if (onNavigate) {
       onNavigate(url);
     }
-    
+
     // Simulate loading time
     setTimeout(() => setIsLoading(false), 500);
   };
@@ -187,7 +190,7 @@ export default function InternalBrowser({
 
   const handleAddressBarSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (addressBar.includes(".") || addressBar.startsWith("http")) {
       // It's a URL
       navigateToUrl(addressBar);
@@ -198,10 +201,8 @@ export default function InternalBrowser({
   };
 
   const updateActiveTab = (updates: Partial<BrowserTab>) => {
-    setTabs(prevTabs =>
-      prevTabs.map(tab =>
-        tab.isActive ? { ...tab, ...updates } : tab
-      )
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => (tab.isActive ? { ...tab, ...updates } : tab)),
     );
   };
 
@@ -213,9 +214,9 @@ export default function InternalBrowser({
       isActive: true,
       isLoading: false,
     };
-    
-    setTabs(prevTabs => [
-      ...prevTabs.map(tab => ({ ...tab, isActive: false })),
+
+    setTabs((prevTabs) => [
+      ...prevTabs.map((tab) => ({ ...tab, isActive: false })),
       newTab,
     ]);
     setCurrentUrl("");
@@ -223,8 +224,8 @@ export default function InternalBrowser({
   };
 
   const closeTab = (tabId: string) => {
-    setTabs(prevTabs => {
-      const newTabs = prevTabs.filter(tab => tab.id !== tabId);
+    setTabs((prevTabs) => {
+      const newTabs = prevTabs.filter((tab) => tab.id !== tabId);
       if (newTabs.length === 0) {
         return [
           {
@@ -241,14 +242,14 @@ export default function InternalBrowser({
   };
 
   const switchTab = (tabId: string) => {
-    setTabs(prevTabs =>
-      prevTabs.map(tab => ({
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => ({
         ...tab,
         isActive: tab.id === tabId,
-      }))
+      })),
     );
-    
-    const tab = tabs.find(t => t.id === tabId);
+
+    const tab = tabs.find((t) => t.id === tabId);
     if (tab) {
       setCurrentUrl(tab.url);
       setAddressBar(tab.url);
@@ -263,7 +264,9 @@ export default function InternalBrowser({
           <h3 className="text-xl font-medium text-text-primary mb-2">
             No Results Found
           </h3>
-          <p className="text-text-muted">Try a different search term or check your spelling.</p>
+          <p className="text-text-muted">
+            Try a different search term or check your spelling.
+          </p>
         </div>
       );
     }
@@ -369,7 +372,9 @@ export default function InternalBrowser({
                 <div className="flex items-center space-x-2 mt-1 mb-2">
                   <span className="text-sm text-neon-green">{result.url}</span>
                   {result.age && (
-                    <span className="text-xs text-text-muted">• {result.age}</span>
+                    <span className="text-xs text-text-muted">
+                      • {result.age}
+                    </span>
                   )}
                   <ExternalLink className="w-3 h-3 text-text-muted" />
                 </div>
@@ -391,10 +396,15 @@ export default function InternalBrowser({
 
     // Check if it's a safe URL to embed
     const isSafeToEmbed = (url: string) => {
-      const unsafeHosts = ["youtube.com", "vimeo.com", "facebook.com", "twitter.com"];
+      const unsafeHosts = [
+        "youtube.com",
+        "vimeo.com",
+        "facebook.com",
+        "twitter.com",
+      ];
       try {
         const urlObj = new URL(url);
-        return !unsafeHosts.some(host => urlObj.hostname.includes(host));
+        return !unsafeHosts.some((host) => urlObj.hostname.includes(host));
       } catch {
         return false;
       }
@@ -408,7 +418,8 @@ export default function InternalBrowser({
             External Site
           </h3>
           <p className="text-text-muted mb-4 text-center">
-            This site cannot be displayed in the internal browser for security reasons.
+            This site cannot be displayed in the internal browser for security
+            reasons.
           </p>
           <button
             onClick={() => window.open(currentUrl, "_blank")}
@@ -509,7 +520,9 @@ export default function InternalBrowser({
               onClick={refresh}
               className="p-2 rounded hover:bg-main-bg/50"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+              />
             </button>
             <button
               onClick={() => navigateToUrl("")}
@@ -519,7 +532,10 @@ export default function InternalBrowser({
             </button>
           </div>
 
-          <form onSubmit={handleAddressBarSubmit} className="flex-1 flex items-center">
+          <form
+            onSubmit={handleAddressBarSubmit}
+            className="flex-1 flex items-center"
+          >
             <div className="flex-1 relative">
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 {isSecure ? (
@@ -546,7 +562,11 @@ export default function InternalBrowser({
               }`}
               title="Privacy Mode"
             >
-              {showPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPrivacyMode ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
             </button>
             <button
               onClick={() => setContentFilter(!contentFilter)}

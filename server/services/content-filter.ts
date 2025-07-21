@@ -90,37 +90,117 @@ export class ContentFilterService {
 
   private initializeKeywords(): void {
     this.adultKeywords = [
-      "explicit", "adult", "nsfw", "mature", "sexual", "intimate", "erotic",
-      "pornography", "nude", "naked", "sex", "porn", "xxx", "escort",
-      "webcam", "cam girl", "onlyfans", "dating", "hookup", "adult content",
+      "explicit",
+      "adult",
+      "nsfw",
+      "mature",
+      "sexual",
+      "intimate",
+      "erotic",
+      "pornography",
+      "nude",
+      "naked",
+      "sex",
+      "porn",
+      "xxx",
+      "escort",
+      "webcam",
+      "cam girl",
+      "onlyfans",
+      "dating",
+      "hookup",
+      "adult content",
     ];
 
     this.violenceKeywords = [
-      "violence", "violent", "kill", "murder", "death", "weapon", "gun",
-      "knife", "bomb", "explosion", "terrorist", "attack", "assault",
-      "fight", "war", "blood", "gore", "torture", "abuse", "harm",
+      "violence",
+      "violent",
+      "kill",
+      "murder",
+      "death",
+      "weapon",
+      "gun",
+      "knife",
+      "bomb",
+      "explosion",
+      "terrorist",
+      "attack",
+      "assault",
+      "fight",
+      "war",
+      "blood",
+      "gore",
+      "torture",
+      "abuse",
+      "harm",
     ];
 
     this.drugKeywords = [
-      "drugs", "cocaine", "heroin", "marijuana", "cannabis", "weed",
-      "meth", "crystal", "ecstasy", "molly", "lsd", "acid", "pills",
-      "substance", "addiction", "dealer", "high", "stoned", "drunk",
+      "drugs",
+      "cocaine",
+      "heroin",
+      "marijuana",
+      "cannabis",
+      "weed",
+      "meth",
+      "crystal",
+      "ecstasy",
+      "molly",
+      "lsd",
+      "acid",
+      "pills",
+      "substance",
+      "addiction",
+      "dealer",
+      "high",
+      "stoned",
+      "drunk",
     ];
 
     this.hateKeywords = [
-      "hate", "racist", "nazi", "supremacist", "discrimination", "slur",
-      "bigot", "extremist", "radical", "terrorism", "genocide", "ethnic",
-      "religious hatred", "homophobic", "transphobic", "xenophobic",
+      "hate",
+      "racist",
+      "nazi",
+      "supremacist",
+      "discrimination",
+      "slur",
+      "bigot",
+      "extremist",
+      "radical",
+      "terrorism",
+      "genocide",
+      "ethnic",
+      "religious hatred",
+      "homophobic",
+      "transphobic",
+      "xenophobic",
     ];
 
     this.safeKeywords = [
-      "education", "tutorial", "learning", "help", "guide", "information",
-      "knowledge", "study", "research", "academic", "school", "university",
-      "science", "technology", "programming", "development", "creative",
+      "education",
+      "tutorial",
+      "learning",
+      "help",
+      "guide",
+      "information",
+      "knowledge",
+      "study",
+      "research",
+      "academic",
+      "school",
+      "university",
+      "science",
+      "technology",
+      "programming",
+      "development",
+      "creative",
     ];
   }
 
-  async analyzeContent(content: string, userId?: string): Promise<ContentAnalysis> {
+  async analyzeContent(
+    content: string,
+    userId?: string,
+  ): Promise<ContentAnalysis> {
     const lowerContent = content.toLowerCase();
     let flaggedCategories: string[] = [];
     let confidence = 0;
@@ -129,7 +209,10 @@ export class ContentFilterService {
 
     // Check against different categories
     if (this.config.categories.adult) {
-      const adultScore = this.calculateKeywordScore(lowerContent, this.adultKeywords);
+      const adultScore = this.calculateKeywordScore(
+        lowerContent,
+        this.adultKeywords,
+      );
       if (adultScore > 0.3) {
         flaggedCategories.push("adult");
         confidence = Math.max(confidence, adultScore);
@@ -139,27 +222,38 @@ export class ContentFilterService {
     }
 
     if (this.config.categories.violence) {
-      const violenceScore = this.calculateKeywordScore(lowerContent, this.violenceKeywords);
+      const violenceScore = this.calculateKeywordScore(
+        lowerContent,
+        this.violenceKeywords,
+      );
       if (violenceScore > 0.2) {
         flaggedCategories.push("violence");
         confidence = Math.max(confidence, violenceScore);
-        ageRating = violenceScore > 0.5 ? "R" : ageRating === "G" ? "PG-13" : ageRating;
+        ageRating =
+          violenceScore > 0.5 ? "R" : ageRating === "G" ? "PG-13" : ageRating;
         warnings.push("Contains violent content");
       }
     }
 
     if (this.config.categories.drugs) {
-      const drugScore = this.calculateKeywordScore(lowerContent, this.drugKeywords);
+      const drugScore = this.calculateKeywordScore(
+        lowerContent,
+        this.drugKeywords,
+      );
       if (drugScore > 0.2) {
         flaggedCategories.push("drugs");
         confidence = Math.max(confidence, drugScore);
-        ageRating = drugScore > 0.4 ? "R" : ageRating === "G" ? "PG-13" : ageRating;
+        ageRating =
+          drugScore > 0.4 ? "R" : ageRating === "G" ? "PG-13" : ageRating;
         warnings.push("Contains drug-related content");
       }
     }
 
     if (this.config.categories.hate) {
-      const hateScore = this.calculateKeywordScore(lowerContent, this.hateKeywords);
+      const hateScore = this.calculateKeywordScore(
+        lowerContent,
+        this.hateKeywords,
+      );
       if (hateScore > 0.1) {
         flaggedCategories.push("hate");
         confidence = Math.max(confidence, hateScore);
@@ -169,7 +263,10 @@ export class ContentFilterService {
     }
 
     // Check custom blacklist
-    const blacklistScore = this.calculateKeywordScore(lowerContent, this.config.blacklist);
+    const blacklistScore = this.calculateKeywordScore(
+      lowerContent,
+      this.config.blacklist,
+    );
     if (blacklistScore > 0) {
       flaggedCategories.push("blacklisted");
       confidence = Math.max(confidence, 0.9);
@@ -177,9 +274,15 @@ export class ContentFilterService {
     }
 
     // Check if content is whitelisted (educational, safe content)
-    const whitelistScore = this.calculateKeywordScore(lowerContent, this.config.whitelist);
-    const safeScore = this.calculateKeywordScore(lowerContent, this.safeKeywords);
-    
+    const whitelistScore = this.calculateKeywordScore(
+      lowerContent,
+      this.config.whitelist,
+    );
+    const safeScore = this.calculateKeywordScore(
+      lowerContent,
+      this.safeKeywords,
+    );
+
     // Reduce confidence if content appears educational/safe
     if (whitelistScore > 0.3 || safeScore > 0.3) {
       confidence *= 0.5;
@@ -205,7 +308,10 @@ export class ContentFilterService {
       if (this.config.strictMode) {
         isAllowed = confidence < 0.1;
       } else {
-        isAllowed = confidence < 0.5 && !flaggedCategories.includes("hate") && !flaggedCategories.includes("blacklisted");
+        isAllowed =
+          confidence < 0.5 &&
+          !flaggedCategories.includes("hate") &&
+          !flaggedCategories.includes("blacklisted");
       }
     }
 
@@ -218,7 +324,11 @@ export class ContentFilterService {
       isAllowed,
       confidence,
       flaggedCategories,
-      reasoning: this.generateReasoning(flaggedCategories, confidence, isAllowed),
+      reasoning: this.generateReasoning(
+        flaggedCategories,
+        confidence,
+        isAllowed,
+      ),
       ageRating,
       warnings,
     };
@@ -239,7 +349,11 @@ export class ContentFilterService {
     return matches / totalKeywords;
   }
 
-  private generateReasoning(categories: string[], confidence: number, isAllowed: boolean): string {
+  private generateReasoning(
+    categories: string[],
+    confidence: number,
+    isAllowed: boolean,
+  ): string {
     if (categories.length === 0) {
       return "Content appears safe and appropriate";
     }
@@ -251,9 +365,13 @@ export class ContentFilterService {
     return `Content flagged for: ${categories.join(", ")} but allowed. Confidence: ${(confidence * 100).toFixed(1)}%`;
   }
 
-  async verifyAge(userId: string, birthDate: Date, verificationMethod: string): Promise<boolean> {
+  async verifyAge(
+    userId: string,
+    birthDate: Date,
+    verificationMethod: string,
+  ): Promise<boolean> {
     const age = this.calculateAge(birthDate);
-    
+
     if (age < this.config.ageRestrictions.minimumAge) {
       return false;
     }
@@ -272,7 +390,7 @@ export class ContentFilterService {
 
     // Update user profile
     const success = await enhancedAuthService.verifyAge(userId, birthDate);
-    
+
     return success;
   }
 
@@ -280,11 +398,14 @@ export class ContentFilterService {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
-    
+
     return age;
   }
 
@@ -295,16 +416,20 @@ export class ContentFilterService {
     console.log("Age verification stored for user:", data.userId);
   }
 
-  async createStrikeForUser(userId: string, reason: string, content: string): Promise<number> {
+  async createStrikeForUser(
+    userId: string,
+    reason: string,
+    content: string,
+  ): Promise<number> {
     // Log the violation
     console.log(`Content violation for user ${userId}: ${reason}`);
-    
+
     // Add strike to user profile
     const strikes = await enhancedAuthService.addStrike(userId, reason);
-    
+
     // Log the incident
     await this.logContentViolation(userId, reason, content, strikes);
-    
+
     return strikes;
   }
 
@@ -312,7 +437,7 @@ export class ContentFilterService {
     userId: string,
     reason: string,
     content: string,
-    strikes: number
+    strikes: number,
   ): Promise<void> {
     const incident = {
       id: crypto.randomUUID(),
@@ -333,7 +458,7 @@ export class ContentFilterService {
     for (const result of results) {
       const analysis = await this.analyzeContent(
         `${result.title} ${result.description}`,
-        userId
+        userId,
       );
 
       if (analysis.isAllowed) {
@@ -347,7 +472,10 @@ export class ContentFilterService {
     return filteredResults;
   }
 
-  async filterChatMessage(message: string, userId?: string): Promise<{
+  async filterChatMessage(
+    message: string,
+    userId?: string,
+  ): Promise<{
     allowed: boolean;
     filteredMessage?: string;
     warning?: string;
@@ -360,7 +488,7 @@ export class ContentFilterService {
         await this.createStrikeForUser(
           userId,
           `Inappropriate content: ${analysis.flaggedCategories.join(", ")}`,
-          message
+          message,
         );
       }
 
@@ -376,13 +504,17 @@ export class ContentFilterService {
       // Mask potentially problematic content
       for (const keyword of [...this.adultKeywords, ...this.violenceKeywords]) {
         const regex = new RegExp(keyword, "gi");
-        filteredMessage = filteredMessage.replace(regex, "*".repeat(keyword.length));
+        filteredMessage = filteredMessage.replace(
+          regex,
+          "*".repeat(keyword.length),
+        );
       }
     }
 
     return {
       allowed: true,
-      filteredMessage: filteredMessage !== message ? filteredMessage : undefined,
+      filteredMessage:
+        filteredMessage !== message ? filteredMessage : undefined,
     };
   }
 
@@ -401,7 +533,7 @@ export class ContentFilterService {
     recommendations: string[];
   }> {
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    
+
     if (!userProfile) {
       return {
         violationsCount: 0,
@@ -413,7 +545,7 @@ export class ContentFilterService {
 
     const strikes = userProfile.stats.strikes;
     const ageVerified = userProfile.preferences.ageVerified;
-    
+
     let contentRating = "General";
     if (!ageVerified) {
       contentRating = "Restricted";
@@ -426,7 +558,9 @@ export class ContentFilterService {
       recommendations.push("Complete age verification to access more content");
     }
     if (strikes > 0) {
-      recommendations.push("Follow community guidelines to avoid further restrictions");
+      recommendations.push(
+        "Follow community guidelines to avoid further restrictions",
+      );
     }
     if (strikes === 0 && ageVerified) {
       recommendations.push("You have access to all appropriate content");

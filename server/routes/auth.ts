@@ -233,14 +233,19 @@ export const handleUpdateUserProfile: RequestHandler = async (req, res) => {
 
     if (success) {
       // Get updated profile to return
-      const updatedProfile = await enhancedAuthService.getEnhancedProfile(userId);
+      const updatedProfile =
+        await enhancedAuthService.getEnhancedProfile(userId);
 
       // Log analytics
       await ckStorage.logAnalytics("profile_updated", {
         userId,
-        updates: Object.keys({ firstName, lastName, username, bio, preferences }).filter(
-          key => req.body[key] !== undefined
-        ),
+        updates: Object.keys({
+          firstName,
+          lastName,
+          username,
+          bio,
+          preferences,
+        }).filter((key) => req.body[key] !== undefined),
         timestamp: new Date(),
       });
 

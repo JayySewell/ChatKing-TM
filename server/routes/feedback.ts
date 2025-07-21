@@ -29,13 +29,14 @@ export async function handleSubmitFeedback(req: Request, res: Response) {
     if (!type || !category || !severity || !title || !description) {
       return res.status(400).json({
         success: false,
-        error: "Missing required fields: type, category, severity, title, description",
+        error:
+          "Missing required fields: type, category, severity, title, description",
       });
     }
 
     // Get browser and device info from headers
-    const browserInfo = req.headers['user-agent'] || '';
-    const deviceInfo = req.headers['device-info'] || '';
+    const browserInfo = req.headers["user-agent"] || "";
+    const deviceInfo = req.headers["device-info"] || "";
 
     const feedbackId = await feedbackService.submitFeedback({
       userId,
@@ -51,7 +52,12 @@ export async function handleSubmitFeedback(req: Request, res: Response) {
       deviceInfo,
       rating,
       tags,
-      priority: severity === 'critical' ? 'urgent' : severity === 'high' ? 'high' : 'medium',
+      priority:
+        severity === "critical"
+          ? "urgent"
+          : severity === "high"
+            ? "high"
+            : "medium",
     });
 
     res.json({
@@ -59,12 +65,12 @@ export async function handleSubmitFeedback(req: Request, res: Response) {
       feedbackId,
       message: "Feedback submitted successfully",
     });
-
   } catch (error) {
-    console.error('Submit feedback failed:', error);
+    console.error("Submit feedback failed:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Failed to submit feedback",
+      error:
+        error instanceof Error ? error.message : "Failed to submit feedback",
     });
   }
 }
@@ -88,9 +94,8 @@ export async function handleGetUserFeedback(req: Request, res: Response) {
       feedback,
       count: feedback.length,
     });
-
   } catch (error) {
-    console.error('Get user feedback failed:', error);
+    console.error("Get user feedback failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get feedback",
@@ -121,8 +126,8 @@ export async function handleGetFeedback(req: Request, res: Response) {
 
     // Check if user owns this feedback or is admin
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (feedback.userId !== userId && !isAdmin) {
       return res.status(403).json({
         success: false,
@@ -134,9 +139,8 @@ export async function handleGetFeedback(req: Request, res: Response) {
       success: true,
       feedback,
     });
-
   } catch (error) {
-    console.error('Get feedback failed:', error);
+    console.error("Get feedback failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get feedback",
@@ -158,14 +162,18 @@ export async function handleVoteFeedback(req: Request, res: Response) {
       });
     }
 
-    if (!vote || !['up', 'down'].includes(vote)) {
+    if (!vote || !["up", "down"].includes(vote)) {
       return res.status(400).json({
         success: false,
         error: "Invalid vote. Must be 'up' or 'down'",
       });
     }
 
-    const success = await feedbackService.voteFeedback(feedbackId, userId, vote);
+    const success = await feedbackService.voteFeedback(
+      feedbackId,
+      userId,
+      vote,
+    );
 
     if (success) {
       res.json({
@@ -175,12 +183,12 @@ export async function handleVoteFeedback(req: Request, res: Response) {
     } else {
       res.status(400).json({
         success: false,
-        error: "Failed to record vote. You may have already voted on this feedback.",
+        error:
+          "Failed to record vote. You may have already voted on this feedback.",
       });
     }
-
   } catch (error) {
-    console.error('Vote feedback failed:', error);
+    console.error("Vote feedback failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to record vote",
@@ -200,8 +208,8 @@ export async function handleGetAllFeedback(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -214,8 +222,8 @@ export async function handleGetAllFeedback(req: Request, res: Response) {
       type,
       category,
       severity,
-      limit = '100',
-      offset = '0',
+      limit = "100",
+      offset = "0",
     } = req.query;
 
     const feedback = await feedbackService.getAllFeedback({
@@ -232,9 +240,8 @@ export async function handleGetAllFeedback(req: Request, res: Response) {
       feedback,
       count: feedback.length,
     });
-
   } catch (error) {
-    console.error('Get all feedback failed:', error);
+    console.error("Get all feedback failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get feedback",
@@ -257,8 +264,8 @@ export async function handleUpdateFeedbackStatus(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -266,7 +273,12 @@ export async function handleUpdateFeedbackStatus(req: Request, res: Response) {
       });
     }
 
-    if (!status || !['open', 'in_progress', 'resolved', 'closed', 'duplicate'].includes(status)) {
+    if (
+      !status ||
+      !["open", "in_progress", "resolved", "closed", "duplicate"].includes(
+        status,
+      )
+    ) {
       return res.status(400).json({
         success: false,
         error: "Invalid status",
@@ -277,7 +289,7 @@ export async function handleUpdateFeedbackStatus(req: Request, res: Response) {
       feedbackId,
       status,
       userId,
-      adminNotes
+      adminNotes,
     );
 
     if (success) {
@@ -291,9 +303,8 @@ export async function handleUpdateFeedbackStatus(req: Request, res: Response) {
         error: "Feedback not found",
       });
     }
-
   } catch (error) {
-    console.error('Update feedback status failed:', error);
+    console.error("Update feedback status failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to update feedback status",
@@ -313,8 +324,8 @@ export async function handleGetFeedbackStats(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -322,7 +333,8 @@ export async function handleGetFeedbackStats(req: Request, res: Response) {
       });
     }
 
-    const timeRange = req.query.timeRange as 'day' | 'week' | 'month' | 'year' || 'month';
+    const timeRange =
+      (req.query.timeRange as "day" | "week" | "month" | "year") || "month";
     const stats = await feedbackService.getFeedbackStats(timeRange);
 
     res.json({
@@ -330,9 +342,8 @@ export async function handleGetFeedbackStats(req: Request, res: Response) {
       stats,
       timeRange,
     });
-
   } catch (error) {
-    console.error('Get feedback stats failed:', error);
+    console.error("Get feedback stats failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get feedback statistics",
@@ -352,8 +363,8 @@ export async function handleGetSystemLogs(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -361,13 +372,7 @@ export async function handleGetSystemLogs(req: Request, res: Response) {
       });
     }
 
-    const {
-      level,
-      service,
-      action,
-      targetUserId,
-      limit = '100',
-    } = req.query;
+    const { level, service, action, targetUserId, limit = "100" } = req.query;
 
     const logs = await feedbackService.getSystemLogs({
       level: level as string,
@@ -382,9 +387,8 @@ export async function handleGetSystemLogs(req: Request, res: Response) {
       logs,
       count: logs.length,
     });
-
   } catch (error) {
-    console.error('Get system logs failed:', error);
+    console.error("Get system logs failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get system logs",
@@ -404,8 +408,8 @@ export async function handleGetAdminActions(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -413,10 +417,10 @@ export async function handleGetAdminActions(req: Request, res: Response) {
       });
     }
 
-    const { adminId, limit = '50' } = req.query;
+    const { adminId, limit = "50" } = req.query;
     const actions = await feedbackService.getAdminActions(
       adminId as string,
-      parseInt(limit as string)
+      parseInt(limit as string),
     );
 
     res.json({
@@ -424,9 +428,8 @@ export async function handleGetAdminActions(req: Request, res: Response) {
       actions,
       count: actions.length,
     });
-
   } catch (error) {
-    console.error('Get admin actions failed:', error);
+    console.error("Get admin actions failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get admin actions",
@@ -437,17 +440,12 @@ export async function handleGetAdminActions(req: Request, res: Response) {
 // Log custom event (for debugging and analytics)
 export async function handleLogEvent(req: Request, res: Response) {
   try {
-    const {
-      level = 'info',
-      service,
-      action,
-      details = {},
-    } = req.body;
+    const { level = "info", service, action, details = {} } = req.body;
 
     const userId = req.session?.userId;
     const sessionId = req.sessionID;
     const ipAddress = req.ip;
-    const userAgent = req.headers['user-agent'];
+    const userAgent = req.headers["user-agent"];
 
     if (!service || !action) {
       return res.status(400).json({
@@ -466,16 +464,15 @@ export async function handleLogEvent(req: Request, res: Response) {
         sessionId,
         ipAddress,
         userAgent,
-      }
+      },
     );
 
     res.json({
       success: true,
       message: "Event logged successfully",
     });
-
   } catch (error) {
-    console.error('Log event failed:', error);
+    console.error("Log event failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to log event",

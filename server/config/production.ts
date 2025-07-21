@@ -39,7 +39,8 @@ export interface ProductionConfig {
 export const productionConfig: ProductionConfig = {
   openRouter: {
     // Use a real OpenRouter API key for production
-    apiKey: process.env.OPENROUTER_API_KEY || "sk-or-v1-PRODUCTION-KEY-REQUIRED",
+    apiKey:
+      process.env.OPENROUTER_API_KEY || "sk-or-v1-PRODUCTION-KEY-REQUIRED",
     models: [
       "google/gemma-2-9b-it:free",
       "meta-llama/llama-3.1-8b-instruct:free",
@@ -77,35 +78,39 @@ export const productionConfig: ProductionConfig = {
   },
   security: {
     jwtSecret: process.env.JWT_SECRET || "chatking-production-jwt-secret-2024",
-    encryptionKey: process.env.ENCRYPTION_KEY || "chatking-production-encryption-key-2024",
+    encryptionKey:
+      process.env.ENCRYPTION_KEY || "chatking-production-encryption-key-2024",
     sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
   },
 };
 
 // Validate that all required API keys are present
-export function validateProductionConfig(): { valid: boolean; errors: string[] } {
+export function validateProductionConfig(): {
+  valid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
+
   if (productionConfig.openRouter.apiKey.includes("REQUIRED")) {
     errors.push("OpenRouter API key is not configured");
   }
-  
+
   if (productionConfig.pinecone.apiKey.includes("REQUIRED")) {
     errors.push("Pinecone API key is not configured");
   }
-  
+
   if (productionConfig.braveSearch.apiKey.includes("REQUIRED")) {
     errors.push("BraveSearch API key is not configured");
   }
-  
+
   if (productionConfig.googleWorkspace.clientId.includes("REQUIRED")) {
     errors.push("Google Workspace Client ID is not configured");
   }
-  
+
   if (productionConfig.email.apiKey.includes("REQUIRED")) {
     errors.push("Email service API key is not configured");
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -113,13 +118,15 @@ export function validateProductionConfig(): { valid: boolean; errors: string[] }
 }
 
 // Get the current environment
-export function getEnvironment(): 'development' | 'production' {
-  return (process.env.NODE_ENV as 'development' | 'production') || 'development';
+export function getEnvironment(): "development" | "production" {
+  return (
+    (process.env.NODE_ENV as "development" | "production") || "development"
+  );
 }
 
 // Check if we're in production mode
 export function isProduction(): boolean {
-  return getEnvironment() === 'production';
+  return getEnvironment() === "production";
 }
 
 // Get configuration for current environment
