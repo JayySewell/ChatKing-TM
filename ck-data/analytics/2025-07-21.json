@@ -186,5 +186,55 @@
       "incognito": false
     },
     "timestamp": "2025-07-21T19:30:14.967Z"
+  },
+  {
+    "id": "de6933f6-d7db-4e74-ae39-6f28fc22921f",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "c7a3bf27-5246-4131-a39b-8d81e6e56ecb",
+      "model": "qwen/qwen3-235b-a22b-07-25:free",
+      "inputTokens": 9,
+      "outputTokens": 21,
+      "totalTokens": 30
+    },
+    "timestamp": "2025-07-21T20:14:36.390Z"
+  },
+  {
+    "id": "ca10aeb7-642d-4423-aab9-b47246e60000",
+    "event": "pinecone_query",
+    "data": {
+      "userId": "demo-user",
+      "indexName": "chatking-documents",
+      "query": "project documentation",
+      "resultCount": 5,
+      "topK": 10
+    },
+    "timestamp": "2025-07-21T20:15:00.161Z"
+  },
+  {
+    "id": "61a57f45-2b5e-4396-83d7-066c668a2da6",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "9*9",
+      "result": "81",
+      "type": "basic",
+      "success": true
+    },
+    "timestamp": "2025-07-21T20:15:35.486Z"
+  },
+  {
+    "id": "ba01830e-c45e-4bdc-8195-8b2138ae33d4",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "number 1 picture",
+      "type": "images",
+      "resultCount": 3,
+      "searchTime": 150,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T20:16:19.260Z"
   }
 ]
