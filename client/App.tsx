@@ -15,6 +15,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Welcome from "./pages/Welcome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
