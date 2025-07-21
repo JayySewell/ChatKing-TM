@@ -99,6 +99,7 @@ import {
 } from "./routes/oauth";
 import { authService } from "./services/auth";
 import { apiKeyService } from "./services/apikeys";
+import { configValidator } from "./services/config-validator";
 import {
   securityMiddleware,
   rateLimitMiddleware,
