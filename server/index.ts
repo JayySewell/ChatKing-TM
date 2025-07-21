@@ -63,6 +63,15 @@ import {
   handleGenerateReport,
   handleGetAnalyticsDashboard,
 } from "./routes/analytics";
+import {
+  handleGoogleAuth,
+  handleAppleAuth,
+  handleGoogleCallback,
+  handleAppleCallback,
+  handleOAuthStatus,
+  handleUnlinkOAuth,
+  sessionMiddleware
+} from "./routes/oauth";
 import { authService } from "./services/auth";
 
 export function createServer() {
