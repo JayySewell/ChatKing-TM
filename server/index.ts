@@ -97,5 +97,15 @@ export function createServer() {
   app.delete("/api/pinecone/indexes/:indexName", handleDeleteIndex);
   app.post("/api/pinecone/search", handleSearchKnowledge);
 
+  // Authentication API routes
+  app.post("/api/auth/register", handleRegister);
+  app.post("/api/auth/login", handleLogin);
+  app.post("/api/auth/validate", handleValidateSession);
+  app.post("/api/auth/change-password", handleChangePassword);
+  app.post("/api/auth/logout", handleLogout);
+  app.get("/api/auth/profile/:userId", handleGetUserProfile);
+  app.put("/api/auth/profile/:userId", handleUpdateUserProfile);
+  app.get("/api/auth/system-stats", handleGetSystemStats);
+
   return app;
 }

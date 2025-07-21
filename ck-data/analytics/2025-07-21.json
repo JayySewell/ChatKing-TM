@@ -1,0 +1,13 @@
+[
+  {
+    "id": "7446d54e-f34f-4529-9117-9d5b659051d2",
+    "event": "user_registered",
+    "data": {
+      "userId": "7aaac1a0-111e-423f-9aaa-d2f56cedbabe",
+      "username": "Owner",
+      "isOwner": true,
+      "timestamp": "2025-07-21T19:03:43.023Z"
+    },
+    "timestamp": "2025-07-21T19:03:43.023Z"
+  }
+]
