@@ -8,6 +8,14 @@ import {
   handleGetChatSession,
   handleDeleteChatSession
 } from "./routes/ai";
+import {
+  handleCalculate,
+  handleConvertUnits,
+  handleConvertBase,
+  handleGetCalculatorHistory,
+  handleClearCalculatorHistory,
+  handleGetCalculatorConstants
+} from "./routes/calculator";
 
 export function createServer() {
   const app = express();
