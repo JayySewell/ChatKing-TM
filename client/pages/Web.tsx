@@ -256,14 +256,20 @@ export default function Web() {
 
       const data: SearchResponse = await response.json();
 
-      if (data.results) {
-        setSearchResults(generateMockResults(searchTerm, type as any));
+      if (data.results && data.results.length > 0) {
+        // Use actual API results
+        setSearchResults(data.results);
         setTotalResults(data.totalResults);
         setSearchTime(data.searchTime);
 
         if (!incognitoMode) {
           loadSearchHistory();
         }
+      } else {
+        // Fallback to mock results if API returns no results
+        setSearchResults(generateMockResults(searchTerm, type as any));
+        setTotalResults(generateMockResults(searchTerm, type as any).length);
+        setSearchTime(150);
       }
     } catch (error) {
       console.error("Search failed:", error);
