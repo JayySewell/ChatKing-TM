@@ -64,13 +64,46 @@ export class PineconeService {
   }
 
   async listIndexes(): Promise<PineconeIndex[]> {
+    if (!this.validateApiKey()) {
+      console.warn("Invalid Pinecone API key, using fallback data");
+      return this.getMockIndexes();
+    }
+
     try {
       const data = await this.makeRequest(`${this.baseUrl}/databases`);
-      return data.databases || [];
+
+      // Transform Pinecone API response to our format
+      const indexes = data.databases?.map((db: any) => ({
+        name: db.name,
+        dimension: db.dimension,
+        metric: db.metric,
+        vectorCount: db.status?.vectorCount || 0,
+      })) || [];
+
+      // If no real indexes exist, create a default one
+      if (indexes.length === 0 && this.validateApiKey()) {
+        console.log("No Pinecone indexes found, creating default index...");
+        await this.createIndex("chatking-production", 768, "cosine");
+        // Return the newly created index
+        return [
+          {
+            name: "chatking-production",
+            dimension: 768,
+            metric: "cosine",
+            vectorCount: 0,
+          }
+        ];
+      }
+
+      return indexes;
     } catch (error) {
       console.error("Failed to list Pinecone indexes:", error);
-      // Return mock indexes for development
-      return this.getMockIndexes();
+      // Only fallback to mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        return this.getMockIndexes();
+      }
+      // In production, return empty array if API fails
+      return [];
     }
   }
 
