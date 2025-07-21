@@ -135,5 +135,15 @@ export function createServer() {
   app.get("/api/keys/health", handleGetSystemApiHealth);
   app.post("/api/keys/validate-all", handleValidateAllApiKeys);
 
+  // Analytics and Monitoring routes
+  app.get("/api/analytics/metrics", handleGetSystemMetrics);
+  app.get("/api/analytics/usage/:userId", handleGetUsageStats);
+  app.get("/api/analytics/activity", handleGetRecentActivity);
+  app.get("/api/analytics/performance", handleGetPerformanceMetrics);
+  app.get("/api/analytics/queries/:service", handleGetTopQueries);
+  app.get("/api/analytics/resources", handleGetResourceUsage);
+  app.post("/api/analytics/report", handleGenerateReport);
+  app.get("/api/analytics/dashboard", handleGetAnalyticsDashboard);
+
   return app;
 }
