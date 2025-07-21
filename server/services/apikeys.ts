@@ -244,7 +244,7 @@ export class ApiKeyService {
       },
       openrouter: {
         name: "Default OpenRouter",
-        key: process.env.OPENROUTER_API_KEY || "sk-or-v1-demo-key",
+        key: process.env.OPENROUTER_API_KEY || "",
         isActive: true,
       },
       brave: {
