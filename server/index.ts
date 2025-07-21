@@ -81,8 +81,9 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(sessionMiddleware);
 
-  // Initialize default owner account
+  // Initialize default owner account with new email
   authService.createDefaultOwner();
 
   // Example API routes
