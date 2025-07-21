@@ -384,12 +384,89 @@ export class EnhancedAuthService {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
+  }
+
+  async updateProfileImage(userId: string, imageUrl: string | null): Promise<boolean> {
+    try {
+      const profile = await this.getEnhancedProfile(userId);
+      if (!profile) {
+        return false;
+      }
+
+      const updatedProfile: EnhancedUserProfile = {
+        ...profile,
+        profileImage: imageUrl || undefined,
+      };
+
+      await this.saveEnhancedProfile(updatedProfile);
+      return true;
+    } catch (error) {
+      console.error('Failed to update profile image:', error);
+      return false;
+    }
+  }
+
+  async updateProfile(userId: string, updates: {
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    bio?: string;
+    preferences?: Partial<UserPreferences>;
+  }): Promise<boolean> {
+    try {
+      const profile = await this.getEnhancedProfile(userId);
+      if (!profile) {
+        return false;
+      }
+
+      const updatedProfile: EnhancedUserProfile = {
+        ...profile,
+        firstName: updates.firstName !== undefined ? updates.firstName : profile.firstName,
+        lastName: updates.lastName !== undefined ? updates.lastName : profile.lastName,
+        username: updates.username !== undefined ? updates.username : profile.username,
+        bio: updates.bio !== undefined ? updates.bio : profile.bio,
+        preferences: updates.preferences ? {
+          ...profile.preferences,
+          ...updates.preferences,
+        } : profile.preferences,
+      };
+
+      await this.saveEnhancedProfile(updatedProfile);
+      return true;
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      return false;
+    }
+  }
+
+  async getUserSettings(userId: string): Promise<UserPreferences | null> {
+    try {
+      const profile = await this.getEnhancedProfile(userId);
+      return profile?.preferences || null;
+    } catch (error) {
+      console.error('Failed to get user settings:', error);
+      return null;
+    }
+  }
+
+  async updateUserSettings(userId: string, preferences: Partial<UserPreferences>): Promise<boolean> {
+    return this.updateProfile(userId, { preferences });
+  }
+
+  async getProfileStats(userId: string): Promise<UserStats | null> {
+    try {
+      const profile = await this.getEnhancedProfile(userId);
+      return profile?.stats || null;
+    } catch (error) {
+      console.error('Failed to get profile stats:', error);
+      return null;
+    }
   }
 }
 
