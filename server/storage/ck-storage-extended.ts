@@ -150,7 +150,7 @@ export class CKStorageExtended {
 
   async storeApiKey(userId: string, service: string, config: ApiKeyConfig): Promise<boolean> {
     try {
-      return ckStorage.store(`users/${userId}/api-keys`, service, config);
+      return await this.store(`users/${userId}/api-keys`, service, config);
     } catch (error) {
       console.error('Failed to store API key:', error);
       return false;
@@ -159,7 +159,7 @@ export class CKStorageExtended {
 
   async getApiKey(userId: string, service: string): Promise<ApiKeyConfig | null> {
     try {
-      return await ckStorage.get(`users/${userId}/api-keys`, service);
+      return await this.get(`users/${userId}/api-keys`, service);
     } catch (error) {
       console.error('Failed to get API key:', error);
       return null;
