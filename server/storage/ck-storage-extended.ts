@@ -117,7 +117,7 @@ export class CKStorageExtended {
   }
 
   async blockIp(ip: string, info: IpInfo): Promise<void> {
-    return ckStorage.store('security/blocked-ips', ip, info);
+    await this.store('security/blocked-ips', ip, info);
   }
 
   async unblockIp(ip: string): Promise<void> {
