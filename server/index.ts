@@ -136,6 +136,9 @@ export function createServer() {
   authService.createDefaultOwner();
   apiKeyService.initializeDefaultKeys();
 
+  // Validate configuration on startup
+  configValidator.logConfigurationStatus();
+
   // Example API routes
   app.get("/api/ping", (_req, res) => {
     res.json({ message: "Hello from Express server v2!" });
