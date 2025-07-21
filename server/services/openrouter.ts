@@ -221,7 +221,7 @@ export class OpenRouterService {
     const startTime = Date.now();
     try {
       const testResponse = await this.sendMessage(
-        'microsoft/phi-3-mini-128k-instruct:free',
+        'meta-llama/llama-3.1-8b-instruct:free',
         [{ role: 'user', content: 'Hello' }],
         { maxTokens: 10, temperature: 0.1 }
       );
