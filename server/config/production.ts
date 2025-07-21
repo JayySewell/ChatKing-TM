@@ -84,36 +84,49 @@ export const productionConfig: ProductionConfig = {
   },
 };
 
-// Validate that all required API keys are present
+// Validate that all required API keys are present (without exposing values)
 export function validateProductionConfig(): {
   valid: boolean;
   errors: string[];
+  warnings: string[];
 } {
   const errors: string[] = [];
+  const warnings: string[] = [];
 
-  if (productionConfig.openRouter.apiKey.includes("REQUIRED")) {
-    errors.push("OpenRouter API key is not configured");
+  // Check required configurations
+  if (!productionConfig.openRouter.apiKey) {
+    errors.push("OpenRouter API key is required but not configured");
   }
 
-  if (productionConfig.pinecone.apiKey.includes("REQUIRED")) {
-    errors.push("Pinecone API key is not configured");
+  if (!productionConfig.pinecone.apiKey) {
+    errors.push("Pinecone API key is required but not configured");
   }
 
-  if (productionConfig.braveSearch.apiKey.includes("REQUIRED")) {
-    errors.push("BraveSearch API key is not configured");
+  if (!productionConfig.security.jwtSecret || productionConfig.security.jwtSecret.length < 32) {
+    errors.push("JWT secret must be at least 32 characters long");
   }
 
-  if (productionConfig.googleWorkspace.clientId.includes("REQUIRED")) {
-    errors.push("Google Workspace Client ID is not configured");
+  if (!productionConfig.security.encryptionKey || productionConfig.security.encryptionKey.length < 32) {
+    errors.push("Encryption key must be at least 32 characters long");
   }
 
-  if (productionConfig.email.apiKey.includes("REQUIRED")) {
-    errors.push("Email service API key is not configured");
+  // Check optional but recommended configurations
+  if (!productionConfig.braveSearch.apiKey) {
+    warnings.push("BraveSearch API key not configured - web search may be limited");
+  }
+
+  if (!productionConfig.googleWorkspace.clientId) {
+    warnings.push("Google Workspace OAuth not configured - single sign-on unavailable");
+  }
+
+  if (!productionConfig.email.apiKey) {
+    warnings.push("Email service not configured - email features unavailable");
   }
 
   return {
     valid: errors.length === 0,
     errors,
+    warnings,
   };
 }
 
