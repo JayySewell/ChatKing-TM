@@ -434,7 +434,10 @@ export class PineconeService {
   }
 
   validateApiKey(): boolean {
-    return this.apiKey && this.apiKey.startsWith("pcsk_") && this.apiKey.length > 20;
+    return this.apiKey &&
+           (this.apiKey.startsWith("pcsk_") || this.apiKey.startsWith("pc-")) &&
+           this.apiKey.length > 20 &&
+           !this.apiKey.includes("REQUIRED");
   }
 
   updateApiKey(newKey: string, environment?: string): void {
