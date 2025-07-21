@@ -314,11 +314,9 @@ export class OpenRouterService {
     if (!this.apiKey) {
       return { valid: false, type: "missing", tested: false };
     }
-    if (
-      this.apiKey ===
-      "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"
-    ) {
-      return { valid: false, type: "default", tested: false };
+    // Check if no API key is configured
+    if (!this.apiKey) {
+      return { valid: false, type: "missing", tested: false };
     }
     if (!this.apiKey.startsWith("sk-or-v1-") || this.apiKey.length < 20) {
       return { valid: false, type: "invalid", tested: false };
