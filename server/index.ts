@@ -246,6 +246,12 @@ export function createServer() {
   app.get("/api/admin/actions", handleGetAdminActions);
   app.post("/api/system/log-event", handleLogEvent);
 
+  // Configuration and Security routes
+  app.get("/api/admin/config-status", handleGetConfigStatus);
+  app.get("/api/config/public", handleGetPublicConfig);
+  app.get("/api/admin/validate-environment", handleValidateEnvironment);
+  app.get("/api/admin/security-check", handleSecurityCheck);
+
   // Health check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({
