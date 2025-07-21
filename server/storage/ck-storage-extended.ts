@@ -139,11 +139,11 @@ export class CKStorageExtended {
   }
 
   async getLoginAttempts(ip: string, hours: number = 24): Promise<LoginAttempt[]> {
-    const allAttempts = await ckStorage.list('security/login-attempts');
+    const allAttempts = await this.list('security/login-attempts');
     const cutoff = Date.now() - (hours * 60 * 60 * 1000);
-    
-    return allAttempts.filter(attempt => 
-      attempt.ip === ip && 
+
+    return allAttempts.filter(attempt =>
+      attempt.ip === ip &&
       new Date(attempt.timestamp).getTime() > cutoff
     );
   }
