@@ -89,10 +89,10 @@ export default function AI() {
       // Fallback to default models
       setModels([
         {
-          id: "deepseek/deepseek-r1",
-          name: "DeepSeek R1 Free",
-          description: "Advanced reasoning model",
-          contextLength: 32768,
+          id: "meta-llama/llama-3.1-8b-instruct:free",
+          name: "Llama 3.1 8B Free",
+          description: "Meta's efficient instruction-following model",
+          contextLength: 131072,
           pricing: { prompt: "0", completion: "0" },
           isFree: true,
         },
