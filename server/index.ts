@@ -61,6 +61,18 @@ import {
   uploadMiddleware,
 } from "./routes/avatar";
 import {
+  handleSubmitFeedback,
+  handleGetUserFeedback,
+  handleGetFeedback,
+  handleVoteFeedback,
+  handleGetAllFeedback,
+  handleUpdateFeedbackStatus,
+  handleGetFeedbackStats,
+  handleGetSystemLogs,
+  handleGetAdminActions,
+  handleLogEvent,
+} from "./routes/feedback";
+import {
   handleGetSystemMetrics,
   handleGetUsageStats,
   handleGetRecentActivity,
