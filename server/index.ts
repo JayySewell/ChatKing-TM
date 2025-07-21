@@ -24,6 +24,16 @@ import {
   handleGetPageContent,
   handleProxyRequest
 } from "./routes/web";
+import {
+  handleListIndexes,
+  handleCreateIndex,
+  handleUpsertVectors,
+  handleQueryVectors,
+  handleDeleteVectors,
+  handleGetIndexStats,
+  handleDeleteIndex,
+  handleSearchKnowledge
+} from "./routes/pinecone";
 
 export function createServer() {
   const app = express();
