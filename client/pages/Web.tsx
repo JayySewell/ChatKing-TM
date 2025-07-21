@@ -273,7 +273,10 @@ export default function Web() {
       }
     } catch (error) {
       console.error("Search failed:", error);
+      // Fallback to mock results on error
       setSearchResults(generateMockResults(searchTerm, type as any));
+      setTotalResults(generateMockResults(searchTerm, type as any).length);
+      setSearchTime(150);
     } finally {
       setIsSearching(false);
     }
