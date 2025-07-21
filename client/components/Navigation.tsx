@@ -266,6 +266,14 @@ export function Navigation({
                     </Link>
                   )}
                   <Link
+                    to="/profile"
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center space-x-3 px-3 py-3 rounded-md text-text-primary hover:bg-cyber-blue/10 transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">Profile</span>
+                  </Link>
+                  <Link
                     to="/settings"
                     onClick={() => setShowMobileMenu(false)}
                     className="flex items-center space-x-3 px-3 py-3 rounded-md text-text-primary hover:bg-cyber-blue/10 transition-colors"
