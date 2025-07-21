@@ -73,5 +73,15 @@ export function createServer() {
   app.post("/api/web/page-content", handleGetPageContent);
   app.post("/api/web/proxy", handleProxyRequest);
 
+  // Pinecone Vector Search API routes
+  app.get("/api/pinecone/indexes/:userId", handleListIndexes);
+  app.post("/api/pinecone/indexes", handleCreateIndex);
+  app.post("/api/pinecone/upsert", handleUpsertVectors);
+  app.post("/api/pinecone/query", handleQueryVectors);
+  app.post("/api/pinecone/delete-vectors", handleDeleteVectors);
+  app.get("/api/pinecone/stats/:indexName", handleGetIndexStats);
+  app.delete("/api/pinecone/indexes/:indexName", handleDeleteIndex);
+  app.post("/api/pinecone/search", handleSearchKnowledge);
+
   return app;
 }
