@@ -39,5 +39,13 @@ export function createServer() {
   app.get("/api/ai/session/:sessionId", handleGetChatSession);
   app.delete("/api/ai/session/:sessionId", handleDeleteChatSession);
 
+  // Calculator API routes
+  app.post("/api/calculator/calculate", handleCalculate);
+  app.post("/api/calculator/convert-units", handleConvertUnits);
+  app.post("/api/calculator/convert-base", handleConvertBase);
+  app.get("/api/calculator/history/:userId", handleGetCalculatorHistory);
+  app.post("/api/calculator/clear-history", handleClearCalculatorHistory);
+  app.get("/api/calculator/constants", handleGetCalculatorConstants);
+
   return app;
 }
