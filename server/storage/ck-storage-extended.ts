@@ -259,7 +259,7 @@ export class CKStorageExtended {
   }
 
   async storePineconeVector(userId: string, indexName: string, vectorId: string, vector: any): Promise<void> {
-    return ckStorage.store(`users/${userId}/pinecone-vectors/${indexName}`, vectorId, {
+    await this.store(`users/${userId}/pinecone-vectors/${indexName}`, vectorId, {
       ...vector,
       storedAt: new Date().toISOString(),
     });
@@ -267,7 +267,7 @@ export class CKStorageExtended {
 
   async getPineconeVectors(userId: string, indexName: string): Promise<any[]> {
     try {
-      return await ckStorage.list(`users/${userId}/pinecone-vectors/${indexName}`);
+      return await this.list(`users/${userId}/pinecone-vectors/${indexName}`);
     } catch (error) {
       console.error('Failed to get Pinecone vectors:', error);
       return [];
@@ -276,7 +276,7 @@ export class CKStorageExtended {
 
   async deletePineconeVector(userId: string, indexName: string, vectorId: string): Promise<boolean> {
     try {
-      return ckStorage.delete(`users/${userId}/pinecone-vectors/${indexName}`, vectorId);
+      return await this.delete(`users/${userId}/pinecone-vectors/${indexName}`, vectorId);
     } catch (error) {
       console.error('Failed to delete Pinecone vector:', error);
       return false;
@@ -291,13 +291,13 @@ export class CKStorageExtended {
       createdAt: new Date().toISOString(),
       verified: false,
     };
-    
-    return ckStorage.store('email-verification', token, tokenData);
+
+    await this.store('email-verification', token, tokenData);
   }
 
   async getEmailVerificationToken(token: string): Promise<any> {
     try {
-      return await ckStorage.get('email-verification', token);
+      return await this.get('email-verification', token);
     } catch (error) {
       console.error('Failed to get email verification token:', error);
       return null;
@@ -310,7 +310,7 @@ export class CKStorageExtended {
       if (tokenData && new Date(tokenData.expiresAt) > new Date()) {
         tokenData.verified = true;
         tokenData.verifiedAt = new Date().toISOString();
-        await ckStorage.store('email-verification', token, tokenData);
+        await this.store('email-verification', token, tokenData);
         return true;
       }
       return false;
@@ -328,13 +328,13 @@ export class CKStorageExtended {
       createdAt: new Date().toISOString(),
       used: false,
     };
-    
-    return ckStorage.store('password-reset', token, resetData);
+
+    await this.store('password-reset', token, resetData);
   }
 
   async getPasswordResetToken(token: string): Promise<any> {
     try {
-      return await ckStorage.get('password-reset', token);
+      return await this.get('password-reset', token);
     } catch (error) {
       console.error('Failed to get password reset token:', error);
       return null;
@@ -347,7 +347,7 @@ export class CKStorageExtended {
       if (resetData && new Date(resetData.expiresAt) > new Date() && !resetData.used) {
         resetData.used = true;
         resetData.usedAt = new Date().toISOString();
-        await ckStorage.store('password-reset', token, resetData);
+        await this.store('password-reset', token, resetData);
         return true;
       }
       return false;
@@ -358,7 +358,7 @@ export class CKStorageExtended {
   }
 
   async storeSystemBackup(backupId: string, data: any): Promise<void> {
-    return ckStorage.store('system/backups', backupId, {
+    await this.store('system/backups', backupId, {
       ...data,
       createdAt: new Date().toISOString(),
     });
@@ -366,7 +366,7 @@ export class CKStorageExtended {
 
   async getSystemBackups(): Promise<any[]> {
     try {
-      return await ckStorage.list('system/backups');
+      return await this.list('system/backups');
     } catch (error) {
       console.error('Failed to get system backups:', error);
       return [];
