@@ -129,7 +129,7 @@ export class ApiKeyService {
 
   async deleteApiKey(userId: string, service: string): Promise<boolean> {
     try {
-      return await ckStorage.deleteApiKey(userId, service);
+      return await ckStorageExtended.deleteApiKey(userId, service);
     } catch (error) {
       console.error("Failed to delete API key:", error);
       return false;
