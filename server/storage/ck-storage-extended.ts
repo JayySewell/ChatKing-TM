@@ -229,7 +229,7 @@ export class CKStorageExtended {
 
   async getUserPineconeIndexes(userId: string): Promise<Array<{ id: string; name: string; vectors: any[]; createdAt: string; updatedAt: string }>> {
     try {
-      const indexes = await ckStorage.list(`users/${userId}/pinecone-indexes`);
+      const indexes = await this.list(`users/${userId}/pinecone-indexes`);
       return indexes || [];
     } catch (error) {
       console.error('Failed to get user Pinecone indexes:', error);
@@ -245,13 +245,13 @@ export class CKStorageExtended {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
-    return ckStorage.store(`users/${userId}/pinecone-indexes`, indexName, indexData);
+
+    await this.store(`users/${userId}/pinecone-indexes`, indexName, indexData);
   }
 
   async deletePineconeIndex(userId: string, indexName: string): Promise<boolean> {
     try {
-      return ckStorage.delete(`users/${userId}/pinecone-indexes`, indexName);
+      return await this.delete(`users/${userId}/pinecone-indexes`, indexName);
     } catch (error) {
       console.error('Failed to delete Pinecone index:', error);
       return false;
