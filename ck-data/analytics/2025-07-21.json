@@ -236,5 +236,342 @@
       "incognito": false
     },
     "timestamp": "2025-07-21T20:16:19.260Z"
+  },
+  {
+    "id": "3db73a89-e164-44a3-939f-f50d070c81be",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "qwen/qwen3-235b-a22b-07-25:free",
+      "inputTokens": 9,
+      "outputTokens": 12,
+      "totalTokens": 21
+    },
+    "timestamp": "2025-07-21T20:51:42.515Z"
+  },
+  {
+    "id": "aa057026-b7a7-4e62-afc1-e881a6c3c933",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "qwen/qwen3-235b-a22b-07-25:free",
+      "inputTokens": 33,
+      "outputTokens": 50,
+      "totalTokens": 83
+    },
+    "timestamp": "2025-07-21T20:52:49.658Z"
+  },
+  {
+    "id": "1672cd1d-22ed-4947-bb37-e48b97a061d3",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "qwen/qwen3-235b-a22b-07-25:free",
+      "inputTokens": 93,
+      "outputTokens": 46,
+      "totalTokens": 139
+    },
+    "timestamp": "2025-07-21T20:53:02.816Z"
+  },
+  {
+    "id": "1ea01575-95b6-4004-8024-bb99e8da7cea",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "agentica-org/deepcoder-14b-preview:free",
+      "inputTokens": 126,
+      "outputTokens": 268,
+      "totalTokens": 394
+    },
+    "timestamp": "2025-07-21T20:53:49.129Z"
+  },
+  {
+    "id": "fc4f9b4f-8dda-4927-9532-14cf9c42a10e",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "agentica-org/deepcoder-14b-preview:free",
+      "inputTokens": 171,
+      "outputTokens": 168,
+      "totalTokens": 339
+    },
+    "timestamp": "2025-07-21T20:54:08.735Z"
+  },
+  {
+    "id": "86a319ee-3f18-4409-94bf-2166309aefbf",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "featherless/qwerky-72b:free",
+      "inputTokens": 239,
+      "outputTokens": 44,
+      "totalTokens": 283
+    },
+    "timestamp": "2025-07-21T20:57:08.740Z"
+  },
+  {
+    "id": "371811f7-ca1d-468e-afde-f1ff4619ce09",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-4b-it:free",
+      "inputTokens": 264,
+      "outputTokens": 0,
+      "totalTokens": 264
+    },
+    "timestamp": "2025-07-21T20:57:39.268Z"
+  },
+  {
+    "id": "0ec8a396-b4dc-4a01-b7f6-f3f4bf4e4e8f",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-4b-it:free",
+      "inputTokens": 299,
+      "outputTokens": 0,
+      "totalTokens": 299
+    },
+    "timestamp": "2025-07-21T20:58:07.238Z"
+  },
+  {
+    "id": "08e8137c-ae7f-417e-9aad-7a16c93b9ed7",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-4b-it:free",
+      "inputTokens": 375,
+      "outputTokens": 0,
+      "totalTokens": 375
+    },
+    "timestamp": "2025-07-21T20:58:39.718Z"
+  },
+  {
+    "id": "f9aae89e-645d-48a6-9272-cb31634af177",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-4b-it:free",
+      "inputTokens": 515,
+      "outputTokens": 0,
+      "totalTokens": 515
+    },
+    "timestamp": "2025-07-21T20:59:28.200Z"
+  },
+  {
+    "id": "5249abad-21cf-4dd2-bac7-fb2c84d868e1",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-4b-it:free",
+      "inputTokens": 1259,
+      "outputTokens": 0,
+      "totalTokens": 1259
+    },
+    "timestamp": "2025-07-21T21:00:09.965Z"
+  },
+  {
+    "id": "51da9d5a-acad-4305-993e-cea7cf9a93aa",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 2376,
+      "outputTokens": 1082,
+      "totalTokens": 3458
+    },
+    "timestamp": "2025-07-21T21:01:54.820Z"
+  },
+  {
+    "id": "cb2f27c1-707e-4c5c-b67f-e742ed11186a",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3367,
+      "outputTokens": 0,
+      "totalTokens": 3367
+    },
+    "timestamp": "2025-07-21T21:02:13.387Z"
+  },
+  {
+    "id": "34b45b4f-5fb1-4f81-8857-12bea8734af2",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3439,
+      "outputTokens": 0,
+      "totalTokens": 3439
+    },
+    "timestamp": "2025-07-21T21:02:47.029Z"
+  },
+  {
+    "id": "1a399726-ccc0-47fe-b845-5ea4bc86a734",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3687,
+      "outputTokens": 25,
+      "totalTokens": 3712
+    },
+    "timestamp": "2025-07-21T21:03:30.317Z"
+  },
+  {
+    "id": "4c91ff61-604c-4a9d-995e-a6c5624448ab",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3721,
+      "outputTokens": 20,
+      "totalTokens": 3741
+    },
+    "timestamp": "2025-07-21T21:03:49.817Z"
+  },
+  {
+    "id": "a62c6ab5-419f-49e1-8072-83c9d95beefc",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3750,
+      "outputTokens": 21,
+      "totalTokens": 3771
+    },
+    "timestamp": "2025-07-21T21:04:05.157Z"
+  },
+  {
+    "id": "5f023cb5-20b4-4eb5-b52a-fed60e3d2afd",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3780,
+      "outputTokens": 22,
+      "totalTokens": 3802
+    },
+    "timestamp": "2025-07-21T21:04:18.492Z"
+  },
+  {
+    "id": "c2954b0e-ae64-4931-8c42-3a3f175bd217",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3813,
+      "outputTokens": 68,
+      "totalTokens": 3881
+    },
+    "timestamp": "2025-07-21T21:04:33.205Z"
+  },
+  {
+    "id": "2aec3764-169f-412c-b7d4-12582e9095de",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "96b83d34-ea32-4c47-b3a9-0f92e3e5a77b",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 3904,
+      "outputTokens": 80,
+      "totalTokens": 3984
+    },
+    "timestamp": "2025-07-21T21:06:02.593Z"
+  },
+  {
+    "id": "8f38a93f-0366-416f-8073-4139a93aad7b",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "1e009ba8-c682-4888-84a2-100e3297ae95",
+      "model": "qwen/qwen3-235b-a22b-07-25:free",
+      "inputTokens": 9,
+      "outputTokens": 12,
+      "totalTokens": 21
+    },
+    "timestamp": "2025-07-21T21:06:12.590Z"
+  },
+  {
+    "id": "04522152-cf65-4c00-aa9c-cb03e2b4d958",
+    "event": "pinecone_query",
+    "data": {
+      "userId": "demo-user",
+      "indexName": "chatking-knowledge",
+      "query": "machine learning",
+      "resultCount": 5,
+      "topK": 10
+    },
+    "timestamp": "2025-07-21T21:06:29.841Z"
+  },
+  {
+    "id": "05b6b91d-e162-48be-b2f2-d61af67b8d2a",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "num tutorial",
+      "type": "images",
+      "resultCount": 3,
+      "searchTime": 150,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T21:07:12.116Z"
+  },
+  {
+    "id": "14c40726-9c5d-4ee2-b7a5-078e14790362",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "news",
+      "type": "news",
+      "resultCount": 0,
+      "searchTime": 660,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T21:08:33.373Z"
+  },
+  {
+    "id": "51c5ddcf-8b46-433f-a07e-0da1e9c54973",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "16858 state highway 110 N",
+      "type": "maps",
+      "resultCount": 3,
+      "searchTime": 150,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T21:09:16.367Z"
+  },
+  {
+    "id": "cc905ff3-abee-4157-89bb-a661576b4d8a",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "duckduckgo",
+      "type": "web",
+      "resultCount": 20,
+      "searchTime": 603,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T21:10:06.292Z"
   }
 ]
