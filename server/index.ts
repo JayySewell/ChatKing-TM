@@ -34,6 +34,17 @@ import {
   handleDeleteIndex,
   handleSearchKnowledge
 } from "./routes/pinecone";
+import {
+  handleRegister,
+  handleLogin,
+  handleValidateSession,
+  handleChangePassword,
+  handleLogout,
+  handleGetUserProfile,
+  handleUpdateUserProfile,
+  handleGetSystemStats
+} from "./routes/auth";
+import { authService } from "./services/auth";
 
 export function createServer() {
   const app = express();
