@@ -228,7 +228,7 @@ export class ApiKeyService {
 
     const userId = "owner";
     for (const [service, config] of Object.entries(defaultKeys)) {
-      const existing = await ckStorage.getApiKey(userId, service);
+      const existing = await ckStorageExtended.getApiKey(userId, service);
       if (!existing) {
         await this.storeApiKey(userId, service, config);
       }
