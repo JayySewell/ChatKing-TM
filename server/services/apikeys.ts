@@ -145,7 +145,7 @@ export class ApiKeyService {
     }
 
     // Store in persistent storage for future restarts
-    await ckStorage.storeEnvironmentVariables(variables);
+    await ckStorageExtended.storeEnvironmentVariables(variables);
   }
 
   getEnvironmentVariables(): EnvironmentVariables {
