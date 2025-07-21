@@ -35,12 +35,11 @@ export interface ProductionConfig {
   };
 }
 
-// Production API Keys - These should be set via environment variables
+// Production API Keys - These MUST be set via environment variables
 export const productionConfig: ProductionConfig = {
   openRouter: {
-    // Use a real OpenRouter API key for production
-    apiKey:
-      process.env.OPENROUTER_API_KEY || "sk-or-v1-PRODUCTION-KEY-REQUIRED",
+    // OpenRouter API key is required for AI functionality
+    apiKey: process.env.OPENROUTER_API_KEY || "",
     models: [
       "google/gemma-2-9b-it:free",
       "meta-llama/llama-3.1-8b-instruct:free",
