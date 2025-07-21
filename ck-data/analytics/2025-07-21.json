@@ -573,5 +573,18 @@
       "incognito": false
     },
     "timestamp": "2025-07-21T21:10:06.292Z"
+  },
+  {
+    "id": "0d428928-1aad-4475-a363-21889da3ef4a",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "test search",
+      "type": "web",
+      "resultCount": 10,
+      "searchTime": 455,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T21:27:33.324Z"
   }
 ]
