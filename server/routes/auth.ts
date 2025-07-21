@@ -212,7 +212,7 @@ export const handleGetUserProfile: RequestHandler = async (req, res) => {
 export const handleUpdateUserProfile: RequestHandler = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { username, settings } = req.body;
+    const { firstName, lastName, username, bio, preferences } = req.body;
 
     if (!userId) {
       return res.status(400).json({
@@ -221,21 +221,32 @@ export const handleUpdateUserProfile: RequestHandler = async (req, res) => {
       });
     }
 
-    const updates: any = {};
-    if (username) updates.username = username;
-    if (settings) updates.settings = settings;
-
-    const success = await ckStorage.updateUser(userId, updates);
+    // Use enhanced auth service for profile updates
+    const success = await enhancedAuthService.updateProfile(userId, {
+      firstName,
+      lastName,
+      username,
+      bio,
+      preferences,
+    });
 
     if (success) {
+      // Get updated profile to return
+      const updatedProfile = await enhancedAuthService.getEnhancedProfile(userId);
+
       // Log analytics
       await ckStorage.logAnalytics("profile_updated", {
         userId,
-        updates: Object.keys(updates),
+        updates: Object.keys({ firstName, lastName, username, bio, preferences }).filter(
+          key => req.body[key] !== undefined
+        ),
         timestamp: new Date(),
       });
 
-      res.json({ success: true });
+      res.json({
+        success: true,
+        profile: updatedProfile,
+      });
     } else {
       res.status(400).json({
         success: false,
