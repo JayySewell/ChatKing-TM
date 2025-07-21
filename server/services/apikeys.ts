@@ -68,7 +68,7 @@ export class ApiKeyService {
 
   async getApiKey(userId: string, service: string): Promise<string | null> {
     try {
-      const config = await ckStorage.getApiKey(userId, service);
+      const config = await ckStorageExtended.getApiKey(userId, service);
       if (!config || !config.isActive) {
         return null;
       }
