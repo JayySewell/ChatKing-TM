@@ -683,6 +683,8 @@ export class PineconeService {
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://chatkingai.com',
+            'X-Title': 'ChatKing AI',
           },
           body: JSON.stringify({
             input: text,
