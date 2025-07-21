@@ -88,19 +88,24 @@ export class PineconeService {
         vectorCount: db.status?.vectorCount || 0,
       })) || [];
 
-      // If no real indexes exist, create a default one
+      // If no real indexes exist and we have a valid API key, create default ones
       if (indexes.length === 0 && this.validateApiKey()) {
-        console.log("No Pinecone indexes found, creating default index...");
-        await this.createIndex("chatking-production", 768, "cosine");
-        // Return the newly created index
-        return [
-          {
-            name: "chatking-production",
-            dimension: 768,
-            metric: "cosine",
-            vectorCount: 0,
-          }
-        ];
+        console.log("No Pinecone indexes found, creating production indexes...");
+        const defaultIndexes = await this.createDefaultIndexes();
+        return defaultIndexes;
+      }
+
+      // If we have indexes, make sure our production index exists
+      const productionIndex = indexes.find(idx => idx.name === productionConfig.pinecone.indexName);
+      if (!productionIndex && this.validateApiKey()) {
+        console.log(`Creating production index: ${productionConfig.pinecone.indexName}`);
+        await this.createIndex(productionConfig.pinecone.indexName, 768, "cosine");
+        indexes.push({
+          name: productionConfig.pinecone.indexName,
+          dimension: 768,
+          metric: "cosine",
+          vectorCount: 0,
+        });
       }
 
       return indexes;
