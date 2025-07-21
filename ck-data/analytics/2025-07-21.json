@@ -599,5 +599,17 @@
       "totalTokens": 23
     },
     "timestamp": "2025-07-21T21:27:46.719Z"
+  },
+  {
+    "id": "16066034-6bd6-4de4-80ae-7635c5456c58",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "2+2",
+      "result": "4",
+      "type": "basic",
+      "success": true
+    },
+    "timestamp": "2025-07-21T21:27:56.398Z"
   }
 ]
