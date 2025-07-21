@@ -13,6 +13,7 @@ interface BraveSearchResponse {
   totalResults: number;
   suggestedQueries?: string[];
   searchTime: number;
+  error?: string;
 }
 
 interface BraveApiResponse {
