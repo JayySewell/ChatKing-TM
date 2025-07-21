@@ -1,6 +1,8 @@
 // Production Configuration for ChatKing AI
 // This file contains production-ready API configurations
 
+import crypto from "crypto";
+
 export interface ProductionConfig {
   openRouter: {
     apiKey: string;
