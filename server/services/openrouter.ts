@@ -37,10 +37,7 @@ export class OpenRouterService {
   private errorCount: number;
 
   constructor(apiKey?: string) {
-    this.apiKey =
-      apiKey ||
-      process.env.OPENROUTER_API_KEY ||
-      "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";
+    this.apiKey = apiKey || process.env.OPENROUTER_API_KEY || "";
     this.rateLimitDelay = 500; // 500ms between requests
     this.lastRequestTime = 0;
     this.connectionTested = false;
