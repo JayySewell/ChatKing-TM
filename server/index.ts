@@ -54,6 +54,13 @@ import {
   handleGetSystemStats,
 } from "./routes/auth";
 import {
+  handleUploadAvatar,
+  handleDeleteAvatar,
+  handleGetAvatarTemplates,
+  handleSetAvatarTemplate,
+  uploadMiddleware,
+} from "./routes/avatar";
+import {
   handleGetSystemMetrics,
   handleGetUsageStats,
   handleGetRecentActivity,
