@@ -238,9 +238,7 @@ export class ApiKeyService {
     const defaultKeys = {
       pinecone: {
         name: "Default Pinecone",
-        key:
-          process.env.PINECONE_API_KEY ||
-          "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA",
+        key: process.env.PINECONE_API_KEY || "",
         environment: process.env.PINECONE_ENVIRONMENT || "us-east1-aws",
         isActive: true,
       },
