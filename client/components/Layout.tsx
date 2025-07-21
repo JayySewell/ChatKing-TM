@@ -22,9 +22,7 @@ export function Layout({
         username={username}
       />
       <main className="pt-14 sm:pt-16">
-        <div className="min-h-screen">
-          {children}
-        </div>
+        <div className="min-h-screen">{children}</div>
       </main>
     </div>
   );

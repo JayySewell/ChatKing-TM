@@ -36,10 +36,10 @@ export function Navigation({
         setShowMobileMenu(false);
       }
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const modes = [
@@ -69,7 +69,10 @@ export function Navigation({
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group flex-shrink-0">
+          <Link
+            to="/"
+            className="flex items-center space-x-2 group flex-shrink-0"
+          >
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-cyber-blue to-neon-purple rounded-full flex items-center justify-center">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-main-bg" />
             </div>
@@ -91,8 +94,12 @@ export function Navigation({
                 }`}
               >
                 <mode.icon className={`w-4 h-4 ${mode.color}`} />
-                <span className="text-sm font-medium hidden xl:block">{mode.name}</span>
-                <span className="text-xs font-medium xl:hidden">{mode.name.split(' ')[1] || mode.name}</span>
+                <span className="text-sm font-medium hidden xl:block">
+                  {mode.name}
+                </span>
+                <span className="text-xs font-medium xl:hidden">
+                  {mode.name.split(" ")[1] || mode.name}
+                </span>
               </Link>
             ))}
           </div>
@@ -120,7 +127,9 @@ export function Navigation({
             {isAuthenticated && (
               <div className="flex items-center space-x-1">
                 {isOwner && <Crown className="w-3 h-3 text-neon-amber" />}
-                <span className="text-xs font-medium text-text-primary max-w-16 truncate">{username}</span>
+                <span className="text-xs font-medium text-text-primary max-w-16 truncate">
+                  {username}
+                </span>
               </div>
             )}
             <button
@@ -173,7 +182,7 @@ export function Navigation({
                         <Settings className="w-4 h-4 mr-2" />
                         Settings
                       </Link>
-                      <button 
+                      <button
                         onClick={() => {
                           setShowUserMenu(false);
                           // Add logout functionality
@@ -207,7 +216,9 @@ export function Navigation({
           <div className="px-4 py-4 space-y-4">
             {/* Mobile Mode Navigation */}
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Modes</h3>
+              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                Modes
+              </h3>
               <div className="grid grid-cols-2 gap-2">
                 {modes.map((mode) => (
                   <Link
@@ -216,12 +227,14 @@ export function Navigation({
                     onClick={() => setShowMobileMenu(false)}
                     className={`flex flex-col items-center space-y-2 p-3 rounded-md transition-colors ${
                       location.pathname === mode.path
-                        ? 'bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/30'
-                        : 'text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10'
+                        ? "bg-cyber-blue/20 text-cyber-blue border border-cyber-blue/30"
+                        : "text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10"
                     }`}
                   >
                     <mode.icon className={`w-6 h-6 ${mode.color}`} />
-                    <span className="text-xs font-medium text-center">{mode.name}</span>
+                    <span className="text-xs font-medium text-center">
+                      {mode.name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -230,7 +243,9 @@ export function Navigation({
             {/* Mobile User Menu */}
             {isAuthenticated ? (
               <div className="space-y-2 pt-4 border-t border-border-glow">
-                <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Account</h3>
+                <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                  Account
+                </h3>
                 <div className="space-y-1">
                   {isOwner && (
                     <Link
@@ -250,7 +265,7 @@ export function Navigation({
                     <Settings className="w-5 h-5" />
                     <span className="font-medium">Settings</span>
                   </Link>
-                  <button 
+                  <button
                     onClick={() => {
                       setShowMobileMenu(false);
                       // Add logout functionality

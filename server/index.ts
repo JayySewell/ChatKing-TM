@@ -70,7 +70,7 @@ import {
   handleAppleCallback,
   handleOAuthStatus,
   handleUnlinkOAuth,
-  sessionMiddleware
+  sessionMiddleware,
 } from "./routes/oauth";
 import { authService } from "./services/auth";
 
