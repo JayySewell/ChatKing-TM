@@ -106,7 +106,7 @@ export class CKStorageExtended {
     }
   }
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
-    return ckStorage.store('security/events', event.id, event);
+    await this.store('security/events', event.id, event);
   }
 
   async getSecurityEvents(limit: number = 1000): Promise<SecurityEvent[]> {
