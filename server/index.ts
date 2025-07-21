@@ -16,6 +16,14 @@ import {
   handleClearCalculatorHistory,
   handleGetCalculatorConstants
 } from "./routes/calculator";
+import {
+  handleSearch,
+  handleGetSuggestions,
+  handleGetSearchHistory,
+  handleClearSearchHistory,
+  handleGetPageContent,
+  handleProxyRequest
+} from "./routes/web";
 
 export function createServer() {
   const app = express();
