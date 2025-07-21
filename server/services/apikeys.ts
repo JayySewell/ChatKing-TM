@@ -76,7 +76,7 @@ export class ApiKeyService {
       // Update usage stats
       config.usageCount++;
       config.lastUsed = new Date().toISOString();
-      await ckStorage.storeApiKey(userId, service, config);
+      await ckStorageExtended.storeApiKey(userId, service, config);
 
       return this.decrypt(config.key);
     } catch (error) {
