@@ -110,7 +110,7 @@ export class CKStorageExtended {
   }
 
   async getSecurityEvents(limit: number = 1000): Promise<SecurityEvent[]> {
-    const events = await ckStorage.list('security/events');
+    const events = await this.list('security/events');
     return events
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, limit);
