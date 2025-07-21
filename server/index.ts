@@ -77,6 +77,7 @@ import {
 import apiKeysRouter from "./routes/apikeys";
 import securityRouter from "./routes/security";
 import emailRouter from "./routes/email";
+import systemRouter from "./routes/system";
 
 export function createServer() {
   const app = express();
@@ -185,6 +186,9 @@ export function createServer() {
 
   // Email Service routes
   app.use("/api/email", emailRouter);
+
+  // System Health and Monitoring routes
+  app.use("/api/system", systemRouter);
 
   // Health check endpoint
   app.get("/api/health", (_req, res) => {
