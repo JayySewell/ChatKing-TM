@@ -251,7 +251,7 @@ export class OpenRouterService {
     const startTime = Date.now();
     try {
       const testResponse = await this.sendMessage(
-        'meta-llama/llama-3.1-8b-instruct:free',
+        'google/gemma-2-9b-it:free',
         [{ role: 'user', content: 'Hello' }],
         { maxTokens: 10, temperature: 0.1 }
       );
