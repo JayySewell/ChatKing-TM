@@ -116,5 +116,14 @@ export function createServer() {
   app.put("/api/auth/profile/:userId", handleUpdateUserProfile);
   app.get("/api/auth/system-stats", handleGetSystemStats);
 
+  // API Key Management routes
+  app.get("/api/keys/:userId", handleGetApiKeys);
+  app.put("/api/keys/update", handleUpdateApiKey);
+  app.post("/api/keys/test", handleTestApiKey);
+  app.post("/api/keys/rotate", handleRotateApiKey);
+  app.get("/api/keys/usage/:keyId", handleGetApiKeyUsage);
+  app.get("/api/keys/health", handleGetSystemApiHealth);
+  app.post("/api/keys/validate-all", handleValidateAllApiKeys);
+
   return app;
 }
