@@ -224,6 +224,18 @@ export function createServer() {
   // System Health and Monitoring routes
   app.use("/api/system", systemRouter);
 
+  // Feedback and Admin routes
+  app.post("/api/feedback/submit", handleSubmitFeedback);
+  app.get("/api/feedback/user", handleGetUserFeedback);
+  app.get("/api/feedback/:feedbackId", handleGetFeedback);
+  app.post("/api/feedback/:feedbackId/vote", handleVoteFeedback);
+  app.get("/api/admin/feedback", handleGetAllFeedback);
+  app.put("/api/admin/feedback/:feedbackId/status", handleUpdateFeedbackStatus);
+  app.get("/api/admin/feedback-stats", handleGetFeedbackStats);
+  app.get("/api/admin/logs", handleGetSystemLogs);
+  app.get("/api/admin/actions", handleGetAdminActions);
+  app.post("/api/system/log-event", handleLogEvent);
+
   // Health check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({
