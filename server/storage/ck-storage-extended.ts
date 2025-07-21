@@ -168,15 +168,15 @@ export class CKStorageExtended {
 
   async getAllApiKeys(userId: string): Promise<Record<string, ApiKeyConfig>> {
     try {
-      const keys = await ckStorage.list(`users/${userId}/api-keys`);
+      const keys = await this.list(`users/${userId}/api-keys`);
       const result: Record<string, ApiKeyConfig> = {};
-      
+
       for (const key of keys) {
         // Assuming the key object has a service property or derive from file name
         const service = key.service || 'unknown';
         result[service] = key;
       }
-      
+
       return result;
     } catch (error) {
       console.error('Failed to get all API keys:', error);
