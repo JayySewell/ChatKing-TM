@@ -380,31 +380,31 @@ export class CKStorageExtended {
     const events = await this.getSecurityEvents();
     for (const event of events) {
       if (new Date(event.timestamp).getTime() < cutoff) {
-        await ckStorage.delete('security/events', event.id);
+        await this.delete('security/events', event.id);
       }
     }
 
     // Clean up old login attempts
-    const attempts = await ckStorage.list('security/login-attempts');
+    const attempts = await this.list('security/login-attempts');
     for (const attempt of attempts) {
       if (new Date(attempt.timestamp).getTime() < cutoff) {
-        await ckStorage.delete('security/login-attempts', attempt.id);
+        await this.delete('security/login-attempts', attempt.id);
       }
     }
 
     // Clean up expired verification tokens
-    const verificationTokens = await ckStorage.list('email-verification');
+    const verificationTokens = await this.list('email-verification');
     for (const token of verificationTokens) {
       if (new Date(token.expiresAt).getTime() < Date.now()) {
-        await ckStorage.delete('email-verification', token.token);
+        await this.delete('email-verification', token.token);
       }
     }
 
     // Clean up expired password reset tokens
-    const resetTokens = await ckStorage.list('password-reset');
+    const resetTokens = await this.list('password-reset');
     for (const token of resetTokens) {
       if (new Date(token.expiresAt).getTime() < Date.now()) {
-        await ckStorage.delete('password-reset', token.token);
+        await this.delete('password-reset', token.token);
       }
     }
   }
