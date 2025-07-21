@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { authService } from "../services/auth";
+import { enhancedAuthService } from "../services/auth-enhanced";
 import { ckStorage } from "../storage/ck-storage";
 
 interface RegisterRequest {
