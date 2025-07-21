@@ -176,6 +176,12 @@ export function createServer() {
   app.put("/api/auth/profile/:userId", handleUpdateUserProfile);
   app.get("/api/auth/system-stats", handleGetSystemStats);
 
+  // Avatar management routes
+  app.post("/api/auth/upload-avatar", uploadMiddleware, handleUploadAvatar);
+  app.delete("/api/auth/delete-avatar", handleDeleteAvatar);
+  app.get("/api/auth/avatar-templates", handleGetAvatarTemplates);
+  app.post("/api/auth/set-avatar-template", handleSetAvatarTemplate);
+
   // Enhanced API Key Management routes
   app.use("/api/keys", apiKeysRouter);
 
