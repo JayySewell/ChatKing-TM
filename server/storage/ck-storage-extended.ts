@@ -46,6 +46,65 @@ interface ApiKeyConfig {
 
 // Extend the existing CK-Storage class with new security and API key features
 export class CKStorageExtended {
+  private basePath = "./ck-data";
+
+  // Generic storage methods
+  async store(category: string, id: string, data: any): Promise<boolean> {
+    try {
+      const categoryPath = join(this.basePath, category);
+      await fs.mkdir(categoryPath, { recursive: true });
+      const filePath = join(categoryPath, `${id}.json`);
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+      return true;
+    } catch (error) {
+      console.error('Failed to store data:', error);
+      return false;
+    }
+  }
+
+  async get(category: string, id: string): Promise<any> {
+    try {
+      const filePath = join(this.basePath, category, `${id}.json`);
+      const data = await fs.readFile(filePath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      // File doesn't exist or parsing error
+      return null;
+    }
+  }
+
+  async list(category: string): Promise<any[]> {
+    try {
+      const categoryPath = join(this.basePath, category);
+      const files = await fs.readdir(categoryPath);
+      const results = [];
+
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const data = await this.get(category, file.replace('.json', ''));
+          if (data) {
+            results.push(data);
+          }
+        }
+      }
+
+      return results;
+    } catch (error) {
+      // Directory doesn't exist
+      return [];
+    }
+  }
+
+  async delete(category: string, id: string): Promise<boolean> {
+    try {
+      const filePath = join(this.basePath, category, `${id}.json`);
+      await fs.unlink(filePath);
+      return true;
+    } catch (error) {
+      console.error('Failed to delete data:', error);
+      return false;
+    }
+  }
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
     return ckStorage.store('security/events', event.id, event);
   }
