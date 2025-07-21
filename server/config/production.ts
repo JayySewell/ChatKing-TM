@@ -53,32 +53,31 @@ export const productionConfig: ProductionConfig = {
     defaultModel: "google/gemma-2-9b-it:free",
   },
   pinecone: {
-    // Use real Pinecone API key for production
-    apiKey: process.env.PINECONE_API_KEY || "pcsk-PRODUCTION-KEY-REQUIRED",
+    // Pinecone API key is required for vector database functionality
+    apiKey: process.env.PINECONE_API_KEY || "",
     environment: process.env.PINECONE_ENVIRONMENT || "us-east-1",
     indexName: "chatking-production",
   },
   braveSearch: {
-    // Use real BraveSearch API key for production
-    apiKey: process.env.BRAVE_SEARCH_API_KEY || "BSA-PRODUCTION-KEY-REQUIRED",
+    // BraveSearch API key is optional but recommended for web search
+    apiKey: process.env.BRAVE_SEARCH_API_KEY || "",
     endpoint: "https://api.search.brave.com/res/v1",
   },
   googleWorkspace: {
-    clientId: process.env.GOOGLE_CLIENT_ID || "CLIENT-ID-REQUIRED",
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "CLIENT-SECRET-REQUIRED",
+    clientId: process.env.GOOGLE_CLIENT_ID || "",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     domain: "chatkingai.com",
     adminEmail: "Jayy.Sewell@chatkingai.com",
   },
   email: {
-    provider: "sendgrid", // Production email provider
-    apiKey: process.env.SENDGRID_API_KEY || "SG-PRODUCTION-KEY-REQUIRED",
+    provider: "sendgrid",
+    apiKey: process.env.SENDGRID_API_KEY || "",
     fromEmail: "noreply@chatkingai.com",
     fromName: "ChatKing AI",
   },
   security: {
-    jwtSecret: process.env.JWT_SECRET || "chatking-production-jwt-secret-2024",
-    encryptionKey:
-      process.env.ENCRYPTION_KEY || "chatking-production-encryption-key-2024",
+    jwtSecret: process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex'),
+    encryptionKey: process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex'),
     sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
   },
 };
