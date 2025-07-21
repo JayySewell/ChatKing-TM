@@ -202,7 +202,7 @@ export class CKStorageExtended {
 
   async getEnvironmentVariables(): Promise<Record<string, any>> {
     try {
-      const data = await ckStorage.get('system', 'environment-variables');
+      const data = await this.get('system', 'environment-variables');
       return data?.variables || {};
     } catch (error) {
       console.error('Failed to get environment variables:', error);
@@ -211,7 +211,7 @@ export class CKStorageExtended {
   }
 
   async storeSecurityConfig(config: any): Promise<void> {
-    return ckStorage.store('system', 'security-config', {
+    await this.store('system', 'security-config', {
       config,
       updatedAt: new Date().toISOString(),
     });
@@ -219,7 +219,7 @@ export class CKStorageExtended {
 
   async getSecurityConfig(): Promise<any> {
     try {
-      const data = await ckStorage.get('system', 'security-config');
+      const data = await this.get('system', 'security-config');
       return data?.config || null;
     } catch (error) {
       console.error('Failed to get security config:', error);
