@@ -336,12 +336,12 @@ export class AuthService {
       const userCount = await this.getUserCount();
       if (userCount === 0) {
         await this.register({
-          username: "Owner",
-          email: "owner@chatkingai.com",
+          username: "Jayy Sewell",
+          email: "jayysewell18@gmail.com",
           password: "chatking123",
         });
         console.log(
-          "Created default owner account: owner@chatkingai.com / chatking123",
+          "Created default owner account: jayysewell18@gmail.com / chatking123",
         );
       }
     } catch (error) {
