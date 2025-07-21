@@ -21,7 +21,11 @@ export function Layout({
         isOwner={isOwner}
         username={username}
       />
-      <main className="pt-16">{children}</main>
+      <main className="pt-14 sm:pt-16">
+        <div className="min-h-screen">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
