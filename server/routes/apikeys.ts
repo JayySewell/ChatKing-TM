@@ -1,280 +1,232 @@
-import { RequestHandler } from "express";
-import { apiKeyManager } from "../services/apikeys";
-import { ckStorage } from "../storage/ck-storage";
+import { Router, RequestHandler } from "express";
+import { apiKeyService } from "../services/apikeys";
+import { authMiddleware } from "../middleware/auth";
 
-interface UpdateApiKeyRequest {
-  keyId: string;
-  newKey: string;
-  userId: string;
+const router = Router();
+
+interface StoreApiKeyRequest {
+  service: string;
+  name: string;
+  key: string;
+  environment?: string;
 }
 
 interface TestApiKeyRequest {
   service: string;
   key: string;
-  userId: string;
 }
 
-interface RotateApiKeyRequest {
-  keyId: string;
-  userId: string;
+interface UpdateEnvironmentRequest {
+  variables: Record<string, string>;
 }
 
-export const handleGetApiKeys: RequestHandler = async (req, res) => {
+export const handleStoreApiKey: RequestHandler = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { service, name, key, environment }: StoreApiKeyRequest = req.body;
+    const userId = req.user?.id || 'anonymous';
 
-    if (!userId) {
+    if (!service || !name || !key) {
       return res.status(400).json({
-        success: false,
-        error: "User ID required",
+        error: "Missing required fields: service, name, key",
       });
     }
 
-    // Verify user is owner
-    const user = await ckStorage.getUser(userId);
-    if (!user?.isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Access denied: Only owners can view API keys",
-      });
-    }
-
-    const apiKeys = await apiKeyManager.getApiKeys(userId);
-
-    res.json({
-      success: true,
-      apiKeys,
-    });
-  } catch (error) {
-    console.error("Get API Keys Error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to get API keys",
-    });
-  }
-};
-
-export const handleUpdateApiKey: RequestHandler = async (req, res) => {
-  try {
-    const { keyId, newKey, userId }: UpdateApiKeyRequest = req.body;
-
-    if (!keyId || !newKey || !userId) {
+    // Validate the API key format
+    const isValid = await apiKeyService.validateApiKey(service, key);
+    if (!isValid) {
       return res.status(400).json({
-        success: false,
-        error: "Missing required fields: keyId, newKey, userId",
+        error: "Invalid API key format for the specified service",
       });
     }
 
-    const success = await apiKeyManager.updateApiKey(userId, keyId, newKey);
+    // Test the API key if possible
+    const testResult = await apiKeyService.testApiKey(service, key);
+    if (!testResult.valid) {
+      return res.status(400).json({
+        error: "API key failed validation test",
+        details: testResult.error,
+      });
+    }
+
+    const success = await apiKeyService.storeApiKey(userId, service, {
+      name,
+      key,
+      environment,
+      isActive: true,
+    });
 
     if (success) {
       res.json({
         success: true,
-        message: "API key updated successfully",
+        service,
+        name,
+        message: "API key stored successfully",
       });
     } else {
-      res.status(400).json({
-        success: false,
-        error: "Failed to update API key",
+      res.status(500).json({
+        error: "Failed to store API key",
       });
     }
   } catch (error) {
-    console.error("Update API Key Error:", error);
+    console.error("Store API Key Error:", error);
     res.status(500).json({
-      success: false,
-      error: "API key update failed",
+      error: "Internal server error",
       details: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export const handleGetApiKeys: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.user?.id || 'anonymous';
+    const apiKeys = await apiKeyService.listApiKeys(userId);
+
+    res.json({
+      apiKeys,
+      count: Object.keys(apiKeys).length,
+    });
+  } catch (error) {
+    console.error("Get API Keys Error:", error);
+    res.status(500).json({
+      error: "Failed to retrieve API keys",
+    });
+  }
+};
+
+export const handleDeleteApiKey: RequestHandler = async (req, res) => {
+  try {
+    const { service } = req.params;
+    const userId = req.user?.id || 'anonymous';
+
+    if (!service) {
+      return res.status(400).json({
+        error: "Service name required",
+      });
+    }
+
+    const success = await apiKeyService.deleteApiKey(userId, service);
+
+    if (success) {
+      res.json({
+        success: true,
+        service,
+        message: "API key deleted successfully",
+      });
+    } else {
+      res.status(404).json({
+        error: "API key not found or failed to delete",
+      });
+    }
+  } catch (error) {
+    console.error("Delete API Key Error:", error);
+    res.status(500).json({
+      error: "Internal server error",
     });
   }
 };
 
 export const handleTestApiKey: RequestHandler = async (req, res) => {
   try {
-    const { service, key, userId }: TestApiKeyRequest = req.body;
+    const { service, key }: TestApiKeyRequest = req.body;
 
-    if (!service || !key || !userId) {
+    if (!service || !key) {
       return res.status(400).json({
-        success: false,
-        error: "Missing required fields: service, key, userId",
+        error: "Missing required fields: service, key",
       });
     }
 
-    // Verify user is owner
-    const user = await ckStorage.getUser(userId);
-    if (!user?.isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Access denied",
-      });
-    }
-
-    const isValid = await apiKeyManager.testApiKey(service, key);
+    const result = await apiKeyService.testApiKey(service, key);
 
     res.json({
-      success: true,
-      isValid,
       service,
+      valid: result.valid,
+      error: result.error,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Test API Key Error:", error);
     res.status(500).json({
-      success: false,
-      error: "API key test failed",
+      error: "Failed to test API key",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
-export const handleRotateApiKey: RequestHandler = async (req, res) => {
+export const handleUpdateEnvironment: RequestHandler = async (req, res) => {
   try {
-    const { keyId, userId }: RotateApiKeyRequest = req.body;
+    const { variables }: UpdateEnvironmentRequest = req.body;
 
-    if (!keyId || !userId) {
+    if (!variables || typeof variables !== 'object') {
       return res.status(400).json({
-        success: false,
-        error: "Missing required fields: keyId, userId",
+        error: "Variables object required",
       });
     }
 
-    const newKey = await apiKeyManager.rotateApiKey(userId, keyId);
-
-    if (newKey) {
-      res.json({
-        success: true,
-        newKey,
-        message: "API key rotated successfully",
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        error: "Failed to rotate API key",
-      });
-    }
-  } catch (error) {
-    console.error("Rotate API Key Error:", error);
-    res.status(500).json({
-      success: false,
-      error: "API key rotation failed",
-    });
-  }
-};
-
-export const handleGetApiKeyUsage: RequestHandler = async (req, res) => {
-  try {
-    const { keyId } = req.params;
-    const { userId, days = 30 } = req.query;
-
-    if (!keyId || !userId) {
-      return res.status(400).json({
-        success: false,
-        error: "Key ID and User ID required",
-      });
-    }
-
-    // Verify user is owner
-    const user = await ckStorage.getUser(userId as string);
-    if (!user?.isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Access denied",
-      });
-    }
-
-    const usage = await apiKeyManager.getApiKeyUsage(
-      userId as string,
-      keyId,
-      parseInt(days as string),
-    );
+    await apiKeyService.updateEnvironmentVariables(variables);
 
     res.json({
       success: true,
-      usage,
+      message: "Environment variables updated successfully",
+      updatedCount: Object.keys(variables).length,
     });
   } catch (error) {
-    console.error("Get API Key Usage Error:", error);
+    console.error("Update Environment Error:", error);
     res.status(500).json({
-      success: false,
-      error: "Failed to get API key usage",
+      error: "Failed to update environment variables",
     });
   }
 };
 
-export const handleGetSystemApiHealth: RequestHandler = async (req, res) => {
+export const handleGetEnvironment: RequestHandler = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const variables = apiKeyService.getEnvironmentVariables();
 
-    // Verify user is owner
-    const user = await ckStorage.getUser(userId as string);
-    if (!user?.isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Access denied",
-      });
-    }
+    // Mask sensitive values for security
+    const masked = Object.keys(variables).reduce((acc, key) => {
+      const value = variables[key];
+      if (value) {
+        acc[key] = value.substring(0, 8) + '***' + value.substring(value.length - 4);
+      } else {
+        acc[key] = null;
+      }
+      return acc;
+    }, {} as Record<string, string | null>);
 
-    const health = await apiKeyManager.getSystemApiHealth();
+    res.json({
+      variables: masked,
+      count: Object.keys(variables).length,
+    });
+  } catch (error) {
+    console.error("Get Environment Error:", error);
+    res.status(500).json({
+      error: "Failed to retrieve environment variables",
+    });
+  }
+};
+
+export const handleInitializeDefaults: RequestHandler = async (req, res) => {
+  try {
+    await apiKeyService.initializeDefaultKeys();
 
     res.json({
       success: true,
-      health,
+      message: "Default API keys initialized successfully",
     });
   } catch (error) {
-    console.error("Get System API Health Error:", error);
+    console.error("Initialize Defaults Error:", error);
     res.status(500).json({
-      success: false,
-      error: "Failed to get system API health",
+      error: "Failed to initialize default API keys",
     });
   }
 };
 
-export const handleValidateAllApiKeys: RequestHandler = async (req, res) => {
-  try {
-    const { userId } = req.body;
+// Routes
+router.post('/store', authMiddleware, handleStoreApiKey);
+router.get('/list', authMiddleware, handleGetApiKeys);
+router.delete('/:service', authMiddleware, handleDeleteApiKey);
+router.post('/test', authMiddleware, handleTestApiKey);
+router.put('/environment', authMiddleware, handleUpdateEnvironment);
+router.get('/environment', authMiddleware, handleGetEnvironment);
+router.post('/initialize', authMiddleware, handleInitializeDefaults);
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        error: "User ID required",
-      });
-    }
-
-    // Verify user is owner
-    const user = await ckStorage.getUser(userId);
-    if (!user?.isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Access denied",
-      });
-    }
-
-    const apiKeys = await apiKeyManager.getApiKeys(userId);
-    const validationResults = await Promise.all(
-      apiKeys.map(async (key) => {
-        const isValid = await apiKeyManager.testApiKey(key.service, key.key);
-        return {
-          keyId: key.id,
-          service: key.service,
-          isValid,
-          lastTested: new Date().toISOString(),
-        };
-      }),
-    );
-
-    // Log analytics
-    await ckStorage.logAnalytics("api_keys_validated", {
-      userId,
-      results: validationResults,
-      timestamp: new Date(),
-    });
-
-    res.json({
-      success: true,
-      validationResults,
-    });
-  } catch (error) {
-    console.error("Validate All API Keys Error:", error);
-    res.status(500).json({
-      success: false,
-      error: "API key validation failed",
-    });
-  }
-};
+export default router;
