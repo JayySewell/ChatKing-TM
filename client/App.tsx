@@ -11,6 +11,9 @@ import AI from "./pages/AI";
 import Web from "./pages/Web";
 import PineconeIndex from "./pages/PineconeIndex";
 import Calculator from "./pages/Calculator";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
