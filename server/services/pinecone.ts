@@ -39,12 +39,18 @@ export class PineconeService {
 
   constructor(
     apiKey?: string,
-    environment: string = "us-east1-aws",
+    environment?: string,
   ) {
-    this.apiKey = apiKey || process.env.PINECONE_API_KEY || "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA";
-    this.environment = environment;
-    this.baseUrl = `https://controller.${environment}.pinecone.io`;
+    // Use production config by default
+    this.apiKey = apiKey || productionConfig.pinecone.apiKey;
+    this.environment = environment || productionConfig.pinecone.environment;
+    this.baseUrl = `https://controller.${this.environment}.pinecone.io`;
     this.indexHost = ""; // Set dynamically per index
+
+    // Validate API key format
+    if (!this.validateApiKey()) {
+      console.warn("Warning: Invalid Pinecone API key format. Some features may not work.");
+    }
   }
 
   private async makeRequest(url: string, options: RequestInit = {}) {
