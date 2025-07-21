@@ -53,6 +53,16 @@ import {
   handleGetSystemApiHealth,
   handleValidateAllApiKeys
 } from "./routes/apikeys";
+import {
+  handleGetSystemMetrics,
+  handleGetUsageStats,
+  handleGetRecentActivity,
+  handleGetPerformanceMetrics,
+  handleGetTopQueries,
+  handleGetResourceUsage,
+  handleGenerateReport,
+  handleGetAnalyticsDashboard
+} from "./routes/analytics";
 import { authService } from "./services/auth";
 
 export function createServer() {
