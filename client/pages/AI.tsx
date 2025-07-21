@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Zap, Settings, Trash2, RotateCcw } from 'lucide-react';
+import { Send, Bot, User, Zap, Settings, Trash2, History, Sparkles } from 'lucide-react';
 import { Layout } from '../components/Layout';
 
 interface Message {
@@ -10,12 +10,29 @@ interface Message {
   model?: string;
 }
 
+interface Model {
+  id: string;
+  name: string;
+  description: string;
+  contextLength: number;
+  pricing: { prompt: string; completion: string };
+  isFree: boolean;
+}
+
+interface ChatSession {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+  lastMessage: string;
+}
+
 export default function AI() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: 'Welcome to ChatKing AI! I\'m powered by OpenRouter and have access to cutting-edge models like DeepSeek R1 Free and Gemma 3 27B Free. How can I assist you today?',
+      content: 'Welcome to ChatKing AI! I\'m powered by OpenRouter and have access to cutting-edge models like DeepSeek R1, Gemma 2 27B, and more. How can I assist you today?',
       timestamp: new Date(),
       model: 'ChatKing System'
     }
@@ -24,14 +41,12 @@ export default function AI() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState('deepseek/deepseek-r1');
   const [showSettings, setShowSettings] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [models, setModels] = useState<Model[]>([]);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [userId] = useState('demo-user'); // In real app, get from auth
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const models = [
-    { id: 'deepseek/deepseek-r1', name: 'DeepSeek R1 Free', provider: 'DeepSeek' },
-    { id: 'google/gemma-2-27b-it', name: 'Gemma 2 27B Free', provider: 'Google' },
-    { id: 'meta-llama/llama-3.2-3b-instruct:free', name: 'Llama 3.2 3B Free', provider: 'Meta' },
-    { id: 'microsoft/phi-3-mini-128k-instruct:free', name: 'Phi-3 Mini Free', provider: 'Microsoft' }
-  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +55,53 @@ export default function AI() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    loadAvailableModels();
+    loadChatHistory();
+  }, []);
+
+  const loadAvailableModels = async () => {
+    try {
+      const response = await fetch('/api/ai/models');
+      const data = await response.json();
+      
+      if (data.models) {
+        setModels(data.models);
+        // Set first free model as default
+        const freeModel = data.models.find((m: Model) => m.isFree);
+        if (freeModel) {
+          setSelectedModel(freeModel.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load models:', error);
+      // Fallback to default models
+      setModels([
+        {
+          id: 'deepseek/deepseek-r1',
+          name: 'DeepSeek R1 Free',
+          description: 'Advanced reasoning model',
+          contextLength: 32768,
+          pricing: { prompt: '0', completion: '0' },
+          isFree: true
+        }
+      ]);
+    }
+  };
+
+  const loadChatHistory = async () => {
+    try {
+      const response = await fetch(`/api/ai/history/${userId}`);
+      const data = await response.json();
+      
+      if (data.sessions) {
+        setChatSessions(data.sessions);
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+    }
+  };
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -56,20 +118,58 @@ export default function AI() {
     setIsLoading(true);
 
     try {
-      // Simulate API call - In real implementation, this would call OpenRouter API
-      setTimeout(() => {
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `This is a simulated response using ${models.find(m => m.id === selectedModel)?.name}. In the full implementation, this would connect to OpenRouter API with key: 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`,
-          timestamp: new Date(),
-          model: selectedModel
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setIsLoading(false);
-      }, 1000);
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          model: selectedModel,
+          sessionId: currentSessionId,
+          userId: userId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const aiMessage: Message = {
+        id: data.messageId || (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date(),
+        model: selectedModel
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Update session ID if new session was created
+      if (data.sessionId && !currentSessionId) {
+        setCurrentSessionId(data.sessionId);
+        loadChatHistory(); // Refresh history
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date(),
+        model: 'Error'
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -82,11 +182,73 @@ export default function AI() {
       timestamp: new Date(),
       model: 'ChatKing System'
     }]);
+    setCurrentSessionId(null);
+  };
+
+  const loadChatSession = async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/ai/session/${sessionId}?userId=${userId}`);
+      const data = await response.json();
+      
+      if (data.session) {
+        setMessages(data.session.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        })));
+        setCurrentSessionId(sessionId);
+        setShowHistory(false);
+      }
+    } catch (error) {
+      console.error('Failed to load chat session:', error);
+    }
+  };
+
+  const formatModelName = (model: Model) => {
+    return model.isFree ? `${model.name} (Free)` : `${model.name}`;
   };
 
   return (
     <Layout isAuthenticated={true} isOwner={true} username="Owner">
       <div className="flex h-screen pt-0">
+        {/* History Sidebar */}
+        {showHistory && (
+          <div className="w-80 glass border-r border-border-glow p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-orbitron font-bold text-lg text-text-primary">Chat History</h3>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="p-2 rounded hover:bg-cyber-blue/10 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              {chatSessions.map((session) => (
+                <button
+                  key={session.id}
+                  onClick={() => loadChatSession(session.id)}
+                  className={`w-full text-left p-3 rounded border transition-all ${
+                    currentSessionId === session.id
+                      ? 'border-cyber-blue bg-cyber-blue/20 text-cyber-blue'
+                      : 'border-border-glow hover:border-cyber-blue/50 text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  <div className="text-sm font-medium mb-1">
+                    {new Date(session.createdAt).toLocaleDateString()}
+                  </div>
+                  <div className="text-xs opacity-70 truncate">
+                    {session.lastMessage || 'No messages'}
+                  </div>
+                  <div className="text-xs opacity-50 mt-1">
+                    {session.messageCount} messages
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
@@ -99,11 +261,17 @@ export default function AI() {
                 <div>
                   <h1 className="font-orbitron font-bold text-xl text-glow-cyber">ChatKing AI</h1>
                   <p className="text-sm text-text-muted">
-                    Model: {models.find(m => m.id === selectedModel)?.name}
+                    Model: {models.find(m => m.id === selectedModel)?.name || selectedModel}
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="p-2 rounded hover:bg-cyber-blue/10 transition-colors"
+                >
+                  <History className="w-5 h-5 text-cyber-blue" />
+                </button>
                 <button
                   onClick={() => setShowSettings(!showSettings)}
                   className="p-2 rounded hover:bg-cyber-blue/10 transition-colors"
@@ -124,7 +292,7 @@ export default function AI() {
           {showSettings && (
             <div className="glass border-b border-border-glow p-4">
               <h3 className="font-semibold text-lg mb-3 text-text-primary">Model Selection</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto">
                 {models.map((model) => (
                   <button
                     key={model.id}
@@ -135,8 +303,16 @@ export default function AI() {
                         : 'border-border-glow hover:border-cyber-blue/50 text-text-muted hover:text-text-primary'
                     }`}
                   >
-                    <div className="font-medium">{model.name}</div>
-                    <div className="text-xs opacity-70">{model.provider}</div>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="font-medium">{formatModelName(model)}</div>
+                      {model.isFree && (
+                        <Sparkles className="w-4 h-4 text-neon-green" />
+                      )}
+                    </div>
+                    <div className="text-xs opacity-70 mb-1">{model.description}</div>
+                    <div className="text-xs opacity-50">
+                      Context: {model.contextLength.toLocaleString()} tokens
+                    </div>
                   </button>
                 ))}
               </div>
@@ -215,6 +391,7 @@ export default function AI() {
                   placeholder="Type your message..."
                   className="w-full cyber-input pr-12"
                   disabled={isLoading}
+                  maxLength={4000}
                 />
                 <button
                   onClick={sendMessage}
@@ -226,7 +403,7 @@ export default function AI() {
               </div>
             </div>
             <div className="flex items-center justify-between mt-2 text-xs text-text-muted">
-              <span>Press Enter to send</span>
+              <span>Press Enter to send • OpenRouter API Active</span>
               <span>{inputMessage.length}/4000</span>
             </div>
           </div>
