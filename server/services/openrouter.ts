@@ -158,32 +158,31 @@ export class OpenRouterService {
   private getDefaultModels() {
     return [
       {
-        id: "deepseek/deepseek-r1",
-        name: "DeepSeek R1 Free",
-        description:
-          "Advanced reasoning model with strong logical capabilities",
-        context_length: 32768,
+        id: "meta-llama/llama-3.1-8b-instruct:free",
+        name: "Llama 3.1 8B Free",
+        description: "Meta's efficient instruction-following model",
+        context_length: 131072,
         pricing: { prompt: "0", completion: "0" },
       },
       {
-        id: "google/gemma-2-27b-it",
-        name: "Gemma 2 27B Free",
+        id: "google/gemma-2-9b-it:free",
+        name: "Gemma 2 9B Free",
         description: "Google's powerful instruction-tuned model",
         context_length: 8192,
         pricing: { prompt: "0", completion: "0" },
       },
       {
-        id: "meta-llama/llama-3.2-3b-instruct:free",
-        name: "Llama 3.2 3B Free",
-        description: "Meta's efficient instruction-following model",
+        id: "microsoft/phi-3-medium-128k-instruct:free",
+        name: "Phi-3 Medium Free",
+        description: "Microsoft's balanced capability model",
         context_length: 128000,
         pricing: { prompt: "0", completion: "0" },
       },
       {
-        id: "microsoft/phi-3-mini-128k-instruct:free",
-        name: "Phi-3 Mini Free",
-        description: "Microsoft's compact but capable model",
-        context_length: 128000,
+        id: "qwen/qwen-2.5-7b-instruct:free",
+        name: "Qwen 2.5 7B Free",
+        description: "Alibaba's efficient multilingual model",
+        context_length: 32768,
         pricing: { prompt: "0", completion: "0" },
       },
       {
