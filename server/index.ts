@@ -35,6 +35,15 @@ import {
   handleSearchKnowledge,
 } from "./routes/pinecone";
 import {
+  handlePineconeConnection,
+  handleSemanticSearch,
+  handleAddKnowledge,
+  handleConversationMemory,
+  handleSearchConversations,
+  handleGetIndexStats as handleGetEnhancedIndexStats,
+  handleCreateIndex as handleCreateEnhancedIndex,
+} from "./routes/pinecone-enhanced";
+import {
   handleRegister,
   handleLogin,
   handleValidateSession,
