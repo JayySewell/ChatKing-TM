@@ -194,7 +194,7 @@ export class CKStorageExtended {
   }
 
   async storeEnvironmentVariables(variables: Record<string, any>): Promise<void> {
-    return ckStorage.store('system', 'environment-variables', {
+    await this.store('system', 'environment-variables', {
       variables,
       updatedAt: new Date().toISOString(),
     });
