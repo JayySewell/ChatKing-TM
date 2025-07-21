@@ -129,7 +129,7 @@ export class CKStorageExtended {
   }
 
   async getBlockedIps(): Promise<IpInfo[]> {
-    const allIps = await ckStorage.list('security/blocked-ips');
+    const allIps = await this.list('security/blocked-ips');
     return allIps.filter(ip => ip.isBlocked);
   }
 
