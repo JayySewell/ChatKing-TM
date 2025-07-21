@@ -106,7 +106,7 @@ export class ApiKeyService {
 
   async listApiKeys(userId: string): Promise<Record<string, Omit<ApiKeyConfig, 'key'>>> {
     try {
-      const keys = await ckStorage.getAllApiKeys(userId);
+      const keys = await ckStorageExtended.getAllApiKeys(userId);
       const sanitized: Record<string, Omit<ApiKeyConfig, 'key'>> = {};
 
       for (const [service, config] of Object.entries(keys)) {
