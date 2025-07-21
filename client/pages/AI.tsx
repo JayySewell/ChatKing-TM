@@ -96,6 +96,22 @@ export default function AI() {
           pricing: { prompt: "0", completion: "0" },
           isFree: true,
         },
+        {
+          id: "google/gemma-2-9b-it:free",
+          name: "Gemma 2 9B Free",
+          description: "Google's powerful instruction-tuned model",
+          contextLength: 8192,
+          pricing: { prompt: "0", completion: "0" },
+          isFree: true,
+        },
+        {
+          id: "qwen/qwen-2.5-7b-instruct:free",
+          name: "Qwen 2.5 7B Free",
+          description: "Alibaba's efficient multilingual model",
+          contextLength: 32768,
+          pricing: { prompt: "0", completion: "0" },
+          isFree: true,
+        },
       ]);
     }
   };
