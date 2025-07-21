@@ -175,6 +175,14 @@ export function Navigation({
                         </Link>
                       )}
                       <Link
+                        to="/profile"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center px-4 py-2 text-sm text-text-primary hover:bg-cyber-blue/10 transition-colors"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Profile
+                      </Link>
+                      <Link
                         to="/settings"
                         onClick={() => setShowUserMenu(false)}
                         className="flex items-center px-4 py-2 text-sm text-text-primary hover:bg-cyber-blue/10 transition-colors"
