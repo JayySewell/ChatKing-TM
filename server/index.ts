@@ -55,5 +55,13 @@ export function createServer() {
   app.post("/api/calculator/clear-history", handleClearCalculatorHistory);
   app.get("/api/calculator/constants", handleGetCalculatorConstants);
 
+  // Web Search API routes
+  app.post("/api/web/search", handleSearch);
+  app.get("/api/web/suggestions", handleGetSuggestions);
+  app.get("/api/web/history/:userId", handleGetSearchHistory);
+  app.post("/api/web/clear-history", handleClearSearchHistory);
+  app.post("/api/web/page-content", handleGetPageContent);
+  app.post("/api/web/proxy", handleProxyRequest);
+
   return app;
 }
