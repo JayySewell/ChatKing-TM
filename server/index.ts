@@ -155,5 +155,13 @@ export function createServer() {
   app.post("/api/analytics/report", handleGenerateReport);
   app.get("/api/analytics/dashboard", handleGetAnalyticsDashboard);
 
+  // OAuth Authentication routes
+  app.get("/api/auth/google", handleGoogleAuth);
+  app.get("/api/auth/apple", handleAppleAuth);
+  app.get("/auth/google/callback", handleGoogleCallback);
+  app.post("/auth/apple/callback", handleAppleCallback);
+  app.get("/api/auth/oauth-status/:userId", handleOAuthStatus);
+  app.post("/api/auth/unlink-oauth", handleUnlinkOAuth);
+
   return app;
 }
