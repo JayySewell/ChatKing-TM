@@ -150,6 +150,15 @@ export function createServer() {
   app.delete("/api/pinecone/indexes/:indexName", handleDeleteIndex);
   app.post("/api/pinecone/search", handleSearchKnowledge);
 
+  // Enhanced Pinecone API routes
+  app.get("/api/pinecone-enhanced/connection", handlePineconeConnection);
+  app.post("/api/pinecone-enhanced/search", handleSemanticSearch);
+  app.post("/api/pinecone-enhanced/knowledge", handleAddKnowledge);
+  app.post("/api/pinecone-enhanced/memory", handleConversationMemory);
+  app.post("/api/pinecone-enhanced/conversations", handleSearchConversations);
+  app.get("/api/pinecone-enhanced/stats/:indexName", handleGetEnhancedIndexStats);
+  app.post("/api/pinecone-enhanced/indexes", handleCreateEnhancedIndex);
+
   // Authentication API routes
   app.post("/api/auth/register", handleRegister);
   app.post("/api/auth/login", handleLogin);
