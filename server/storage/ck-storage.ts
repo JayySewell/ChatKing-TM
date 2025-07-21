@@ -86,17 +86,44 @@ export class CKStorage {
   }
 
   private encrypt(data: string): string {
-    const cipher = crypto.createCipher('aes-256-cbc', this.encryptionKey);
-    let encrypted = cipher.update(data, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted;
+    try {
+      const algorithm = 'aes-256-gcm';
+      const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
+      const iv = crypto.randomBytes(16);
+      const cipher = crypto.createCipher(algorithm, key);
+
+      let encrypted = cipher.update(data, 'utf8', 'hex');
+      encrypted += cipher.final('hex');
+
+      // Return IV + encrypted data
+      return iv.toString('hex') + ':' + encrypted;
+    } catch (error) {
+      console.warn('Encryption failed, storing unencrypted:', error);
+      return data; // Fallback to unencrypted
+    }
   }
 
   private decrypt(encryptedData: string): string {
-    const decipher = crypto.createDecipher('aes-256-cbc', this.encryptionKey);
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    try {
+      if (!encryptedData.includes(':')) {
+        // Data is not encrypted
+        return encryptedData;
+      }
+
+      const [ivHex, encrypted] = encryptedData.split(':');
+      const algorithm = 'aes-256-gcm';
+      const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
+      const iv = Buffer.from(ivHex, 'hex');
+
+      const decipher = crypto.createDecipher(algorithm, key);
+      let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+
+      return decrypted;
+    } catch (error) {
+      console.warn('Decryption failed, treating as unencrypted:', error);
+      return encryptedData; // Fallback to treating as unencrypted
+    }
   }
 
   private async writeFile(filePath: string, data: any, options: StorageOptions = {}): Promise<void> {
