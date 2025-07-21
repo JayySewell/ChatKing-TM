@@ -1,5 +1,7 @@
 import { ckStorage } from "./ck-storage";
 import crypto from "crypto";
+import { join } from "path";
+import fs from "fs/promises";
 
 interface SecurityEvent {
   id: string;
