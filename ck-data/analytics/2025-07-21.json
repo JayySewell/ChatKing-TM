@@ -586,5 +586,18 @@
       "incognito": false
     },
     "timestamp": "2025-07-21T21:27:33.324Z"
+  },
+  {
+    "id": "11d0f020-40bb-44be-bb2b-a9687d47ef8c",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "79db8fb8-63a6-4447-8f06-54e6346c8f89",
+      "model": "google/gemma-2-9b-it:free",
+      "inputTokens": 10,
+      "outputTokens": 13,
+      "totalTokens": 23
+    },
+    "timestamp": "2025-07-21T21:27:46.719Z"
   }
 ]
