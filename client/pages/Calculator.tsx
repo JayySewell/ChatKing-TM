@@ -1,4 +1,4 @@
-import { Calculator as CalcIcon, History, Function, PlusCircle } from 'lucide-react';
+import { Calculator as CalcIcon, History, Sigma, PlusCircle } from 'lucide-react';
 import { Layout } from '../components/Layout';
 
 export default function Calculator() {
