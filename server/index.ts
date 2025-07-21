@@ -44,6 +44,15 @@ import {
   handleUpdateUserProfile,
   handleGetSystemStats
 } from "./routes/auth";
+import {
+  handleGetApiKeys,
+  handleUpdateApiKey,
+  handleTestApiKey,
+  handleRotateApiKey,
+  handleGetApiKeyUsage,
+  handleGetSystemApiHealth,
+  handleValidateAllApiKeys
+} from "./routes/apikeys";
 import { authService } from "./services/auth";
 
 export function createServer() {
