@@ -1,13 +1,21 @@
-import { useState, useEffect } from 'react';
-import { Calculator as CalcIcon, History, Sigma, Delete, RotateCcw, Settings, Trash2 } from 'lucide-react';
-import { Layout } from '../components/Layout';
+import { useState, useEffect } from "react";
+import {
+  Calculator as CalcIcon,
+  History,
+  Sigma,
+  Delete,
+  RotateCcw,
+  Settings,
+  Trash2,
+} from "lucide-react";
+import { Layout } from "../components/Layout";
 
 interface CalculationResult {
   expression: string;
   result: string;
   isValid: boolean;
   error?: string;
-  type: 'basic' | 'scientific' | 'programming';
+  type: "basic" | "scientific" | "programming";
 }
 
 interface CalculatorLog {
@@ -24,18 +32,23 @@ interface Constant {
 }
 
 export default function Calculator() {
-  const [display, setDisplay] = useState('0');
-  const [previousResult, setPreviousResult] = useState('');
+  const [display, setDisplay] = useState("0");
+  const [previousResult, setPreviousResult] = useState("");
   const [isNewCalculation, setIsNewCalculation] = useState(true);
-  const [mode, setMode] = useState<'basic' | 'scientific' | 'programming'>('basic');
+  const [mode, setMode] = useState<"basic" | "scientific" | "programming">(
+    "basic",
+  );
   const [showHistory, setShowHistory] = useState(false);
   const [showConstants, setShowConstants] = useState(false);
   const [history, setHistory] = useState<CalculatorLog[]>([]);
-  const [constants, setConstants] = useState<{ mathematical: Record<string, Constant>, physical: Record<string, Constant> }>({
+  const [constants, setConstants] = useState<{
+    mathematical: Record<string, Constant>;
+    physical: Record<string, Constant>;
+  }>({
     mathematical: {},
-    physical: {}
+    physical: {},
   });
-  const [userId] = useState('demo-user'); // In real app, get from auth
+  const [userId] = useState("demo-user"); // In real app, get from auth
 
   useEffect(() => {
     loadHistory();
@@ -50,33 +63,33 @@ export default function Calculator() {
         setHistory(data.history);
       }
     } catch (error) {
-      console.error('Failed to load calculator history:', error);
+      console.error("Failed to load calculator history:", error);
     }
   };
 
   const loadConstants = async () => {
     try {
-      const response = await fetch('/api/calculator/constants');
+      const response = await fetch("/api/calculator/constants");
       const data = await response.json();
       if (data.constants) {
         setConstants(data.constants);
       }
     } catch (error) {
-      console.error('Failed to load constants:', error);
+      console.error("Failed to load constants:", error);
     }
   };
 
   const handleButtonClick = (value: string) => {
-    if (value === '=') {
+    if (value === "=") {
       calculate();
-    } else if (value === 'C') {
+    } else if (value === "C") {
       clear();
-    } else if (value === 'CE') {
+    } else if (value === "CE") {
       clearEntry();
-    } else if (value === '⌫') {
+    } else if (value === "⌫") {
       backspace();
-    } else if (value === 'Ans') {
-      insertValue(previousResult || '0');
+    } else if (value === "Ans") {
+      insertValue(previousResult || "0");
     } else {
       insertValue(value);
     }
@@ -87,42 +100,42 @@ export default function Calculator() {
       setDisplay(value);
       setIsNewCalculation(false);
     } else {
-      setDisplay(prev => prev === '0' ? value : prev + value);
+      setDisplay((prev) => (prev === "0" ? value : prev + value));
       setIsNewCalculation(false);
     }
   };
 
   const clear = () => {
-    setDisplay('0');
-    setPreviousResult('');
+    setDisplay("0");
+    setPreviousResult("");
     setIsNewCalculation(true);
   };
 
   const clearEntry = () => {
-    setDisplay('0');
+    setDisplay("0");
     setIsNewCalculation(true);
   };
 
   const backspace = () => {
     if (display.length > 1) {
-      setDisplay(prev => prev.slice(0, -1));
+      setDisplay((prev) => prev.slice(0, -1));
     } else {
-      setDisplay('0');
+      setDisplay("0");
       setIsNewCalculation(true);
     }
   };
 
   const calculate = async () => {
     try {
-      const response = await fetch('/api/calculator/calculate', {
-        method: 'POST',
+      const response = await fetch("/api/calculator/calculate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           expression: display,
-          userId: userId
-        })
+          userId: userId,
+        }),
       });
 
       const result: CalculationResult = await response.json();
@@ -133,27 +146,27 @@ export default function Calculator() {
         setIsNewCalculation(true);
         loadHistory(); // Refresh history
       } else {
-        setDisplay('Error: ' + (result.error || 'Invalid expression'));
+        setDisplay("Error: " + (result.error || "Invalid expression"));
         setIsNewCalculation(true);
       }
     } catch (error) {
-      setDisplay('Error: Network error');
+      setDisplay("Error: Network error");
       setIsNewCalculation(true);
     }
   };
 
   const clearHistory = async () => {
     try {
-      await fetch('/api/calculator/clear-history', {
-        method: 'POST',
+      await fetch("/api/calculator/clear-history", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId }),
       });
       setHistory([]);
     } catch (error) {
-      console.error('Failed to clear history:', error);
+      console.error("Failed to clear history:", error);
     }
   };
 
@@ -171,72 +184,262 @@ export default function Calculator() {
   const renderBasicButtons = () => (
     <div className="grid grid-cols-4 gap-3">
       {/* Row 1 */}
-      <button onClick={() => handleButtonClick('C')} className="btn-calc btn-operator">C</button>
-      <button onClick={() => handleButtonClick('CE')} className="btn-calc btn-operator">CE</button>
-      <button onClick={() => handleButtonClick('⌫')} className="btn-calc btn-operator">⌫</button>
-      <button onClick={() => handleButtonClick('/')} className="btn-calc btn-operator">÷</button>
-      
+      <button
+        onClick={() => handleButtonClick("C")}
+        className="btn-calc btn-operator"
+      >
+        C
+      </button>
+      <button
+        onClick={() => handleButtonClick("CE")}
+        className="btn-calc btn-operator"
+      >
+        CE
+      </button>
+      <button
+        onClick={() => handleButtonClick("⌫")}
+        className="btn-calc btn-operator"
+      >
+        ⌫
+      </button>
+      <button
+        onClick={() => handleButtonClick("/")}
+        className="btn-calc btn-operator"
+      >
+        ÷
+      </button>
+
       {/* Row 2 */}
-      <button onClick={() => handleButtonClick('7')} className="btn-calc">7</button>
-      <button onClick={() => handleButtonClick('8')} className="btn-calc">8</button>
-      <button onClick={() => handleButtonClick('9')} className="btn-calc">9</button>
-      <button onClick={() => handleButtonClick('*')} className="btn-calc btn-operator">×</button>
-      
+      <button onClick={() => handleButtonClick("7")} className="btn-calc">
+        7
+      </button>
+      <button onClick={() => handleButtonClick("8")} className="btn-calc">
+        8
+      </button>
+      <button onClick={() => handleButtonClick("9")} className="btn-calc">
+        9
+      </button>
+      <button
+        onClick={() => handleButtonClick("*")}
+        className="btn-calc btn-operator"
+      >
+        ×
+      </button>
+
       {/* Row 3 */}
-      <button onClick={() => handleButtonClick('4')} className="btn-calc">4</button>
-      <button onClick={() => handleButtonClick('5')} className="btn-calc">5</button>
-      <button onClick={() => handleButtonClick('6')} className="btn-calc">6</button>
-      <button onClick={() => handleButtonClick('-')} className="btn-calc btn-operator">−</button>
-      
+      <button onClick={() => handleButtonClick("4")} className="btn-calc">
+        4
+      </button>
+      <button onClick={() => handleButtonClick("5")} className="btn-calc">
+        5
+      </button>
+      <button onClick={() => handleButtonClick("6")} className="btn-calc">
+        6
+      </button>
+      <button
+        onClick={() => handleButtonClick("-")}
+        className="btn-calc btn-operator"
+      >
+        −
+      </button>
+
       {/* Row 4 */}
-      <button onClick={() => handleButtonClick('1')} className="btn-calc">1</button>
-      <button onClick={() => handleButtonClick('2')} className="btn-calc">2</button>
-      <button onClick={() => handleButtonClick('3')} className="btn-calc">3</button>
-      <button onClick={() => handleButtonClick('+')} className="btn-calc btn-operator">+</button>
-      
+      <button onClick={() => handleButtonClick("1")} className="btn-calc">
+        1
+      </button>
+      <button onClick={() => handleButtonClick("2")} className="btn-calc">
+        2
+      </button>
+      <button onClick={() => handleButtonClick("3")} className="btn-calc">
+        3
+      </button>
+      <button
+        onClick={() => handleButtonClick("+")}
+        className="btn-calc btn-operator"
+      >
+        +
+      </button>
+
       {/* Row 5 */}
-      <button onClick={() => handleButtonClick('0')} className="btn-calc col-span-2">0</button>
-      <button onClick={() => handleButtonClick('.')} className="btn-calc">.</button>
-      <button onClick={() => handleButtonClick('=')} className="btn-calc btn-equals">=</button>
+      <button
+        onClick={() => handleButtonClick("0")}
+        className="btn-calc col-span-2"
+      >
+        0
+      </button>
+      <button onClick={() => handleButtonClick(".")} className="btn-calc">
+        .
+      </button>
+      <button
+        onClick={() => handleButtonClick("=")}
+        className="btn-calc btn-equals"
+      >
+        =
+      </button>
     </div>
   );
 
   const renderScientificButtons = () => (
     <div className="grid grid-cols-5 gap-2 text-sm">
       {/* Row 1 - Functions */}
-      <button onClick={() => handleButtonClick('sin(')} className="btn-calc btn-function">sin</button>
-      <button onClick={() => handleButtonClick('cos(')} className="btn-calc btn-function">cos</button>
-      <button onClick={() => handleButtonClick('tan(')} className="btn-calc btn-function">tan</button>
-      <button onClick={() => handleButtonClick('log(')} className="btn-calc btn-function">log</button>
-      <button onClick={() => handleButtonClick('ln(')} className="btn-calc btn-function">ln</button>
-      
+      <button
+        onClick={() => handleButtonClick("sin(")}
+        className="btn-calc btn-function"
+      >
+        sin
+      </button>
+      <button
+        onClick={() => handleButtonClick("cos(")}
+        className="btn-calc btn-function"
+      >
+        cos
+      </button>
+      <button
+        onClick={() => handleButtonClick("tan(")}
+        className="btn-calc btn-function"
+      >
+        tan
+      </button>
+      <button
+        onClick={() => handleButtonClick("log(")}
+        className="btn-calc btn-function"
+      >
+        log
+      </button>
+      <button
+        onClick={() => handleButtonClick("ln(")}
+        className="btn-calc btn-function"
+      >
+        ln
+      </button>
+
       {/* Row 2 - Inverse Functions */}
-      <button onClick={() => handleButtonClick('asin(')} className="btn-calc btn-function">sin⁻¹</button>
-      <button onClick={() => handleButtonClick('acos(')} className="btn-calc btn-function">cos⁻¹</button>
-      <button onClick={() => handleButtonClick('atan(')} className="btn-calc btn-function">tan⁻¹</button>
-      <button onClick={() => handleButtonClick('10^(')} className="btn-calc btn-function">10ˣ</button>
-      <button onClick={() => handleButtonClick('exp(')} className="btn-calc btn-function">eˣ</button>
-      
+      <button
+        onClick={() => handleButtonClick("asin(")}
+        className="btn-calc btn-function"
+      >
+        sin⁻¹
+      </button>
+      <button
+        onClick={() => handleButtonClick("acos(")}
+        className="btn-calc btn-function"
+      >
+        cos⁻¹
+      </button>
+      <button
+        onClick={() => handleButtonClick("atan(")}
+        className="btn-calc btn-function"
+      >
+        tan⁻¹
+      </button>
+      <button
+        onClick={() => handleButtonClick("10^(")}
+        className="btn-calc btn-function"
+      >
+        10ˣ
+      </button>
+      <button
+        onClick={() => handleButtonClick("exp(")}
+        className="btn-calc btn-function"
+      >
+        eˣ
+      </button>
+
       {/* Row 3 - Powers & Roots */}
-      <button onClick={() => handleButtonClick('^2')} className="btn-calc btn-function">x²</button>
-      <button onClick={() => handleButtonClick('^3')} className="btn-calc btn-function">x³</button>
-      <button onClick={() => handleButtonClick('^(')} className="btn-calc btn-function">xʸ</button>
-      <button onClick={() => handleButtonClick('sqrt(')} className="btn-calc btn-function">√</button>
-      <button onClick={() => handleButtonClick('cbrt(')} className="btn-calc btn-function">∛</button>
-      
+      <button
+        onClick={() => handleButtonClick("^2")}
+        className="btn-calc btn-function"
+      >
+        x²
+      </button>
+      <button
+        onClick={() => handleButtonClick("^3")}
+        className="btn-calc btn-function"
+      >
+        x³
+      </button>
+      <button
+        onClick={() => handleButtonClick("^(")}
+        className="btn-calc btn-function"
+      >
+        xʸ
+      </button>
+      <button
+        onClick={() => handleButtonClick("sqrt(")}
+        className="btn-calc btn-function"
+      >
+        √
+      </button>
+      <button
+        onClick={() => handleButtonClick("cbrt(")}
+        className="btn-calc btn-function"
+      >
+        ∛
+      </button>
+
       {/* Row 4 - Constants & Special */}
-      <button onClick={() => handleButtonClick('pi')} className="btn-calc btn-constant">π</button>
-      <button onClick={() => handleButtonClick('e')} className="btn-calc btn-constant">e</button>
-      <button onClick={() => handleButtonClick('(')} className="btn-calc btn-operator">(</button>
-      <button onClick={() => handleButtonClick(')')} className="btn-calc btn-operator">)</button>
-      <button onClick={() => handleButtonClick('Ans')} className="btn-calc btn-constant">Ans</button>
-      
+      <button
+        onClick={() => handleButtonClick("pi")}
+        className="btn-calc btn-constant"
+      >
+        π
+      </button>
+      <button
+        onClick={() => handleButtonClick("e")}
+        className="btn-calc btn-constant"
+      >
+        e
+      </button>
+      <button
+        onClick={() => handleButtonClick("(")}
+        className="btn-calc btn-operator"
+      >
+        (
+      </button>
+      <button
+        onClick={() => handleButtonClick(")")}
+        className="btn-calc btn-operator"
+      >
+        )
+      </button>
+      <button
+        onClick={() => handleButtonClick("Ans")}
+        className="btn-calc btn-constant"
+      >
+        Ans
+      </button>
+
       {/* Row 5 - Additional */}
-      <button onClick={() => handleButtonClick('factorial(')} className="btn-calc btn-function">n!</button>
-      <button onClick={() => handleButtonClick('abs(')} className="btn-calc btn-function">|x|</button>
-      <button onClick={() => handleButtonClick('floor(')} className="btn-calc btn-function">⌊x⌋</button>
-      <button onClick={() => handleButtonClick('ceil(')} className="btn-calc btn-function">⌈x⌉</button>
-      <button onClick={() => handleButtonClick('round(')} className="btn-calc btn-function">round</button>
+      <button
+        onClick={() => handleButtonClick("factorial(")}
+        className="btn-calc btn-function"
+      >
+        n!
+      </button>
+      <button
+        onClick={() => handleButtonClick("abs(")}
+        className="btn-calc btn-function"
+      >
+        |x|
+      </button>
+      <button
+        onClick={() => handleButtonClick("floor(")}
+        className="btn-calc btn-function"
+      >
+        ⌊x⌋
+      </button>
+      <button
+        onClick={() => handleButtonClick("ceil(")}
+        className="btn-calc btn-function"
+      >
+        ⌈x⌉
+      </button>
+      <button
+        onClick={() => handleButtonClick("round(")}
+        className="btn-calc btn-function"
+      >
+        round
+      </button>
     </div>
   );
 
@@ -280,21 +483,21 @@ export default function Calculator() {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setMode('basic')}
+                      onClick={() => setMode("basic")}
                       className={`px-4 py-2 rounded text-sm font-medium transition-all ${
-                        mode === 'basic'
-                          ? 'bg-cyber-blue text-main-bg'
-                          : 'bg-secondary-bg text-text-muted hover:text-text-primary'
+                        mode === "basic"
+                          ? "bg-cyber-blue text-main-bg"
+                          : "bg-secondary-bg text-text-muted hover:text-text-primary"
                       }`}
                     >
                       Basic
                     </button>
                     <button
-                      onClick={() => setMode('scientific')}
+                      onClick={() => setMode("scientific")}
                       className={`px-4 py-2 rounded text-sm font-medium transition-all ${
-                        mode === 'scientific'
-                          ? 'bg-cyber-blue text-main-bg'
-                          : 'bg-secondary-bg text-text-muted hover:text-text-primary'
+                        mode === "scientific"
+                          ? "bg-cyber-blue text-main-bg"
+                          : "bg-secondary-bg text-text-muted hover:text-text-primary"
                       }`}
                     >
                       Scientific
@@ -320,25 +523,33 @@ export default function Calculator() {
                 {/* Constants Panel */}
                 {showConstants && (
                   <div className="mb-6 p-4 bg-secondary-bg rounded-lg border border-border-glow">
-                    <h3 className="font-semibold text-lg mb-3 text-text-primary">Constants</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-text-primary">
+                      Constants
+                    </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {Object.entries(constants.mathematical).map(([key, constant]) => (
-                        <button
-                          key={key}
-                          onClick={() => insertConstant(constant.value)}
-                          className="p-2 text-left rounded border border-border-glow hover:border-cyber-blue/50 transition-colors"
-                        >
-                          <div className="font-medium text-cyber-blue">{constant.symbol}</div>
-                          <div className="text-xs text-text-muted">{constant.description}</div>
-                        </button>
-                      ))}
+                      {Object.entries(constants.mathematical).map(
+                        ([key, constant]) => (
+                          <button
+                            key={key}
+                            onClick={() => insertConstant(constant.value)}
+                            className="p-2 text-left rounded border border-border-glow hover:border-cyber-blue/50 transition-colors"
+                          >
+                            <div className="font-medium text-cyber-blue">
+                              {constant.symbol}
+                            </div>
+                            <div className="text-xs text-text-muted">
+                              {constant.description}
+                            </div>
+                          </button>
+                        ),
+                      )}
                     </div>
                   </div>
                 )}
 
                 {/* Button Grid */}
                 <div className="space-y-4">
-                  {mode === 'scientific' && renderScientificButtons()}
+                  {mode === "scientific" && renderScientificButtons()}
                   {renderBasicButtons()}
                 </div>
               </div>
@@ -348,7 +559,9 @@ export default function Calculator() {
             <div className="lg:col-span-1">
               <div className="glass-card">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-lg text-text-primary">History</h3>
+                  <h3 className="font-semibold text-lg text-text-primary">
+                    History
+                  </h3>
                   <button
                     onClick={clearHistory}
                     className="p-2 rounded hover:bg-neon-red/10 transition-colors"
@@ -375,7 +588,7 @@ export default function Calculator() {
                       </div>
                     </button>
                   ))}
-                  
+
                   {history.length === 0 && (
                     <div className="text-center text-text-muted py-8">
                       No calculations yet
@@ -392,19 +605,19 @@ export default function Calculator() {
         .btn-calc {
           @apply bg-secondary-bg hover:bg-border-glow text-text-primary font-medium py-3 px-4 rounded border border-border-glow transition-all hover:border-cyber-blue/50;
         }
-        
+
         .btn-operator {
           @apply bg-cyber-blue/20 text-cyber-blue hover:bg-cyber-blue/30;
         }
-        
+
         .btn-function {
           @apply bg-neon-purple/20 text-neon-purple hover:bg-neon-purple/30 text-xs;
         }
-        
+
         .btn-constant {
           @apply bg-neon-amber/20 text-neon-amber hover:bg-neon-amber/30;
         }
-        
+
         .btn-equals {
           @apply bg-neon-green/20 text-neon-green hover:bg-neon-green/30 font-bold;
         }

@@ -1,59 +1,68 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Zap, Crown, Shield, User, Mail, Lock } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  Zap,
+  Crown,
+  Shield,
+  User,
+  Mail,
+  Lock,
+} from "lucide-react";
 
 export default function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     // Validation
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         // Store token and user info
-        localStorage.setItem('chatking_token', data.token);
-        localStorage.setItem('chatking_user', JSON.stringify(data.user));
-        
+        localStorage.setItem("chatking_token", data.token);
+        localStorage.setItem("chatking_user", JSON.stringify(data.user));
+
         // Redirect to home
-        navigate('/');
+        navigate("/");
       } else {
-        setError(data.error || 'Registration failed');
+        setError(data.error || "Registration failed");
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +136,7 @@ export default function Register() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full cyber-input pr-12"
@@ -140,7 +149,11 @@ export default function Register() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -152,7 +165,7 @@ export default function Register() {
               </label>
               <div className="relative">
                 <input
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full cyber-input pr-12"
@@ -164,7 +177,11 @@ export default function Register() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -180,7 +197,7 @@ export default function Register() {
                   <span>Creating Account...</span>
                 </div>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </button>
           </form>
@@ -189,14 +206,16 @@ export default function Register() {
           <div className="mt-6 p-3 bg-neon-amber/10 border border-neon-amber/30 rounded">
             <div className="flex items-center space-x-2 text-sm text-neon-amber">
               <Crown className="w-4 h-4" />
-              <span>First user becomes the platform owner with full admin access</span>
+              <span>
+                First user becomes the platform owner with full admin access
+              </span>
             </div>
           </div>
 
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-text-muted text-sm">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 to="/login"
                 className="text-cyber-blue hover:text-cyber-blue-light transition-colors font-medium"
@@ -227,14 +246,24 @@ export default function Register() {
 
         {/* Password Requirements */}
         <div className="mt-4 glass-card">
-          <h4 className="text-sm font-medium text-text-primary mb-2">Password Requirements:</h4>
+          <h4 className="text-sm font-medium text-text-primary mb-2">
+            Password Requirements:
+          </h4>
           <ul className="text-xs text-text-muted space-y-1">
-            <li className={`flex items-center space-x-2 ${password.length >= 6 ? 'text-neon-green' : ''}`}>
-              <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-neon-green' : 'bg-border-glow'}`}></div>
+            <li
+              className={`flex items-center space-x-2 ${password.length >= 6 ? "text-neon-green" : ""}`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${password.length >= 6 ? "bg-neon-green" : "bg-border-glow"}`}
+              ></div>
               <span>At least 6 characters</span>
             </li>
-            <li className={`flex items-center space-x-2 ${password === confirmPassword && password ? 'text-neon-green' : ''}`}>
-              <div className={`w-2 h-2 rounded-full ${password === confirmPassword && password ? 'bg-neon-green' : 'bg-border-glow'}`}></div>
+            <li
+              className={`flex items-center space-x-2 ${password === confirmPassword && password ? "text-neon-green" : ""}`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${password === confirmPassword && password ? "bg-neon-green" : "bg-border-glow"}`}
+              ></div>
               <span>Passwords match</span>
             </li>
           </ul>

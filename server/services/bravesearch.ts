@@ -4,7 +4,7 @@ interface BraveSearchResult {
   description: string;
   favicon?: string;
   age?: string;
-  type: 'web' | 'news' | 'image' | 'video';
+  type: "web" | "news" | "image" | "video";
 }
 
 interface BraveSearchResponse {
@@ -58,113 +58,115 @@ interface BraveApiResponse {
 
 export class BraveSearchService {
   private apiKey: string;
-  private baseUrl = 'https://api.search.brave.com/res/v1';
+  private baseUrl = "https://api.search.brave.com/res/v1";
 
-  constructor(apiKey: string = 'BSAjvpAPq4Pz7lbp6px2jI4aXacwkI6') {
+  constructor(apiKey: string = "BSAjvpAPq4Pz7lbp6px2jI4aXacwkI6") {
     this.apiKey = apiKey;
   }
 
   async search(
     query: string,
     options: {
-      type?: 'web' | 'news' | 'images' | 'videos';
+      type?: "web" | "news" | "images" | "videos";
       count?: number;
       offset?: number;
-      safeSearch?: 'strict' | 'moderate' | 'off';
+      safeSearch?: "strict" | "moderate" | "off";
       country?: string;
-      freshness?: 'pd' | 'pw' | 'pm' | 'py'; // past day, week, month, year
-    } = {}
+      freshness?: "pd" | "pw" | "pm" | "py"; // past day, week, month, year
+    } = {},
   ): Promise<BraveSearchResponse> {
     const startTime = Date.now();
-    
+
     try {
-      const searchType = options.type || 'web';
-      const endpoint = searchType === 'web' ? '/web/search' : `/${searchType}/search`;
-      
+      const searchType = options.type || "web";
+      const endpoint =
+        searchType === "web" ? "/web/search" : `/${searchType}/search`;
+
       const params = new URLSearchParams({
         q: query,
         count: (options.count || 10).toString(),
         offset: (options.offset || 0).toString(),
-        safesearch: options.safeSearch || 'moderate',
-        country: options.country || 'US',
-        ...(options.freshness && { freshness: options.freshness })
+        safesearch: options.safeSearch || "moderate",
+        country: options.country || "US",
+        ...(options.freshness && { freshness: options.freshness }),
       });
 
       const response = await fetch(`${this.baseUrl}${endpoint}?${params}`, {
         headers: {
-          'Accept': 'application/json',
-          'Accept-Encoding': 'gzip',
-          'X-Subscription-Token': this.apiKey
-        }
+          Accept: "application/json",
+          "Accept-Encoding": "gzip",
+          "X-Subscription-Token": this.apiKey,
+        },
       });
 
       if (!response.ok) {
-        throw new Error(`Brave Search API error: ${response.status} - ${response.statusText}`);
+        throw new Error(
+          `Brave Search API error: ${response.status} - ${response.statusText}`,
+        );
       }
 
       const data: BraveApiResponse = await response.json();
       const searchTime = Date.now() - startTime;
 
       return this.formatSearchResults(data, query, searchTime, searchType);
-
     } catch (error) {
-      console.error('Brave Search error:', error);
-      
+      console.error("Brave Search error:", error);
+
       // Return mock results for development
-      return this.getMockResults(query, options.type || 'web');
+      return this.getMockResults(query, options.type || "web");
     }
   }
 
   private formatSearchResults(
-    data: BraveApiResponse, 
-    query: string, 
+    data: BraveApiResponse,
+    query: string,
     searchTime: number,
-    type: string
+    type: string,
   ): BraveSearchResponse {
     let results: BraveSearchResult[] = [];
     let totalResults = 0;
 
-    if (type === 'web' && data.web?.results) {
-      results = data.web.results.map(result => ({
+    if (type === "web" && data.web?.results) {
+      results = data.web.results.map((result) => ({
         title: result.title,
         url: result.url,
         description: result.description,
         favicon: result.favicon,
         age: result.age,
-        type: 'web' as const
+        type: "web" as const,
       }));
       totalResults = data.web.results.length;
     }
 
-    if (type === 'news' && data.news?.results) {
-      results = data.news.results.map(result => ({
+    if (type === "news" && data.news?.results) {
+      results = data.news.results.map((result) => ({
         title: result.title,
         url: result.url,
         description: result.description,
         age: result.age,
-        type: 'news' as const
+        type: "news" as const,
       }));
       totalResults = data.news.results.length;
     }
 
-    if (type === 'images' && data.images?.results) {
-      results = data.images.results.map(result => ({
+    if (type === "images" && data.images?.results) {
+      results = data.images.results.map((result) => ({
         title: result.title,
         url: result.url,
         description: result.source,
         favicon: result.thumbnail,
-        type: 'image' as const
+        type: "image" as const,
       }));
       totalResults = data.images.results.length;
     }
 
-    if (type === 'videos' && data.videos?.results) {
-      results = data.videos.results.map(result => ({
+    if (type === "videos" && data.videos?.results) {
+      results = data.videos.results.map((result) => ({
         title: result.title,
         url: result.url,
         description: result.description,
         favicon: result.thumbnail,
-        type: 'video' as const
+        type: "video" as const,
       }));
       totalResults = data.videos.results.length;
     }
@@ -173,7 +175,7 @@ export class BraveSearchService {
       query: data.query.original || query,
       results,
       totalResults,
-      searchTime
+      searchTime,
     };
   }
 
@@ -181,29 +183,32 @@ export class BraveSearchService {
     const mockResults: BraveSearchResult[] = [
       {
         title: `Search results for "${query}"`,
-        url: 'https://example.com',
-        description: 'This is a mock result while the BraveSearch API is being configured. The real implementation will show actual search results.',
-        type: type as any
+        url: "https://example.com",
+        description:
+          "This is a mock result while the BraveSearch API is being configured. The real implementation will show actual search results.",
+        type: type as any,
       },
       {
-        title: 'ChatKing Web Browser',
-        url: 'https://chatkingai.com/web',
-        description: 'ChatKing\'s integrated web browser with privacy features and real-time search capabilities.',
-        type: type as any
+        title: "ChatKing Web Browser",
+        url: "https://chatkingai.com/web",
+        description:
+          "ChatKing's integrated web browser with privacy features and real-time search capabilities.",
+        type: type as any,
       },
       {
-        title: 'Sample Result 3',
-        url: 'https://example.org',
-        description: 'Another mock result to demonstrate the search interface. Real results will come from BraveSearch API.',
-        type: type as any
-      }
+        title: "Sample Result 3",
+        url: "https://example.org",
+        description:
+          "Another mock result to demonstrate the search interface. Real results will come from BraveSearch API.",
+        type: type as any,
+      },
     ];
 
     return {
       query,
       results: mockResults,
       totalResults: mockResults.length,
-      searchTime: 150
+      searchTime: 150,
     };
   }
 
@@ -215,12 +220,12 @@ export class BraveSearchService {
         `${query} examples`,
         `${query} guide`,
         `${query} documentation`,
-        `${query} vs alternatives`
+        `${query} vs alternatives`,
       ];
 
       return commonSuggestions.slice(0, 5);
     } catch (error) {
-      console.error('Failed to get search suggestions:', error);
+      console.error("Failed to get search suggestions:", error);
       return [];
     }
   }

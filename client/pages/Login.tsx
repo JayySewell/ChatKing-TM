@@ -1,51 +1,51 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Zap, Crown, Shield } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Zap, Crown, Shield } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         // Store token and user info
-        localStorage.setItem('chatking_token', data.token);
-        localStorage.setItem('chatking_user', JSON.stringify(data.user));
-        
+        localStorage.setItem("chatking_token", data.token);
+        localStorage.setItem("chatking_user", JSON.stringify(data.user));
+
         // Redirect to home
-        navigate('/');
+        navigate("/");
       } else {
-        setError(data.error || 'Login failed');
+        setError(data.error || "Login failed");
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const loginAsDemo = () => {
-    setEmail('owner@chatkingai.com');
-    setPassword('chatking123');
+    setEmail("owner@chatkingai.com");
+    setPassword("chatking123");
   };
 
   return (
@@ -98,7 +98,7 @@ export default function Login() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full cyber-input pr-12"
@@ -110,7 +110,11 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -126,7 +130,7 @@ export default function Login() {
                   <span>Signing In...</span>
                 </div>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </button>
           </form>
@@ -145,7 +149,7 @@ export default function Login() {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-text-muted text-sm">
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <Link
                 to="/register"
                 className="text-cyber-blue hover:text-cyber-blue-light transition-colors font-medium"
@@ -160,7 +164,9 @@ export default function Login() {
         <div className="mt-6 glass-card">
           <div className="flex items-center space-x-2 text-sm text-text-muted">
             <Shield className="w-4 h-4 text-neon-green" />
-            <span>Your data is encrypted and stored locally using CK-Storage</span>
+            <span>
+              Your data is encrypted and stored locally using CK-Storage
+            </span>
           </div>
         </div>
 

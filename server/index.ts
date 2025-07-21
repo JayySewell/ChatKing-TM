@@ -6,7 +6,7 @@ import {
   handleGetModels,
   handleGetChatHistory,
   handleGetChatSession,
-  handleDeleteChatSession
+  handleDeleteChatSession,
 } from "./routes/ai";
 import {
   handleCalculate,
@@ -14,7 +14,7 @@ import {
   handleConvertBase,
   handleGetCalculatorHistory,
   handleClearCalculatorHistory,
-  handleGetCalculatorConstants
+  handleGetCalculatorConstants,
 } from "./routes/calculator";
 import {
   handleSearch,
@@ -22,7 +22,7 @@ import {
   handleGetSearchHistory,
   handleClearSearchHistory,
   handleGetPageContent,
-  handleProxyRequest
+  handleProxyRequest,
 } from "./routes/web";
 import {
   handleListIndexes,
@@ -32,7 +32,7 @@ import {
   handleDeleteVectors,
   handleGetIndexStats,
   handleDeleteIndex,
-  handleSearchKnowledge
+  handleSearchKnowledge,
 } from "./routes/pinecone";
 import {
   handleRegister,
@@ -42,7 +42,7 @@ import {
   handleLogout,
   handleGetUserProfile,
   handleUpdateUserProfile,
-  handleGetSystemStats
+  handleGetSystemStats,
 } from "./routes/auth";
 import {
   handleGetApiKeys,
@@ -51,7 +51,7 @@ import {
   handleRotateApiKey,
   handleGetApiKeyUsage,
   handleGetSystemApiHealth,
-  handleValidateAllApiKeys
+  handleValidateAllApiKeys,
 } from "./routes/apikeys";
 import {
   handleGetSystemMetrics,
@@ -61,7 +61,7 @@ import {
   handleGetTopQueries,
   handleGetResourceUsage,
   handleGenerateReport,
-  handleGetAnalyticsDashboard
+  handleGetAnalyticsDashboard,
 } from "./routes/analytics";
 import { authService } from "./services/auth";
 

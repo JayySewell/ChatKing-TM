@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { Navigation } from './Navigation';
+import { ReactNode } from "react";
+import { Navigation } from "./Navigation";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,17 +8,20 @@ interface LayoutProps {
   username?: string;
 }
 
-export function Layout({ children, isAuthenticated = false, isOwner = false, username }: LayoutProps) {
+export function Layout({
+  children,
+  isAuthenticated = false,
+  isOwner = false,
+  username,
+}: LayoutProps) {
   return (
     <div className="min-h-screen bg-main-bg">
-      <Navigation 
-        isAuthenticated={isAuthenticated} 
-        isOwner={isOwner} 
-        username={username} 
+      <Navigation
+        isAuthenticated={isAuthenticated}
+        isOwner={isOwner}
+        username={username}
       />
-      <main className="pt-16">
-        {children}
-      </main>
+      <main className="pt-16">{children}</main>
     </div>
   );
 }

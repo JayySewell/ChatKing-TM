@@ -1,12 +1,12 @@
 import { RequestHandler } from "express";
 import { pineconeService } from "../services/pinecone";
 import { ckStorage } from "../storage/ck-storage";
-import crypto from 'crypto';
+import crypto from "crypto";
 
 interface CreateIndexRequest {
   name: string;
   dimension: number;
-  metric: 'cosine' | 'euclidean' | 'dotproduct';
+  metric: "cosine" | "euclidean" | "dotproduct";
   userId: string;
 }
 
@@ -42,25 +42,24 @@ export const handleListIndexes: RequestHandler = async (req, res) => {
     const { userId } = req.params;
 
     if (!userId) {
-      return res.status(400).json({ error: 'User ID required' });
+      return res.status(400).json({ error: "User ID required" });
     }
 
     // Get both Pinecone indexes and user's local indexes
     const [pineconeIndexes, userIndexes] = await Promise.all([
       pineconeService.listIndexes(),
-      ckStorage.getUserPineconeIndexes(userId)
+      ckStorage.getUserPineconeIndexes(userId),
     ]);
 
     res.json({
       pineconeIndexes,
       userIndexes,
-      totalIndexes: pineconeIndexes.length + userIndexes.length
+      totalIndexes: pineconeIndexes.length + userIndexes.length,
     });
-
   } catch (error) {
-    console.error('List Indexes Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to list indexes' 
+    console.error("List Indexes Error:", error);
+    res.status(500).json({
+      error: "Failed to list indexes",
     });
   }
 };
@@ -70,8 +69,8 @@ export const handleCreateIndex: RequestHandler = async (req, res) => {
     const { name, dimension, metric, userId }: CreateIndexRequest = req.body;
 
     if (!name || !dimension || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: name, dimension, userId' 
+      return res.status(400).json({
+        error: "Missing required fields: name, dimension, userId",
       });
     }
 
@@ -81,13 +80,13 @@ export const handleCreateIndex: RequestHandler = async (req, res) => {
     if (created) {
       // Also create local tracking
       await ckStorage.createPineconeIndex(userId, name);
-      
+
       // Log analytics
-      await ckStorage.logAnalytics('pinecone_index_created', {
+      await ckStorage.logAnalytics("pinecone_index_created", {
         userId,
         indexName: name,
         dimension,
-        metric
+        metric,
       });
     }
 
@@ -95,14 +94,13 @@ export const handleCreateIndex: RequestHandler = async (req, res) => {
       success: created,
       indexName: name,
       dimension,
-      metric
+      metric,
     });
-
   } catch (error) {
-    console.error('Create Index Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to create index',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Create Index Error:", error);
+    res.status(500).json({
+      error: "Failed to create index",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -112,8 +110,8 @@ export const handleUpsertVectors: RequestHandler = async (req, res) => {
     const { indexName, documents, namespace, userId }: UpsertRequest = req.body;
 
     if (!indexName || !documents || !Array.isArray(documents) || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: indexName, documents (array), userId' 
+      return res.status(400).json({
+        error: "Missing required fields: indexName, documents (array), userId",
       });
     }
 
@@ -123,7 +121,7 @@ export const handleUpsertVectors: RequestHandler = async (req, res) => {
     for (const doc of documents) {
       const id = doc.id || crypto.randomUUID();
       const embedding = await pineconeService.embedText(doc.content);
-      
+
       vectors.push({
         id,
         values: embedding,
@@ -131,26 +129,30 @@ export const handleUpsertVectors: RequestHandler = async (req, res) => {
           content: doc.content,
           ...doc.metadata,
           userId,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
 
       processedDocs.push({
         id,
         content: doc.content,
-        metadata: doc.metadata
+        metadata: doc.metadata,
       });
     }
 
-    const success = await pineconeService.upsertVectors(indexName, vectors, namespace);
+    const success = await pineconeService.upsertVectors(
+      indexName,
+      vectors,
+      namespace,
+    );
 
     if (success) {
       // Log analytics
-      await ckStorage.logAnalytics('pinecone_vectors_upserted', {
+      await ckStorage.logAnalytics("pinecone_vectors_upserted", {
         userId,
         indexName,
         namespace,
-        vectorCount: vectors.length
+        vectorCount: vectors.length,
       });
     }
 
@@ -159,25 +161,31 @@ export const handleUpsertVectors: RequestHandler = async (req, res) => {
       indexName,
       namespace,
       vectorsUpserted: vectors.length,
-      documents: processedDocs
+      documents: processedDocs,
     });
-
   } catch (error) {
-    console.error('Upsert Vectors Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to upsert vectors',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Upsert Vectors Error:", error);
+    res.status(500).json({
+      error: "Failed to upsert vectors",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 export const handleQueryVectors: RequestHandler = async (req, res) => {
   try {
-    const { indexName, query, topK = 10, namespace, filter, userId }: QueryRequest = req.body;
+    const {
+      indexName,
+      query,
+      topK = 10,
+      namespace,
+      filter,
+      userId,
+    }: QueryRequest = req.body;
 
     if (!indexName || !query || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: indexName, query, userId' 
+      return res.status(400).json({
+        error: "Missing required fields: indexName, query, userId",
       });
     }
 
@@ -185,65 +193,73 @@ export const handleQueryVectors: RequestHandler = async (req, res) => {
     const queryVector = await pineconeService.embedText(query);
 
     // Query Pinecone
-    const results = await pineconeService.queryVectors(indexName, {
-      vector: queryVector,
-      topK,
-      includeMetadata: true,
-      includeValues: false,
-      filter
-    }, namespace);
+    const results = await pineconeService.queryVectors(
+      indexName,
+      {
+        vector: queryVector,
+        topK,
+        includeMetadata: true,
+        includeValues: false,
+        filter,
+      },
+      namespace,
+    );
 
     // Log analytics
-    await ckStorage.logAnalytics('pinecone_query', {
+    await ckStorage.logAnalytics("pinecone_query", {
       userId,
       indexName,
       namespace,
       query,
       resultCount: results.matches.length,
-      topK
+      topK,
     });
 
     res.json({
       query,
       indexName,
       namespace,
-      results: results.matches.map(match => ({
+      results: results.matches.map((match) => ({
         id: match.id,
         score: match.score,
-        content: match.metadata?.content || '',
-        metadata: match.metadata
+        content: match.metadata?.content || "",
+        metadata: match.metadata,
       })),
-      totalResults: results.matches.length
+      totalResults: results.matches.length,
     });
-
   } catch (error) {
-    console.error('Query Vectors Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to query vectors',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Query Vectors Error:", error);
+    res.status(500).json({
+      error: "Failed to query vectors",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 export const handleDeleteVectors: RequestHandler = async (req, res) => {
   try {
-    const { indexName, ids, namespace, userId }: DeleteVectorsRequest = req.body;
+    const { indexName, ids, namespace, userId }: DeleteVectorsRequest =
+      req.body;
 
     if (!indexName || !ids || !Array.isArray(ids) || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: indexName, ids (array), userId' 
+      return res.status(400).json({
+        error: "Missing required fields: indexName, ids (array), userId",
       });
     }
 
-    const success = await pineconeService.deleteVectors(indexName, ids, namespace);
+    const success = await pineconeService.deleteVectors(
+      indexName,
+      ids,
+      namespace,
+    );
 
     if (success) {
       // Log analytics
-      await ckStorage.logAnalytics('pinecone_vectors_deleted', {
+      await ckStorage.logAnalytics("pinecone_vectors_deleted", {
         userId,
         indexName,
         namespace,
-        vectorCount: ids.length
+        vectorCount: ids.length,
       });
     }
 
@@ -251,14 +267,13 @@ export const handleDeleteVectors: RequestHandler = async (req, res) => {
       success,
       indexName,
       namespace,
-      deletedCount: ids.length
+      deletedCount: ids.length,
     });
-
   } catch (error) {
-    console.error('Delete Vectors Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to delete vectors',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Delete Vectors Error:", error);
+    res.status(500).json({
+      error: "Failed to delete vectors",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -269,8 +284,8 @@ export const handleGetIndexStats: RequestHandler = async (req, res) => {
     const { userId } = req.query;
 
     if (!indexName || !userId) {
-      return res.status(400).json({ 
-        error: 'Index name and user ID required' 
+      return res.status(400).json({
+        error: "Index name and user ID required",
       });
     }
 
@@ -278,13 +293,12 @@ export const handleGetIndexStats: RequestHandler = async (req, res) => {
 
     res.json({
       indexName,
-      stats
+      stats,
     });
-
   } catch (error) {
-    console.error('Get Index Stats Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to get index statistics' 
+    console.error("Get Index Stats Error:", error);
+    res.status(500).json({
+      error: "Failed to get index statistics",
     });
   }
 };
@@ -295,8 +309,8 @@ export const handleDeleteIndex: RequestHandler = async (req, res) => {
     const { userId } = req.body;
 
     if (!indexName || !userId) {
-      return res.status(400).json({ 
-        error: 'Index name and user ID required' 
+      return res.status(400).json({
+        error: "Index name and user ID required",
       });
     }
 
@@ -304,22 +318,21 @@ export const handleDeleteIndex: RequestHandler = async (req, res) => {
 
     if (success) {
       // Log analytics
-      await ckStorage.logAnalytics('pinecone_index_deleted', {
+      await ckStorage.logAnalytics("pinecone_index_deleted", {
         userId,
-        indexName
+        indexName,
       });
     }
 
     res.json({
       success,
-      indexName
+      indexName,
     });
-
   } catch (error) {
-    console.error('Delete Index Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to delete index',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Delete Index Error:", error);
+    res.status(500).json({
+      error: "Failed to delete index",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -329,8 +342,8 @@ export const handleSearchKnowledge: RequestHandler = async (req, res) => {
     const { query, userId, limit = 20 } = req.body;
 
     if (!query || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: query, userId' 
+      return res.status(400).json({
+        error: "Missing required fields: query, userId",
       });
     }
 
@@ -344,15 +357,17 @@ export const handleSearchKnowledge: RequestHandler = async (req, res) => {
         const results = await pineconeService.queryVectors(index.name, {
           vector: queryVector,
           topK: Math.ceil(limit / userIndexes.length),
-          includeMetadata: true
+          includeMetadata: true,
         });
 
-        allResults.push(...results.matches.map(match => ({
-          ...match,
-          indexName: index.name,
-          content: match.metadata?.content || '',
-          title: match.metadata?.title || `Document ${match.id}`
-        })));
+        allResults.push(
+          ...results.matches.map((match) => ({
+            ...match,
+            indexName: index.name,
+            content: match.metadata?.content || "",
+            title: match.metadata?.title || `Document ${match.id}`,
+          })),
+        );
       } catch (error) {
         console.error(`Failed to search index ${index.name}:`, error);
       }
@@ -364,25 +379,24 @@ export const handleSearchKnowledge: RequestHandler = async (req, res) => {
       .slice(0, limit);
 
     // Log analytics
-    await ckStorage.logAnalytics('knowledge_search', {
+    await ckStorage.logAnalytics("knowledge_search", {
       userId,
       query,
       indexCount: userIndexes.length,
-      resultCount: sortedResults.length
+      resultCount: sortedResults.length,
     });
 
     res.json({
       query,
       results: sortedResults,
       indexesSearched: userIndexes.length,
-      totalResults: sortedResults.length
+      totalResults: sortedResults.length,
     });
-
   } catch (error) {
-    console.error('Search Knowledge Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to search knowledge base',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Search Knowledge Error:", error);
+    res.status(500).json({
+      error: "Failed to search knowledge base",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

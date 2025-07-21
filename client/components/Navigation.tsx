@@ -1,6 +1,15 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Crown, Zap, Globe, Database, Calculator, Settings, User, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { Link, useLocation } from "react-router-dom";
+import {
+  Crown,
+  Zap,
+  Globe,
+  Database,
+  Calculator,
+  Settings,
+  User,
+  LogOut,
+} from "lucide-react";
+import { useState } from "react";
 
 interface NavigationProps {
   isAuthenticated?: boolean;
@@ -8,15 +17,34 @@ interface NavigationProps {
   username?: string;
 }
 
-export function Navigation({ isAuthenticated = false, isOwner = false, username = 'User' }: NavigationProps) {
+export function Navigation({
+  isAuthenticated = false,
+  isOwner = false,
+  username = "User",
+}: NavigationProps) {
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const modes = [
-    { path: '/ai', name: 'ChatKing AI', icon: Zap, color: 'text-cyber-blue' },
-    { path: '/web', name: 'ChatKing Web', icon: Globe, color: 'text-neon-green' },
-    { path: '/index', name: 'Pinecone Index', icon: Database, color: 'text-neon-purple' },
-    { path: '/calculator', name: 'Calculator', icon: Calculator, color: 'text-neon-amber' },
+    { path: "/ai", name: "ChatKing AI", icon: Zap, color: "text-cyber-blue" },
+    {
+      path: "/web",
+      name: "ChatKing Web",
+      icon: Globe,
+      color: "text-neon-green",
+    },
+    {
+      path: "/index",
+      name: "Pinecone Index",
+      icon: Database,
+      color: "text-neon-purple",
+    },
+    {
+      path: "/calculator",
+      name: "Calculator",
+      icon: Calculator,
+      color: "text-neon-amber",
+    },
   ];
 
   return (
@@ -41,8 +69,8 @@ export function Navigation({ isAuthenticated = false, isOwner = false, username 
                 to={mode.path}
                 className={`px-4 py-2 rounded-md transition-all duration-300 flex items-center space-x-2 ${
                   location.pathname === mode.path
-                    ? 'bg-cyber-blue/20 text-cyber-blue border-neon'
-                    : 'text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10'
+                    ? "bg-cyber-blue/20 text-cyber-blue border-neon"
+                    : "text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10"
                 }`}
               >
                 <mode.icon className={`w-4 h-4 ${mode.color}`} />
@@ -63,7 +91,9 @@ export function Navigation({ isAuthenticated = false, isOwner = false, username 
                     <Crown className="w-4 h-4 text-neon-amber animate-pulse" />
                   )}
                   <User className="w-4 h-4 text-cyber-blue" />
-                  <span className="text-sm font-medium text-text-primary">{username}</span>
+                  <span className="text-sm font-medium text-text-primary">
+                    {username}
+                  </span>
                 </button>
 
                 {showUserMenu && (
@@ -95,16 +125,10 @@ export function Navigation({ isAuthenticated = false, isOwner = false, username 
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                  className="btn-ghost-cyber text-sm"
-                >
+                <Link to="/login" className="btn-ghost-cyber text-sm">
                   Login
                 </Link>
-                <Link
-                  to="/register"
-                  className="btn-cyber text-sm"
-                >
+                <Link to="/register" className="btn-cyber text-sm">
                   Register
                 </Link>
               </div>
@@ -122,8 +146,8 @@ export function Navigation({ isAuthenticated = false, isOwner = false, username 
               to={mode.path}
               className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 location.pathname === mode.path
-                  ? 'bg-cyber-blue/20 text-cyber-blue'
-                  : 'text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10'
+                  ? "bg-cyber-blue/20 text-cyber-blue"
+                  : "text-text-muted hover:text-cyber-blue hover:bg-cyber-blue/10"
               }`}
             >
               <div className="flex items-center space-x-2">

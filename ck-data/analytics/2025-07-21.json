@@ -9,5 +9,182 @@
       "timestamp": "2025-07-21T19:03:43.023Z"
     },
     "timestamp": "2025-07-21T19:03:43.023Z"
+  },
+  {
+    "id": "15ca08a9-c638-4549-9803-645a8652f8c6",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "8ab9c4e5-c0a5-4dff-86fd-a0e0fa71c070",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 10,
+      "outputTokens": 188,
+      "totalTokens": 198
+    },
+    "timestamp": "2025-07-21T19:18:40.593Z"
+  },
+  {
+    "id": "e5b06847-d936-4b5d-be73-8b916c1b3555",
+    "event": "ai_message",
+    "data": {
+      "userId": "demo-user",
+      "sessionId": "8ab9c4e5-c0a5-4dff-86fd-a0e0fa71c070",
+      "model": "google/gemma-3-27b-it:free",
+      "inputTokens": 199,
+      "outputTokens": 0,
+      "totalTokens": 199
+    },
+    "timestamp": "2025-07-21T19:20:21.174Z"
+  },
+  {
+    "id": "3527fba1-89a3-4f56-8c1d-e42d9cc70dfc",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "3+3",
+      "result": "6",
+      "type": "basic",
+      "success": true
+    },
+    "timestamp": "2025-07-21T19:20:54.895Z"
+  },
+  {
+    "id": "0a9e9b54-4389-4fc6-8850-1f39c691c6d3",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "pi",
+      "result": "3.14159265359",
+      "type": "scientific",
+      "success": true
+    },
+    "timestamp": "2025-07-21T19:21:33.813Z"
+  },
+  {
+    "id": "7d28ec86-4ba0-4ce1-a568-3a0bb4fc50e3",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "7*9",
+      "result": "63",
+      "type": "basic",
+      "success": true
+    },
+    "timestamp": "2025-07-21T19:24:16.321Z"
+  },
+  {
+    "id": "ee8ba976-7ee7-422c-ae13-4791214e3f48",
+    "event": "calculation",
+    "data": {
+      "userId": "demo-user",
+      "expression": "63",
+      "result": "63",
+      "type": "basic",
+      "success": true
+    },
+    "timestamp": "2025-07-21T19:24:17.142Z"
+  },
+  {
+    "id": "46d4de98-3d8e-453a-b644-3acd6d51c7da",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "Number 1 picture",
+      "type": "web",
+      "resultCount": 20,
+      "searchTime": 527,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:24:48.844Z"
+  },
+  {
+    "id": "c28e7068-2f3d-4e10-bd96-211fd3f1c6b6",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "Number 1 picture",
+      "type": "news",
+      "resultCount": 0,
+      "searchTime": 632,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:26:15.953Z"
+  },
+  {
+    "id": "5fd38f5c-07cd-41b9-9092-ca3525c1e595",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "News",
+      "type": "news",
+      "resultCount": 0,
+      "searchTime": 703,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:26:27.704Z"
+  },
+  {
+    "id": "50d28a5a-edb9-4be5-9e00-2e59cbc837e8",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "News",
+      "type": "web",
+      "resultCount": 19,
+      "searchTime": 1095,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:26:38.260Z"
+  },
+  {
+    "id": "3050410c-16a4-48fd-8e9f-53710dd4f93a",
+    "event": "pinecone_query",
+    "data": {
+      "userId": "demo-user",
+      "indexName": "chatking-knowledge",
+      "query": "machine learning",
+      "resultCount": 5,
+      "topK": 10
+    },
+    "timestamp": "2025-07-21T19:27:24.701Z"
+  },
+  {
+    "id": "76c33b98-9004-4952-ba69-35f5b1d042c8",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "Duckduckgo",
+      "type": "web",
+      "resultCount": 20,
+      "searchTime": 607,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:29:16.803Z"
+  },
+  {
+    "id": "94402c4b-9a37-4d55-a301-55f2e5c39c95",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "Duckduckgo",
+      "type": "images",
+      "resultCount": 0,
+      "searchTime": 1041,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:30:13.360Z"
+  },
+  {
+    "id": "16a59aba-db2c-4d7c-a5d7-f546686e9ab1",
+    "event": "web_search",
+    "data": {
+      "userId": "demo-user",
+      "query": "Duckduckgo",
+      "type": "images",
+      "resultCount": 0,
+      "searchTime": 76,
+      "incognito": false
+    },
+    "timestamp": "2025-07-21T19:30:14.967Z"
   }
 ]

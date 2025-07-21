@@ -24,26 +24,25 @@ export const handleRegister: RequestHandler = async (req, res) => {
     const { username, email, password }: RegisterRequest = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'Missing required fields: username, email, password' 
+        error: "Missing required fields: username, email, password",
       });
     }
 
     const result = await authService.register({ username, email, password });
-    
+
     if (result.success) {
       res.status(201).json(result);
     } else {
       res.status(400).json(result);
     }
-
   } catch (error) {
-    console.error('Register Error:', error);
-    res.status(500).json({ 
+    console.error("Register Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Registration failed',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: "Registration failed",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -53,26 +52,25 @@ export const handleLogin: RequestHandler = async (req, res) => {
     const { email, password }: LoginRequest = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'Missing required fields: email, password' 
+        error: "Missing required fields: email, password",
       });
     }
 
     const result = await authService.login({ email, password });
-    
+
     if (result.success) {
       res.json(result);
     } else {
       res.status(401).json(result);
     }
-
   } catch (error) {
-    console.error('Login Error:', error);
-    res.status(500).json({ 
+    console.error("Login Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Login failed',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: "Login failed",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -80,66 +78,69 @@ export const handleLogin: RequestHandler = async (req, res) => {
 export const handleValidateSession: RequestHandler = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader?.replace('Bearer ', '');
+    const token = authHeader?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'No token provided' 
+        error: "No token provided",
       });
     }
 
     const result = await authService.validateSession(token);
-    
+
     if (result.success) {
       res.json(result);
     } else {
       res.status(401).json(result);
     }
-
   } catch (error) {
-    console.error('Session Validation Error:', error);
-    res.status(500).json({ 
+    console.error("Session Validation Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Session validation failed'
+      error: "Session validation failed",
     });
   }
 };
 
 export const handleChangePassword: RequestHandler = async (req, res) => {
   try {
-    const { currentPassword, newPassword, userId }: ChangePasswordRequest = req.body;
+    const { currentPassword, newPassword, userId }: ChangePasswordRequest =
+      req.body;
 
     if (!currentPassword || !newPassword || !userId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'Missing required fields: currentPassword, newPassword, userId' 
+        error: "Missing required fields: currentPassword, newPassword, userId",
       });
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'New password must be at least 6 characters' 
+        error: "New password must be at least 6 characters",
       });
     }
 
-    const success = await authService.changePassword(userId, currentPassword, newPassword);
-    
+    const success = await authService.changePassword(
+      userId,
+      currentPassword,
+      newPassword,
+    );
+
     if (success) {
       res.json({ success: true });
     } else {
-      res.status(400).json({ 
+      res.status(400).json({
         success: false,
-        error: 'Current password is incorrect' 
+        error: "Current password is incorrect",
       });
     }
-
   } catch (error) {
-    console.error('Change Password Error:', error);
-    res.status(500).json({ 
+    console.error("Change Password Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Password change failed'
+      error: "Password change failed",
     });
   }
 };
@@ -150,19 +151,18 @@ export const handleLogout: RequestHandler = async (req, res) => {
 
     if (userId) {
       // Log analytics
-      await ckStorage.logAnalytics('user_logout', {
+      await ckStorage.logAnalytics("user_logout", {
         userId,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
 
     res.json({ success: true });
-
   } catch (error) {
-    console.error('Logout Error:', error);
-    res.status(500).json({ 
+    console.error("Logout Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Logout failed'
+      error: "Logout failed",
     });
   }
 };
@@ -172,18 +172,18 @@ export const handleGetUserProfile: RequestHandler = async (req, res) => {
     const { userId } = req.params;
 
     if (!userId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'User ID required' 
+        error: "User ID required",
       });
     }
 
     const user = await ckStorage.getUser(userId);
-    
+
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'User not found' 
+        error: "User not found",
       });
     }
 
@@ -197,15 +197,14 @@ export const handleGetUserProfile: RequestHandler = async (req, res) => {
         isOwner: user.isOwner,
         createdAt: user.createdAt,
         lastLogin: user.lastLogin,
-        settings: user.settings
-      }
+        settings: user.settings,
+      },
     });
-
   } catch (error) {
-    console.error('Get User Profile Error:', error);
-    res.status(500).json({ 
+    console.error("Get User Profile Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Failed to get user profile'
+      error: "Failed to get user profile",
     });
   }
 };
@@ -216,9 +215,9 @@ export const handleUpdateUserProfile: RequestHandler = async (req, res) => {
     const { username, settings } = req.body;
 
     if (!userId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'User ID required' 
+        error: "User ID required",
       });
     }
 
@@ -227,28 +226,27 @@ export const handleUpdateUserProfile: RequestHandler = async (req, res) => {
     if (settings) updates.settings = settings;
 
     const success = await ckStorage.updateUser(userId, updates);
-    
+
     if (success) {
       // Log analytics
-      await ckStorage.logAnalytics('profile_updated', {
+      await ckStorage.logAnalytics("profile_updated", {
         userId,
         updates: Object.keys(updates),
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       res.json({ success: true });
     } else {
-      res.status(400).json({ 
+      res.status(400).json({
         success: false,
-        error: 'Failed to update profile' 
+        error: "Failed to update profile",
       });
     }
-
   } catch (error) {
-    console.error('Update Profile Error:', error);
-    res.status(500).json({ 
+    console.error("Update Profile Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Profile update failed'
+      error: "Profile update failed",
     });
   }
 };
@@ -260,24 +258,23 @@ export const handleGetSystemStats: RequestHandler = async (req, res) => {
     // Verify user is owner
     const user = await ckStorage.getUser(userId as string);
     if (!user?.isOwner) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        error: 'Access denied' 
+        error: "Access denied",
       });
     }
 
     const stats = await ckStorage.getStorageStats();
-    
+
     res.json({
       success: true,
-      stats
+      stats,
     });
-
   } catch (error) {
-    console.error('Get System Stats Error:', error);
-    res.status(500).json({ 
+    console.error("Get System Stats Error:", error);
+    res.status(500).json({
       success: false,
-      error: 'Failed to get system stats'
+      error: "Failed to get system stats",
     });
   }
 };

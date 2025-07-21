@@ -1,68 +1,85 @@
-import { Link } from 'react-router-dom';
-import { Zap, Globe, Database, Calculator, Crown, Shield, Cpu, Sparkles } from 'lucide-react';
-import { Layout } from '../components/Layout';
+import { Link } from "react-router-dom";
+import {
+  Zap,
+  Globe,
+  Database,
+  Calculator,
+  Crown,
+  Shield,
+  Cpu,
+  Sparkles,
+} from "lucide-react";
+import { Layout } from "../components/Layout";
 
 export default function Index() {
   const modes = [
     {
-      id: 'ai',
-      title: 'ChatKing AI',
-      description: 'Advanced AI chat powered by OpenRouter with access to DeepSeek R1 Free, Gemma 3 27B Free, and more cutting-edge models.',
+      id: "ai",
+      title: "ChatKing AI",
+      description:
+        "Advanced AI chat powered by OpenRouter with access to DeepSeek R1 Free, Gemma 3 27B Free, and more cutting-edge models.",
       icon: Zap,
-      path: '/ai',
-      color: 'cyber-blue',
-      gradient: 'from-cyber-blue to-cyber-blue-dark'
+      path: "/ai",
+      color: "cyber-blue",
+      gradient: "from-cyber-blue to-cyber-blue-dark",
     },
     {
-      id: 'web',
-      title: 'ChatKing Web',
-      description: 'Full BraveSearch-powered browser with real search results, privacy modes, and VPN/proxy integration.',
+      id: "web",
+      title: "ChatKing Web",
+      description:
+        "Full BraveSearch-powered browser with real search results, privacy modes, and VPN/proxy integration.",
       icon: Globe,
-      path: '/web',
-      color: 'neon-green',
-      gradient: 'from-neon-green to-green-400'
+      path: "/web",
+      color: "neon-green",
+      gradient: "from-neon-green to-green-400",
     },
     {
-      id: 'index',
-      title: 'Pinecone Index',
-      description: 'Knowledge indexing and vector search powered by Pinecone for intelligent data retrieval and analysis.',
+      id: "index",
+      title: "Pinecone Index",
+      description:
+        "Knowledge indexing and vector search powered by Pinecone for intelligent data retrieval and analysis.",
       icon: Database,
-      path: '/index',
-      color: 'neon-purple',
-      gradient: 'from-neon-purple to-purple-400'
+      path: "/index",
+      color: "neon-purple",
+      gradient: "from-neon-purple to-purple-400",
     },
     {
-      id: 'calculator',
-      title: 'Calculator',
-      description: 'Scientific calculator with full computation history, advanced math functions, and per-user session tracking.',
+      id: "calculator",
+      title: "Calculator",
+      description:
+        "Scientific calculator with full computation history, advanced math functions, and per-user session tracking.",
       icon: Calculator,
-      path: '/calculator',
-      color: 'neon-amber',
-      gradient: 'from-neon-amber to-yellow-400'
-    }
+      path: "/calculator",
+      color: "neon-amber",
+      gradient: "from-neon-amber to-yellow-400",
+    },
   ];
 
   const features = [
     {
       icon: Shield,
-      title: 'CK-Storage Engine',
-      description: 'Encrypted, file-based storage system for complete data ownership and privacy'
+      title: "CK-Storage Engine",
+      description:
+        "Encrypted, file-based storage system for complete data ownership and privacy",
     },
     {
       icon: Crown,
-      title: 'Owner Dashboard',
-      description: 'Full admin control with golden crown access, API management, and user analytics'
+      title: "Owner Dashboard",
+      description:
+        "Full admin control with golden crown access, API management, and user analytics",
     },
     {
       icon: Cpu,
-      title: 'Real-time Processing',
-      description: 'High-performance backend with instant responses and seamless mode switching'
+      title: "Real-time Processing",
+      description:
+        "High-performance backend with instant responses and seamless mode switching",
     },
     {
       icon: Sparkles,
-      title: 'Cyberpunk UI',
-      description: 'Stunning glassmorphic interface with neon effects and smooth animations'
-    }
+      title: "Cyberpunk UI",
+      description:
+        "Stunning glassmorphic interface with neon effects and smooth animations",
+    },
   ];
 
   return (
@@ -79,20 +96,19 @@ export default function Index() {
                 The Next-Gen All-in-One AI Platform
               </p>
               <p className="text-lg text-cyber-blue mt-4 max-w-3xl mx-auto">
-                Unlimited power, expansion, and control. Built from scratch for the future.
+                Unlimited power, expansion, and control. Built from scratch for
+                the future.
               </p>
             </div>
 
             {/* Mode Selection Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
               {modes.map((mode) => (
-                <Link
-                  key={mode.id}
-                  to={mode.path}
-                  className="mode-card group"
-                >
+                <Link key={mode.id} to={mode.path} className="mode-card group">
                   <div className="text-center">
-                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${mode.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                    <div
+                      className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${mode.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                    >
                       <mode.icon className="w-8 h-8 text-main-bg" />
                     </div>
                     <h3 className="font-orbitron font-bold text-xl mb-2 text-text-primary group-hover:text-glow-cyber transition-all">
@@ -128,7 +144,8 @@ export default function Index() {
                 Platform Features
               </h2>
               <p className="text-text-muted text-lg max-w-3xl mx-auto">
-                Built for unlimited expansion with complete ownership and control
+                Built for unlimited expansion with complete ownership and
+                control
               </p>
             </div>
 
@@ -160,17 +177,23 @@ export default function Index() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="w-3 h-3 bg-neon-green rounded-full mx-auto mb-2 animate-pulse"></div>
-                  <p className="text-sm font-medium text-text-primary">OpenRouter AI</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    OpenRouter AI
+                  </p>
                   <p className="text-xs text-neon-green">Connected</p>
                 </div>
                 <div className="text-center">
                   <div className="w-3 h-3 bg-neon-green rounded-full mx-auto mb-2 animate-pulse"></div>
-                  <p className="text-sm font-medium text-text-primary">BraveSearch</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    BraveSearch
+                  </p>
                   <p className="text-xs text-neon-green">Active</p>
                 </div>
                 <div className="text-center">
                   <div className="w-3 h-3 bg-neon-green rounded-full mx-auto mb-2 animate-pulse"></div>
-                  <p className="text-sm font-medium text-text-primary">Pinecone Index</p>
+                  <p className="text-sm font-medium text-text-primary">
+                    Pinecone Index
+                  </p>
                   <p className="text-xs text-neon-green">Online</p>
                 </div>
               </div>
