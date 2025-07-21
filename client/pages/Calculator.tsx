@@ -34,7 +34,7 @@ export default function Calculator() {
                 <span className="text-text-primary">Calculation History</span>
               </div>
               <div className="flex items-center space-x-3 text-left">
-                <Function className="w-5 h-5 text-neon-amber" />
+                <Sigma className="w-5 h-5 text-neon-amber" />
                 <span className="text-text-primary">Scientific Functions</span>
               </div>
               <div className="flex items-center space-x-3 text-left">
