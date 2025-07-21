@@ -33,12 +33,14 @@ export class PineconeService {
   private apiKey: string;
   private baseUrl: string;
   private indexHost: string;
+  private environment: string;
 
   constructor(
-    apiKey: string = "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA",
+    apiKey?: string,
     environment: string = "us-east1-aws",
   ) {
-    this.apiKey = apiKey;
+    this.apiKey = apiKey || process.env.PINECONE_API_KEY || "pcsk_6DAaeQ_NHpbyRENkVBaBwwkrV2Hf9mzDyXKvWdnxGsg2WVmMBZcmv2QjMKR3xKP7EbrtnA";
+    this.environment = environment;
     this.baseUrl = `https://controller.${environment}.pinecone.io`;
     this.indexHost = ""; // Set dynamically per index
   }
@@ -200,9 +202,26 @@ export class PineconeService {
   }
 
   // Text embedding utilities
-  async embedText(text: string): Promise<number[]> {
-    // In a real implementation, this would use an embedding service like OpenAI
-    // For now, return a mock embedding
+  async embedText(text: string, embeddingService?: 'openai' | 'openrouter', apiKey?: string): Promise<number[]> {
+    // Try real embedding services first if API keys are available
+    if (embeddingService === 'openai' && apiKey) {
+      return this.embedTextWithOpenAI(text, apiKey);
+    }
+
+    if (embeddingService === 'openrouter' && apiKey) {
+      return this.embedTextWithOpenRouter(text, apiKey);
+    }
+
+    // Try with environment variables
+    if (process.env.OPENAI_API_KEY) {
+      return this.embedTextWithOpenAI(text, process.env.OPENAI_API_KEY);
+    }
+
+    if (process.env.OPENROUTER_API_KEY) {
+      return this.embedTextWithOpenRouter(text, process.env.OPENROUTER_API_KEY);
+    }
+
+    // Fallback to mock embedding for development
     return this.generateMockEmbedding(text);
   }
 
@@ -295,11 +314,90 @@ export class PineconeService {
   }
 
   validateApiKey(): boolean {
-    return this.apiKey && this.apiKey.startsWith("pcsk_");
+    return this.apiKey && this.apiKey.startsWith("pcsk_") && this.apiKey.length > 20;
   }
 
-  updateApiKey(newKey: string): void {
+  updateApiKey(newKey: string, environment?: string): void {
     this.apiKey = newKey;
+    if (environment) {
+      this.environment = environment;
+      this.baseUrl = `https://controller.${environment}.pinecone.io`;
+    }
+  }
+
+  async testConnection(): Promise<{ connected: boolean; error?: string; indexCount?: number }> {
+    try {
+      if (!this.validateApiKey()) {
+        return { connected: false, error: 'Invalid API key format' };
+      }
+
+      const indexes = await this.listIndexes();
+      return {
+        connected: true,
+        indexCount: indexes.length
+      };
+    } catch (error) {
+      return {
+        connected: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  async embedTextWithOpenAI(text: string, apiKey?: string): Promise<number[]> {
+    if (apiKey) {
+      try {
+        const response = await fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            input: text,
+            model: 'text-embedding-ada-002',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.data[0].embedding;
+        }
+      } catch (error) {
+        console.error('OpenAI embedding failed, falling back to mock:', error);
+      }
+    }
+
+    // Fallback to mock embedding
+    return this.generateMockEmbedding(text);
+  }
+
+  async embedTextWithOpenRouter(text: string, apiKey?: string): Promise<number[]> {
+    if (apiKey) {
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            input: text,
+            model: 'openai/text-embedding-ada-002',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.data[0].embedding;
+        }
+      } catch (error) {
+        console.error('OpenRouter embedding failed, falling back to mock:', error);
+      }
+    }
+
+    // Fallback to mock embedding
+    return this.generateMockEmbedding(text);
   }
 }
 
