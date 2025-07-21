@@ -30,6 +30,9 @@ const App = () => (
           <Route path="/web" element={<Web />} />
           <Route path="/index" element={<PineconeIndex />} />
           <Route path="/calculator" element={<Calculator />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
