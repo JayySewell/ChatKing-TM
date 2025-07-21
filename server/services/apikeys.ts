@@ -59,7 +59,7 @@ export class ApiKeyService {
         usageCount: 0,
       };
 
-      return await ckStorage.storeApiKey(userId, service, apiKeyData);
+      return await ckStorageExtended.storeApiKey(userId, service, apiKeyData);
     } catch (error) {
       console.error("Failed to store API key:", error);
       return false;
