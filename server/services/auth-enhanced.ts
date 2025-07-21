@@ -194,14 +194,7 @@ export class EnhancedAuthService {
     }
   }
 
-  async updateProfile(userId: string, updates: Partial<EnhancedUserProfile>): Promise<boolean> {
-    const profile = await this.getEnhancedProfile(userId);
-    if (!profile) return false;
 
-    const updatedProfile = { ...profile, ...updates };
-    await this.saveEnhancedProfile(updatedProfile);
-    return true;
-  }
 
   async createSession(userId: string, ipAddress: string, userAgent: string): Promise<string> {
     const sessionId = crypto.randomUUID();
