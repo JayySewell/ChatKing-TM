@@ -45,15 +45,6 @@ import {
   handleGetSystemStats,
 } from "./routes/auth";
 import {
-  handleGetApiKeys,
-  handleUpdateApiKey,
-  handleTestApiKey,
-  handleRotateApiKey,
-  handleGetApiKeyUsage,
-  handleGetSystemApiHealth,
-  handleValidateAllApiKeys,
-} from "./routes/apikeys";
-import {
   handleGetSystemMetrics,
   handleGetUsageStats,
   handleGetRecentActivity,
@@ -73,18 +64,40 @@ import {
   sessionMiddleware,
 } from "./routes/oauth";
 import { authService } from "./services/auth";
+import { apiKeyService } from "./services/apikeys";
+import {
+  securityMiddleware,
+  rateLimitMiddleware,
+  bruteForceProtection,
+  honeypotMiddleware,
+  antiScanMiddleware,
+  headerSecurityMiddleware,
+  geoBlockMiddleware,
+} from "./middleware/security";
+import apiKeysRouter from "./routes/apikeys";
+import securityRouter from "./routes/security";
 
 export function createServer() {
   const app = express();
 
-  // Middleware
+  // Security middleware (applied first)
+  app.use(headerSecurityMiddleware);
+  app.use(geoBlockMiddleware);
+  app.use(honeypotMiddleware);
+  app.use(antiScanMiddleware);
+  app.use(securityMiddleware);
+  app.use(rateLimitMiddleware());
+  app.use(bruteForceProtection);
+
+  // Standard middleware
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(sessionMiddleware);
 
-  // Initialize default owner account with new email
+  // Initialize services
   authService.createDefaultOwner();
+  apiKeyService.initializeDefaultKeys();
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -136,7 +149,10 @@ export function createServer() {
   app.put("/api/auth/profile/:userId", handleUpdateUserProfile);
   app.get("/api/auth/system-stats", handleGetSystemStats);
 
-  // API Key Management routes
+  // Enhanced API Key Management routes
+  app.use("/api/keys", apiKeysRouter);
+
+  // Legacy API Key routes (for backward compatibility)
   app.get("/api/keys/:userId", handleGetApiKeys);
   app.put("/api/keys/update", handleUpdateApiKey);
   app.post("/api/keys/test", handleTestApiKey);
@@ -162,6 +178,32 @@ export function createServer() {
   app.post("/auth/apple/callback", handleAppleCallback);
   app.get("/api/auth/oauth-status/:userId", handleOAuthStatus);
   app.post("/api/auth/unlink-oauth", handleUnlinkOAuth);
+
+  // Security and Monitoring routes
+  app.use("/api/security", securityRouter);
+
+  // Health check endpoint
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || "development",
+      version: "2.0.0",
+    });
+  });
+
+  // Catch-all for undefined routes (security measure)
+  app.use("*", (req, res) => {
+    // Log potential scanning attempt
+    console.log(`404 request to: ${req.originalUrl} from ${req.ip}`);
+
+    // Return 404 with minimal information
+    res.status(404).json({
+      error: "Not Found",
+      message: "The requested resource does not exist",
+    });
+  });
 
   return app;
 }
