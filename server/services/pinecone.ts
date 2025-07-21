@@ -1,3 +1,5 @@
+import { productionConfig } from "../config/production";
+
 interface PineconeVector {
   id: string;
   values: number[];
