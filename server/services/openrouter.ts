@@ -30,11 +30,19 @@ interface OpenRouterResponse {
 export class OpenRouterService {
   private apiKey: string;
   private baseUrl = "https://openrouter.ai/api/v1";
+  private rateLimitDelay: number;
+  private lastRequestTime: number;
+  private connectionTested: boolean;
+  private requestCount: number;
+  private errorCount: number;
 
-  constructor(
-    apiKey: string = "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",
-  ) {
-    this.apiKey = apiKey;
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey || process.env.OPENROUTER_API_KEY || "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";
+    this.rateLimitDelay = 500; // 500ms between requests
+    this.lastRequestTime = 0;
+    this.connectionTested = false;
+    this.requestCount = 0;
+    this.errorCount = 0;
   }
 
   async sendMessage(
@@ -54,25 +62,76 @@ export class OpenRouterService {
       stream: options.stream || false,
     };
 
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-        "HTTP-Referer": "https://chatkingai.com",
-        "X-Title": "ChatKing AI Platform",
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `OpenRouter API error: ${response.status} - ${errorText}`,
-      );
+    // Rate limiting
+    const now = Date.now();
+    if (now - this.lastRequestTime < this.rateLimitDelay) {
+      await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay - (now - this.lastRequestTime)));
     }
+    this.lastRequestTime = Date.now();
+    this.requestCount++;
 
-    return response.json();
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "HTTP-Referer": "https://chatkingai.com",
+          "X-Title": "ChatKing AI Platform",
+          "User-Agent": "ChatKing-AI/2.0",
+        },
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(30000), // 30 second timeout
+      });
+
+      if (!response.ok) {
+        this.errorCount++;
+        const errorText = await response.text().catch(() => 'Unknown error');
+
+        console.error(`OpenRouter API Error ${response.status}:`, errorText);
+
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please try again later.');
+        }
+        if (response.status === 401) {
+          throw new Error('Invalid API key. Please check your OpenRouter API key.');
+        }
+        if (response.status === 403) {
+          throw new Error('Access forbidden. Please check your API key permissions.');
+        }
+        if (response.status === 400) {
+          throw new Error(`Invalid request: ${errorText}`);
+        }
+        if (response.status === 503) {
+          throw new Error('OpenRouter service unavailable. Please try again later.');
+        }
+
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+
+      // Log successful request for analytics
+      if (result.usage) {
+        console.log(`OpenRouter: ${result.usage.total_tokens} tokens used for model ${model}`);
+      }
+
+      return result;
+    } catch (error) {
+      this.errorCount++;
+
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout. Please try again.');
+        }
+        if (error.message.includes('fetch')) {
+          throw new Error('Network error. Please check your internet connection.');
+        }
+        throw error;
+      }
+
+      throw new Error('Unknown error occurred while processing your request.');
+    }
   }
 
   async getAvailableModels(): Promise<any[]> {
@@ -145,11 +204,89 @@ export class OpenRouterService {
   }
 
   validateApiKey(): boolean {
-    return this.apiKey && this.apiKey.startsWith("sk-or-v1-");
+    return this.apiKey && this.apiKey.startsWith("sk-or-v1-") && this.apiKey.length > 20;
   }
 
   updateApiKey(newKey: string): void {
     this.apiKey = newKey;
+    this.connectionTested = false;
+    this.requestCount = 0;
+    this.errorCount = 0;
+  }
+
+  async testConnection(): Promise<{ connected: boolean; error?: string; responseTime?: number; model?: string }> {
+    if (!this.validateApiKey()) {
+      return { connected: false, error: 'Invalid API key format' };
+    }
+
+    const startTime = Date.now();
+    try {
+      const testResponse = await this.sendMessage(
+        'microsoft/phi-3-mini-128k-instruct:free',
+        [{ role: 'user', content: 'Hello' }],
+        { maxTokens: 10, temperature: 0.1 }
+      );
+
+      const responseTime = Date.now() - startTime;
+      this.connectionTested = true;
+
+      return {
+        connected: true,
+        responseTime,
+        model: testResponse.model
+      };
+    } catch (error) {
+      return {
+        connected: false,
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  getApiKeyStatus(): { valid: boolean; type: string; tested: boolean } {
+    if (!this.apiKey) {
+      return { valid: false, type: 'missing', tested: false };
+    }
+    if (this.apiKey === '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') {
+      return { valid: false, type: 'default', tested: false };
+    }
+    if (!this.apiKey.startsWith('sk-or-v1-') || this.apiKey.length < 20) {
+      return { valid: false, type: 'invalid', tested: false };
+    }
+    return { valid: true, type: 'valid', tested: this.connectionTested };
+  }
+
+  getUsageStats(): { requests: number; errors: number; successRate: number } {
+    const successRate = this.requestCount > 0 ? (this.requestCount - this.errorCount) / this.requestCount : 0;
+    return {
+      requests: this.requestCount,
+      errors: this.errorCount,
+      successRate: Math.round(successRate * 100) / 100,
+    };
+  }
+
+  async getAccountInfo(): Promise<{ balance?: number; usage?: any; error?: string }> {
+    if (!this.validateApiKey()) {
+      return { error: 'Invalid API key' };
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/key`, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return { balance: data.usage?.balance, usage: data.usage };
+      } else {
+        return { error: 'Failed to get account info' };
+      }
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : 'Unknown error' };
+    }
   }
 }
 
