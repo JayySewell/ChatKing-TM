@@ -169,6 +169,11 @@ export class PineconeService {
     request: PineconeQueryRequest,
     namespace?: string,
   ): Promise<PineconeQueryResponse> {
+    if (!this.validateApiKey()) {
+      console.warn("Invalid Pinecone API key, using mock results");
+      return this.getMockQueryResults(request);
+    }
+
     try {
       const indexUrl = await this.getIndexUrl(indexName);
       const url = `${indexUrl}/query`;
@@ -181,10 +186,25 @@ export class PineconeService {
         }),
       });
 
-      return response;
+      // Ensure proper response structure
+      return {
+        matches: response.matches || [],
+        namespace: response.namespace,
+        usage: response.usage,
+      };
     } catch (error) {
       console.error("Failed to query vectors:", error);
-      // Return mock results for development
+
+      // In production, try to return meaningful error info
+      if (process.env.NODE_ENV === 'production') {
+        return {
+          matches: [],
+          namespace,
+          error: error instanceof Error ? error.message : 'Query failed',
+        };
+      }
+
+      // In development, return mock results
       return this.getMockQueryResults(request);
     }
   }
