@@ -249,9 +249,26 @@ export class PineconeService {
   }
 
   private async getIndexUrl(indexName: string): Promise<string> {
-    // In a real implementation, this would fetch the index host URL
-    // For now, return a mock URL
-    return `https://${indexName}-12345.svc.us-east1-aws.pinecone.io`;
+    if (!this.validateApiKey()) {
+      // Return mock URL for development
+      return `https://${indexName}-12345.svc.${this.environment}.pinecone.io`;
+    }
+
+    try {
+      // Get the actual index details from Pinecone API
+      const indexDetails = await this.makeRequest(`${this.baseUrl}/databases/${indexName}`);
+
+      if (indexDetails && indexDetails.status && indexDetails.status.host) {
+        return `https://${indexDetails.status.host}`;
+      }
+
+      // Fallback to constructed URL
+      return `https://${indexName}.svc.${this.environment}.pinecone.io`;
+    } catch (error) {
+      console.warn(`Failed to get index URL for ${indexName}, using constructed URL:`, error);
+      // Construct URL based on naming convention
+      return `https://${indexName}.svc.${this.environment}.pinecone.io`;
+    }
   }
 
   // Text embedding utilities
