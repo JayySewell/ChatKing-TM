@@ -121,10 +121,10 @@ export class CKStorageExtended {
   }
 
   async unblockIp(ip: string): Promise<void> {
-    const info = await ckStorage.get('security/blocked-ips', ip);
+    const info = await this.get('security/blocked-ips', ip);
     if (info) {
       info.isBlocked = false;
-      return ckStorage.store('security/blocked-ips', ip, info);
+      await this.store('security/blocked-ips', ip, info);
     }
   }
 
