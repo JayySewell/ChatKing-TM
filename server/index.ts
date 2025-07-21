@@ -24,5 +24,12 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // AI Chat API routes
+  app.post("/api/ai/chat", handleChatMessage);
+  app.get("/api/ai/models", handleGetModels);
+  app.get("/api/ai/history/:userId", handleGetChatHistory);
+  app.get("/api/ai/session/:sessionId", handleGetChatSession);
+  app.delete("/api/ai/session/:sessionId", handleDeleteChatSession);
+
   return app;
 }
