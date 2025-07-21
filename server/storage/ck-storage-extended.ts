@@ -135,7 +135,7 @@ export class CKStorageExtended {
 
   async recordLoginAttempt(attempt: LoginAttempt): Promise<void> {
     const id = crypto.randomUUID();
-    return ckStorage.store('security/login-attempts', id, attempt);
+    await this.store('security/login-attempts', id, attempt);
   }
 
   async getLoginAttempts(ip: string, hours: number = 24): Promise<LoginAttempt[]> {
