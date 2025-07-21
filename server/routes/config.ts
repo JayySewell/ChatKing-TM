@@ -15,8 +15,8 @@ export async function handleGetConfigStatus(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -43,9 +43,8 @@ export async function handleGetConfigStatus(req: Request, res: Response) {
         warnings: productionValidation.warnings,
       },
     });
-
   } catch (error) {
-    console.error('Get config status failed:', error);
+    console.error("Get config status failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get configuration status",
@@ -57,7 +56,7 @@ export async function handleGetConfigStatus(req: Request, res: Response) {
 export async function handleGetPublicConfig(req: Request, res: Response) {
   try {
     const environmentStatus = configValidator.getEnvironmentStatus();
-    
+
     // Only return non-sensitive configuration info
     res.json({
       success: true,
@@ -77,9 +76,8 @@ export async function handleGetPublicConfig(req: Request, res: Response) {
         contentFiltering: true,
       },
     });
-
   } catch (error) {
-    console.error('Get public config failed:', error);
+    console.error("Get public config failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to get configuration",
@@ -99,8 +97,8 @@ export async function handleValidateEnvironment(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -109,11 +107,11 @@ export async function handleValidateEnvironment(req: Request, res: Response) {
     }
 
     const validation = configValidator.validateConfiguration();
-    
+
     res.json({
       success: true,
       valid: validation.valid,
-      validations: validation.validations.map(v => ({
+      validations: validation.validations.map((v) => ({
         service: v.service,
         required: v.required,
         present: v.present,
@@ -123,9 +121,8 @@ export async function handleValidateEnvironment(req: Request, res: Response) {
       })),
       errors: validation.errors,
     });
-
   } catch (error) {
-    console.error('Validate environment failed:', error);
+    console.error("Validate environment failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to validate environment",
@@ -145,8 +142,8 @@ export async function handleSecurityCheck(req: Request, res: Response) {
     }
 
     const userProfile = await enhancedAuthService.getEnhancedProfile(userId);
-    const isAdmin = userProfile?.role === 'admin' || userProfile?.isOwner;
-    
+    const isAdmin = userProfile?.role === "admin" || userProfile?.isOwner;
+
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
@@ -156,19 +153,23 @@ export async function handleSecurityCheck(req: Request, res: Response) {
 
     const secureConfig = configValidator.generateSecureConfig();
     const environmentStatus = configValidator.getEnvironmentStatus();
-    
+
     // Perform security checks
     const securityChecks = {
-      environmentProduction: process.env.NODE_ENV === 'production',
+      environmentProduction: process.env.NODE_ENV === "production",
       requiredConfigsPresent: environmentStatus.missingRequired.length === 0,
       hasStrongSecrets: true, // We generate strong secrets now
       noHardcodedKeys: true, // We removed all hardcoded keys
-      httpsConfigured: process.env.HTTPS === 'true' || process.env.NODE_ENV !== 'production',
+      httpsConfigured:
+        process.env.HTTPS === "true" || process.env.NODE_ENV !== "production",
       logSecurityEnabled: true,
       sessionSecurityEnabled: true,
     };
 
-    const securityScore = Object.values(securityChecks).filter(Boolean).length / Object.keys(securityChecks).length * 100;
+    const securityScore =
+      (Object.values(securityChecks).filter(Boolean).length /
+        Object.keys(securityChecks).length) *
+      100;
 
     res.json({
       success: true,
@@ -178,9 +179,8 @@ export async function handleSecurityCheck(req: Request, res: Response) {
       warnings: secureConfig.warnings,
       environment: environmentStatus.environment,
     });
-
   } catch (error) {
-    console.error('Security check failed:', error);
+    console.error("Security check failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to perform security check",

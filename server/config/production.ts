@@ -78,8 +78,9 @@ export const productionConfig: ProductionConfig = {
     fromName: "ChatKing AI",
   },
   security: {
-    jwtSecret: process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex'),
-    encryptionKey: process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex'),
+    jwtSecret: process.env.JWT_SECRET || crypto.randomBytes(32).toString("hex"),
+    encryptionKey:
+      process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString("hex"),
     sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
   },
 };
@@ -102,21 +103,31 @@ export function validateProductionConfig(): {
     errors.push("Pinecone API key is required but not configured");
   }
 
-  if (!productionConfig.security.jwtSecret || productionConfig.security.jwtSecret.length < 32) {
+  if (
+    !productionConfig.security.jwtSecret ||
+    productionConfig.security.jwtSecret.length < 32
+  ) {
     errors.push("JWT secret must be at least 32 characters long");
   }
 
-  if (!productionConfig.security.encryptionKey || productionConfig.security.encryptionKey.length < 32) {
+  if (
+    !productionConfig.security.encryptionKey ||
+    productionConfig.security.encryptionKey.length < 32
+  ) {
     errors.push("Encryption key must be at least 32 characters long");
   }
 
   // Check optional but recommended configurations
   if (!productionConfig.braveSearch.apiKey) {
-    warnings.push("BraveSearch API key not configured - web search may be limited");
+    warnings.push(
+      "BraveSearch API key not configured - web search may be limited",
+    );
   }
 
   if (!productionConfig.googleWorkspace.clientId) {
-    warnings.push("Google Workspace OAuth not configured - single sign-on unavailable");
+    warnings.push(
+      "Google Workspace OAuth not configured - single sign-on unavailable",
+    );
   }
 
   if (!productionConfig.email.apiKey) {
