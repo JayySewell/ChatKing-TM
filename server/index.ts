@@ -73,6 +73,12 @@ import {
   handleLogEvent,
 } from "./routes/feedback";
 import {
+  handleGetConfigStatus,
+  handleGetPublicConfig,
+  handleValidateEnvironment,
+  handleSecurityCheck,
+} from "./routes/config";
+import {
   handleGetSystemMetrics,
   handleGetUsageStats,
   handleGetRecentActivity,
