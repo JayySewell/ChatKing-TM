@@ -1,4 +1,4 @@
-import { ckStorage } from "../storage/ck-storage";
+import { ckStorageExtended } from "../storage/ck-storage-extended";
 import crypto from "crypto";
 
 interface ApiKeyConfig {
